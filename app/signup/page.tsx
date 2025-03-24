@@ -69,113 +69,114 @@ export default function Signup() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <>
             <Navbar />
+            <div className="flex flex-col min-h-screen items-center">
+                <main className="flex-1 container flex items-center justify-center py-12 px-4">
+                    <Card className="w-full max-w-md">
+                        <CardHeader className="space-y-1">
+                            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+                            <CardDescription>Enter your information to create an account</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {error && (
+                                <Alert variant="destructive" className="mb-4">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertDescription>{error}</AlertDescription>
+                                </Alert>
+                            )}
 
-            <main className="flex-1 container flex items-center justify-center py-12">
-                <Card className="w-full max-w-md">
-                    <CardHeader className="space-y-1">
-                        <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-                        <CardDescription>Enter your information to create an account</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {error && (
-                            <Alert variant="destructive" className="mb-4">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertDescription>{error}</AlertDescription>
-                            </Alert>
-                        )}
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input
+                                        id="name"
+                                        placeholder="Your name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        disabled={isLoading}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="name@example.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        disabled={isLoading}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        placeholder="Create a password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        disabled={isLoading}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                                    <Input
+                                        id="confirm-password"
+                                        type="password"
+                                        placeholder="Confirm your password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        disabled={isLoading}
+                                        required
+                                    />
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="terms"
+                                        checked={acceptTerms}
+                                        onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                                        disabled={isLoading}
+                                    />
+                                    <label
+                                        htmlFor="terms"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        I accept the{" "}
+                                        <Link href="/terms" className="text-primary hover:underline">
+                                            terms and conditions
+                                        </Link>
+                                    </label>
+                                </div>
+                                <Button type="submit" className="w-full" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Creating account...
+                                        </>
+                                    ) : (
+                                        "Sign up"
+                                    )}
+                                </Button>
+                            </form>
+                        </CardContent>
+                        <CardFooter className="flex flex-col space-y-4">
+                            <div className="text-sm text-center text-muted-foreground">
+                                Already have an account?{" "}
+                                <Link href="/login" className="text-primary font-medium hover:underline">
+                                    Log in
+                                </Link>
+                            </div>
+                        </CardFooter>
+                    </Card>
+                </main>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    placeholder="Your name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    disabled={isLoading}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="name@example.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    disabled={isLoading}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Create a password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    disabled={isLoading}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="confirm-password">Confirm Password</Label>
-                                <Input
-                                    id="confirm-password"
-                                    type="password"
-                                    placeholder="Confirm your password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    disabled={isLoading}
-                                    required
-                                />
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="terms"
-                                    checked={acceptTerms}
-                                    onCheckedChange={(checked) => setAcceptTerms(checked === true)}
-                                    disabled={isLoading}
-                                />
-                                <label
-                                    htmlFor="terms"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    I accept the{" "}
-                                    <Link href="/terms" className="text-primary hover:underline">
-                                        terms and conditions
-                                    </Link>
-                                </label>
-                            </div>
-                            <Button type="submit" className="w-full" disabled={isLoading}>
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Creating account...
-                                    </>
-                                ) : (
-                                    "Sign up"
-                                )}
-                            </Button>
-                        </form>
-                    </CardContent>
-                    <CardFooter className="flex flex-col space-y-4">
-                        <div className="text-sm text-center text-muted-foreground">
-                            Already have an account?{" "}
-                            <Link href="/login" className="text-primary font-medium hover:underline">
-                                Log in
-                            </Link>
-                        </div>
-                    </CardFooter>
-                </Card>
-            </main>
-
-            <Footer />
-        </div>
+                <Footer />
+            </div>
+        </>
     )
 }
 
