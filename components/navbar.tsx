@@ -1,105 +1,117 @@
+"use client"
+
 import Link from "next/link"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/mode-toggle"
+import { Menu, X } from "lucide-react"
+import { usePathname } from "next/navigation"
 
-export default function Footer() {
+export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const pathname = usePathname()
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
+
+  const isActive = (path: string) => {
+    return pathname === path
+  }
+
   return (
-    <footer className="border-t border-border bg-background">
-      <div className="container mx-auto max-w-6xl px-4 md:px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-bold">BrainSiftAI</h3>
-            <p className="text-sm text-muted-foreground">
-              Transform your content into interactive exams with AI assistance.
-            </p>
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Product</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/features"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link href="/explore" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Explore Exams
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Resources</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/help" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/tutorials"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Tutorials
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-medium mb-4">Company</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} BrainSiftAI. All rights reserved.
-          </p>
-          <div className="flex gap-4 mt-4 md:mt-0">
-            <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              Twitter
+    <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="font-bold text-xl">BrainSiftAI</span>
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              LinkedIn
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6">
+            <Link
+              href="/dashboard"
+              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/dashboard") ? "text-primary" : "text-foreground/70"}`}
+            >
+              Dashboard
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              Facebook
+            <Link
+              href="/explore"
+              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/explore") ? "text-primary" : "text-foreground/70"}`}
+            >
+              Explore
             </Link>
+            <Link
+              href="/pricing"
+              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/pricing") ? "text-primary" : "text-foreground/70"}`}
+            >
+              Pricing
+            </Link>
+          </nav>
+
+          <div className="hidden md:flex items-center gap-4">
+            <ModeToggle />
+            <Button variant="outline" asChild>
+              <Link href="/login">Log In</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/signup">Sign Up</Link>
+            </Button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="flex md:hidden items-center gap-4">
+            <ModeToggle />
+            <Button variant="ghost" size="icon" onClick={toggleMenu}>
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
           </div>
         </div>
       </div>
-    </footer>
+
+      {/* Mobile Navigation */}
+      {isMenuOpen && (
+        <div className="md:hidden border-t border-border">
+          <div className="container mx-auto max-w-6xl px-4 py-4 flex flex-col gap-4">
+            <Link
+              href="/dashboard"
+              className={`text-sm font-medium py-2 transition-colors hover:text-primary ${isActive("/dashboard") ? "text-primary" : "text-foreground/70"}`}
+              onClick={toggleMenu}
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/explore"
+              className={`text-sm font-medium py-2 transition-colors hover:text-primary ${isActive("/explore") ? "text-primary" : "text-foreground/70"}`}
+              onClick={toggleMenu}
+            >
+              Explore
+            </Link>
+            <Link
+              href="/pricing"
+              className={`text-sm font-medium py-2 transition-colors hover:text-primary ${isActive("/pricing") ? "text-primary" : "text-foreground/70"}`}
+              onClick={toggleMenu}
+            >
+              Pricing
+            </Link>
+            <div className="flex flex-col gap-2 pt-2">
+              <Button variant="outline" asChild className="w-full">
+                <Link href="/login" onClick={toggleMenu}>
+                  Log In
+                </Link>
+              </Button>
+              <Button asChild className="w-full">
+                <Link href="/signup" onClick={toggleMenu}>
+                  Sign Up
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
   )
 }
 
