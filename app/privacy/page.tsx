@@ -15,7 +15,7 @@ export default function PrivacyPolicy() {
         <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
           <div className="container mx-auto max-w-4xl text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Privacy Policy</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">Last updated: March 15, 2024</p>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">Last updated: March 24, 2025</p>
           </div>
         </section>
 
@@ -133,9 +133,9 @@ export default function PrivacyPolicy() {
               <p>
                 Email: privacy@brainsiftai.com
                 <br />
-                Address: 123 Innovation Drive, Suite 400, San Francisco, CA 94103
+                Address: Bangkok, Thailand
                 <br />
-                Phone: +1 (555) 123-4567
+                Phone: +66 123 456 789
               </p>
             </div>
 
