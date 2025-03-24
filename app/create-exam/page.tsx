@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,6 +14,7 @@ import { Switch } from "@/components/ui/switch"
 import { FileUp, Upload, Loader2 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { useAuth } from "@/components/auth-context"
 
 export default function CreateExam() {
     const [isUploading, setIsUploading] = useState(false)
@@ -20,6 +22,20 @@ export default function CreateExam() {
     const [fileName, setFileName] = useState<string | null>(null)
     const [textContent, setTextContent] = useState("")
     const [isPrivate, setIsPrivate] = useState(false)
+
+    const { isAuthenticated, isLoading } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push("/login")
+        }
+    }, [isAuthenticated, isLoading, router])
+
+    // If still loading or not authenticated, don't render the page
+    if (isLoading || !isAuthenticated) {
+        return null
+    }
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -41,7 +57,7 @@ export default function CreateExam() {
         setTimeout(() => {
             setIsGenerating(false)
             // In a real app, we would redirect to the exam preview page
-            window.location.href = "/exam-preview/123"
+            router.push("/exam-preview/123")
         }, 3000)
     }
 

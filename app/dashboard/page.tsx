@@ -1,4 +1,9 @@
+"use client"
+
 import type React from "react"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -6,8 +11,23 @@ import { FileUp, Plus, BookOpen, Users } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { useAuth } from "@/components/auth-context"
 
 export default function Dashboard() {
+    const { isAuthenticated, isLoading } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push("/login")
+        }
+    }, [isAuthenticated, isLoading, router])
+
+    // // If still loading or not authenticated, don't render the dashboard
+    // if (isLoading || !isAuthenticated) {
+    //     return null
+    // }
+
     // Mock data for exams
     const myExams = [
         { id: 1, title: "Introduction to Biology", questions: 15, visibility: "public", createdAt: "2023-10-15" },
