@@ -33,9 +33,9 @@ export default function CreateExam() {
     }, [isAuthenticated, isLoading, router])
 
     // If still loading or not authenticated, don't render the page
-    if (isLoading || !isAuthenticated) {
-        return null
-    }
+    // if (isLoading || !isAuthenticated) {
+    //     return null
+    // }
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
