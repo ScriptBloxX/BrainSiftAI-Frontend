@@ -37,7 +37,7 @@ export default function Home() {
               <div className="flex-1">
                 <div className="relative rounded-lg overflow-hidden shadow-2xl border border-border">
                   <img
-                    src="/placeholder.svg?height=600&width=800"
+                    src="/brain.gif"
                     alt="BrainSiftAI Platform Preview"
                     className="w-full h-auto"
                   />
