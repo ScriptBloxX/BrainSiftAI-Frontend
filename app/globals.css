@@ -84,3 +84,17 @@
     color: var(--color-foreground);
   }
 }
+
+.terms h2,.privacy h2{
+  font-size: 2rem;
+}
+.terms p,.privacy p{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+.terms ul,.privacy ul{
+  padding: 1rem;
+}
+.terms ul li,.privacy ul li{
+  list-style: disc;
+}
