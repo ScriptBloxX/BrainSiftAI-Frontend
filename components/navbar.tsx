@@ -123,7 +123,7 @@ export default function Navbar() {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-border">
+        <div className="md:hidden border-t border-border h-screen">
           <div className="container mx-auto max-w-6xl px-4 py-4 flex flex-col gap-4">
             <Link
               href="/dashboard"
