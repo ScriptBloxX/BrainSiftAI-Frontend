@@ -5,7 +5,6 @@ import { ArrowRight, BookOpen, FileText, Users } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision"
-import { ThreeDMarqueeDemo } from "@/components/review"
 
 export default function Home() {
   return (
