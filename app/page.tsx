@@ -13,7 +13,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         {/* Hero Section */}
-          <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
+        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
           <BackgroundBeamsWithCollision>
             <div className="container mx-auto max-w-6xl">
               <div className="flex flex-col md:flex-row items-center gap-12">
@@ -48,7 +48,7 @@ export default function Home() {
               </div>
             </div>
           </BackgroundBeamsWithCollision>
-          </section>
+        </section>
         {/* Features Section */}
         <section className="py-20 px-4 md:px-6">
           <div className="container mx-auto max-w-6xl">
@@ -110,14 +110,15 @@ export default function Home() {
         {/* <ThreeDMarqueeDemo></ThreeDMarqueeDemo> */}
 
         {/* CTA Section */}
-        <section className="py-20 px-4 md:px-6">
-          <div className="container mx-auto max-w-6xl">
+        <section className="py-20 px-4 md:px-6 relative">
+          <div className="container mx-auto max-w-6xl z-10">
+          {/* <ThreeDMarqueeDemo></ThreeDMarqueeDemo> */}
             <div className="bg-primary text-primary-foreground rounded-xl p-8 md:p-12 text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
                 Join thousands of educators and students who are already using BrainSiftAI to create and take exams.
               </p>
-              <Button asChild size="lg" variant="secondary" className="gap-2">
+              <Button asChild size="lg" variant="secondary" className="gap-2 z-20">
                 <Link href="/signup">
                   Create Your First Exam <ArrowRight className="h-4 w-4" />
                 </Link>
