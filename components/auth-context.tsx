@@ -20,7 +20,7 @@ type AuthContextType = {
     user: User | null
     isAuthenticated: boolean
     isLoading: boolean
-    login: (user: Omit<User, "profile" | "role"> & { profile?: Partial<User["profile"]>; role?: User["role"] }) => void
+    login: (user: Omit<User, "profile" | "role" | "plan"> & { profile?: Partial<User["profile"]>; role?: User["role"]; plan?: User["plan"] }) => void
     logout: () => void
     updateProfile: (profile: Partial<User["profile"]>) => void
     updateUser: (userData: Partial<Omit<User, "profile">>) => void
@@ -30,7 +30,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     isAuthenticated: false,
     isLoading: true,
-    login: () => { },
+    login: (user: Omit<User, "profile" | "role" | "plan"> & { profile?: Partial<User["profile"]>; role?: User["role"]; plan?: User["plan"] }) => { },
     logout: () => { },
     updateProfile: () => { },
     updateUser: () => { },
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [])
 
     const login = (
-        userData: Omit<User, "profile" | "role"> & { profile?: Partial<User["profile"]>; role?: User["role"] },
+        userData: Omit<User, "profile" | "role" | "plan"> & { profile?: Partial<User["profile"]>; role?: User["role"]; plan?: User["plan"] },
     ) => {
         // Create a complete user object with default values for missing fields
         const completeUser: User = {
