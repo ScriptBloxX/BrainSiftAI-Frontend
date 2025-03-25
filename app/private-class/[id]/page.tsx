@@ -57,7 +57,7 @@ export default function PrivateClass({ params }: { params: Promise<{ id: string 
     name: "Biology 101",
     description: "Introduction to basic biological concepts and principles",
     createdBy: "John Smith",
-    createdAt: "2023-10-15",
+    createdAt: "2025-3-15",
     members: [
       {
         id: 1,
@@ -89,9 +89,9 @@ export default function PrivateClass({ params }: { params: Promise<{ id: string 
       },
     ],
     exams: [
-      { id: 1, title: "Cell Structure and Function", questions: 15, completions: 3, createdAt: "2023-10-20" },
-      { id: 2, title: "Genetics Basics", questions: 20, completions: 2, createdAt: "2023-11-05" },
-      { id: 3, title: "Evolution and Natural Selection", questions: 18, completions: 1, createdAt: "2023-12-10" },
+      { id: 1, title: "Cell Structure and Function", questions: 15, completions: 3, createdAt: "2025-1-20" },
+      { id: 2, title: "Genetics Basics", questions: 20, completions: 2, createdAt: "2025-2-05" },
+      { id: 3, title: "Evolution and Natural Selection", questions: 18, completions: 1, createdAt: "2025-3-10" },
     ],
   }
 
@@ -101,21 +101,21 @@ export default function PrivateClass({ params }: { params: Promise<{ id: string 
       student: "Sarah Johnson",
       email: "sarah@example.com",
       score: 85,
-      completedAt: "2023-10-25",
+      completedAt: "2025-3-25",
       timeSpent: "18 minutes",
     },
     {
       student: "Michael Brown",
       email: "michael@example.com",
       score: 92,
-      completedAt: "2023-10-24",
+      completedAt: "2025-2-24",
       timeSpent: "15 minutes",
     },
     {
       student: "Emily Davis",
       email: "emily@example.com",
       score: 78,
-      completedAt: "2023-10-26",
+      completedAt: "2025-1-26",
       timeSpent: "22 minutes",
     },
   ]

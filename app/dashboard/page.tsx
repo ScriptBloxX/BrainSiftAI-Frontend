@@ -45,9 +45,9 @@ export default function Dashboard() {
 
     // Mock data for exams
     const myExams = [
-        { id: 1, title: "Introduction to Biology", questions: 15, visibility: "public", createdAt: "2023-10-15" },
-        { id: 2, title: "Advanced Mathematics", questions: 20, visibility: "private", createdAt: "2023-11-02" },
-        { id: 3, title: "World History Overview", questions: 25, visibility: "public", createdAt: "2023-12-10" },
+        { id: 1, title: "Introduction to Biology", questions: 15, visibility: "public", createdAt: "2025-3-15" },
+        { id: 2, title: "Advanced Mathematics", questions: 20, visibility: "private", createdAt: "2025-3-02" },
+        { id: 3, title: "World History Overview", questions: 25, visibility: "public", createdAt: "2025-3-10" },
     ]
 
     // Mock data for classes

@@ -17,7 +17,7 @@ export default function Explore() {
             creator: "John Smith",
             questions: 15,
             completions: 156,
-            createdAt: "2023-10-15",
+            createdAt: "2025-1-15",
             tags: ["Biology", "Science", "Beginner"],
         },
         {
@@ -26,7 +26,7 @@ export default function Explore() {
             creator: "Jane Doe",
             questions: 20,
             completions: 89,
-            createdAt: "2023-11-02",
+            createdAt: "2025-2-02",
             tags: ["Mathematics", "Advanced"],
         },
         {
@@ -35,7 +35,7 @@ export default function Explore() {
             creator: "Robert Johnson",
             questions: 25,
             completions: 210,
-            createdAt: "2023-12-10",
+            createdAt: "2025-2-10",
             tags: ["History", "Global"],
         },
         {
