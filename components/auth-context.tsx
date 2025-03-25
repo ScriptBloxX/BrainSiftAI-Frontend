@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const completeUser: User = {
             ...userData,
             role: userData.role || "user",
+            plan: userData.plan || "free",
             profile: {
                 avatar: "/placeholder.svg?height=200&width=200",
                 bio: "",
