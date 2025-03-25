@@ -8,7 +8,7 @@ import Footer from "@/components/footer"
 
 export default function Pricing() {
   return (
-    <div className="flex flex-col min-h-screen mt-8">
+    <div className="flex flex-col min-h-screen">
       <Navbar />
 
       <main className="flex-1">
