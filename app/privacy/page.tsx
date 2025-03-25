@@ -12,7 +12,7 @@ export default function PrivacyPolicy() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
+        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20 mt-16">
           <div className="container mx-auto max-w-4xl text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Privacy Policy</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">Last updated: March 24, 2025</p>

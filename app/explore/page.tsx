@@ -85,7 +85,7 @@ export default function Explore() {
         <div className="flex flex-col min-h-screen">
             <Navbar />
 
-            <main className="flex-1 container mx-auto max-w-6xl px-4 md:px-6 py-8">
+            <main className="flex-1 container mx-auto max-w-6xl px-4 md:px-6 py-8 mt-16">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Explore Exams</h1>

@@ -13,7 +13,7 @@ export default function AboutUs() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
+        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20 mt-16">
           <div className="container mx-auto max-w-6xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div>

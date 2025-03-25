@@ -73,7 +73,7 @@ export default function ResetPassword({ params }: { params: Promise<{ token: str
         <Navbar />
         <div className="flex flex-col min-h-screen items-center">
 
-          <main className="flex-1 container flex items-center justify-center py-12">
+          <main className="flex-1 container flex items-center justify-center py-12 mt-16">
             <Card className="w-full max-w-md">
               <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold">Invalid or expired link</CardTitle>

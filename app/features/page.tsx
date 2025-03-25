@@ -13,7 +13,7 @@ export default function Features() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
+        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20 mt-16">
           <div className="container mx-auto max-w-6xl text-center">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Powerful Features for Exam Creation</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
