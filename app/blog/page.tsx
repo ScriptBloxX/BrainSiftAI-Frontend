@@ -41,7 +41,7 @@ export default function Blog() {
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>March 20, 2024</span>
+                    <span>March 20, 2025</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
@@ -92,7 +92,7 @@ export default function Blog() {
               <BlogCard
                 title="Creating Effective Multiple-Choice Questions: Best Practices"
                 excerpt="Learn how to craft multiple-choice questions that accurately assess understanding and critical thinking skills."
-                date="March 15, 2024"
+                date="March 15, 2025"
                 author="Michael Chen"
                 category="Assessment"
                 readTime="6 min read"
@@ -102,7 +102,7 @@ export default function Blog() {
               <BlogCard
                 title="How AI is Personalizing Learning Experiences"
                 excerpt="Discover how artificial intelligence is enabling truly personalized learning paths for students of all ages."
-                date="March 10, 2024"
+                date="March 10, 2025"
                 author="Emily Rodriguez"
                 category="AI Technology"
                 readTime="5 min read"
@@ -112,7 +112,7 @@ export default function Blog() {
               <BlogCard
                 title="The Science of Knowledge Retention: Spaced Repetition"
                 excerpt="Explore the research behind spaced repetition and how it can be implemented in your teaching strategy."
-                date="March 5, 2024"
+                date="March 5, 2025"
                 author="Dr. James Wilson"
                 category="Education"
                 readTime="7 min read"
@@ -122,7 +122,7 @@ export default function Blog() {
               <BlogCard
                 title="Using AI to Identify Knowledge Gaps in Students"
                 excerpt="How intelligent assessment tools can help identify and address knowledge gaps more effectively."
-                date="February 28, 2024"
+                date="February 28, 2025"
                 author="Aisha Patel"
                 category="Assessment"
                 readTime="4 min read"
@@ -132,7 +132,7 @@ export default function Blog() {
               <BlogCard
                 title="The Ethics of AI in Educational Assessment"
                 excerpt="Examining the ethical considerations and best practices for using AI in student assessment."
-                date="February 20, 2024"
+                date="February 20, 2025"
                 author="Dr. Sarah Johnson"
                 category="AI Technology"
                 readTime="9 min read"
@@ -142,7 +142,7 @@ export default function Blog() {
               <BlogCard
                 title="Designing Assessments for Different Learning Styles"
                 excerpt="How to create inclusive assessments that accommodate visual, auditory, and kinesthetic learners."
-                date="February 15, 2024"
+                date="February 15, 2025"
                 author="Maria Gonzalez"
                 category="Education"
                 readTime="6 min read"
