@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -37,7 +39,7 @@ import { useAuth } from "@/components/auth-context"
 import { useTheme } from "next-themes"
 
 export default function Settings() {
-    const { user, isAuthenticated, isLoading, logout } = useAuth()
+    const { user, isAuthenticated, isLoading, logout, updateUser, updateProfile } = useAuth()
     const { theme, setTheme } = useTheme()
     const router = useRouter()
 
@@ -64,6 +66,11 @@ export default function Settings() {
     const [classInvitations, setClassInvitations] = useState(true)
     const [marketingEmails, setMarketingEmails] = useState(false)
 
+    // Privacy settings
+    const [publicProfile, setPublicProfile] = useState(false)
+    const [showCompletions, setShowCompletions] = useState(false)
+    const [shareActivity, setShareActivity] = useState(false)
+
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
             router.push("/login")
@@ -73,6 +80,9 @@ export default function Settings() {
         if (user) {
             setName(user.name || "")
             setEmail(user.email || "")
+            setBio(user.profile.bio || "")
+            setLanguage(user.profile.language || "english")
+            setTimezone(user.profile.timezone || "utc")
         }
     }, [isAuthenticated, isLoading, router, user])
 
@@ -80,7 +90,6 @@ export default function Settings() {
     if (isLoading || !isAuthenticated) {
         return null
     }
-
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -112,6 +121,11 @@ export default function Settings() {
             // formData.append('avatar', avatarFile)
             // const response = await fetch('/api/upload-avatar', { method: 'POST', body: formData })
 
+            // Update the avatar in the user profile
+            updateProfile({
+                avatar: avatarPreview ?? undefined,
+            })
+
             setSuccessMessage("Profile picture updated successfully")
 
             // Reset the file input
@@ -138,7 +152,12 @@ export default function Settings() {
             // Simulate API call delay
             await new Promise((resolve) => setTimeout(resolve, 1000))
 
-            // In a real app, you would make an API call to update the profile
+            // Update user profile in context
+            updateUser({ name, email })
+            updateProfile({
+                bio,
+            })
+
             setSuccessMessage("Profile updated successfully")
         } catch (error) {
             setErrorMessage("Failed to update profile. Please try again.")
@@ -247,7 +266,7 @@ export default function Settings() {
                             <CardContent className="pt-6">
                                 <div className="flex flex-col items-center">
                                     <Avatar className="h-24 w-24 mb-4">
-                                        <AvatarImage src="/placeholder.svg?height=96&width=96" alt={user?.name} />
+                                        <AvatarImage src={user?.profile.avatar || "/placeholder.svg?height=96&width=96"} alt={user?.name} />
                                         <AvatarFallback className="text-2xl">{user?.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                     <h2 className="text-xl font-bold">{user?.name}</h2>
@@ -302,7 +321,10 @@ export default function Settings() {
                                                     {avatarPreview ? (
                                                         <AvatarImage src={avatarPreview} alt={user?.name} />
                                                     ) : (
-                                                        <AvatarImage src="/placeholder.svg?height=64&width=64" alt={user?.name} />
+                                                        <AvatarImage
+                                                            src={user?.profile.avatar || "/placeholder.svg?height=64&width=64"}
+                                                            alt={user?.name}
+                                                        />
                                                     )}
                                                     <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
                                                 </Avatar>

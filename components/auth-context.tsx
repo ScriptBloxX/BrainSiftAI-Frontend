@@ -5,14 +5,24 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 type User = {
     email: string
     name: string
+    role: "user" | "admin" | "instructor"
+    profile: {
+        avatar?: string
+        bio?: string
+        joinedAt: string
+        language?: string
+        timezone?: string
+    }
 }
 
 type AuthContextType = {
     user: User | null
     isAuthenticated: boolean
     isLoading: boolean
-    login: (user: User) => void
+    login: (user: Omit<User, "profile" | "role"> & { profile?: Partial<User["profile"]>; role?: User["role"] }) => void
     logout: () => void
+    updateProfile: (profile: Partial<User["profile"]>) => void
+    updateUser: (userData: Partial<Omit<User, "profile">>) => void
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +31,8 @@ const AuthContext = createContext<AuthContextType>({
     isLoading: true,
     login: () => { },
     logout: () => { },
+    updateProfile: () => { },
+    updateUser: () => { },
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -41,9 +53,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false)
     }, [])
 
-    const login = (userData: User) => {
-        setUser(userData)
-        localStorage.setItem("user", JSON.stringify(userData))
+    const login = (
+        userData: Omit<User, "profile" | "role"> & { profile?: Partial<User["profile"]>; role?: User["role"] },
+    ) => {
+        // Create a complete user object with default values for missing fields
+        const completeUser: User = {
+            ...userData,
+            role: userData.role || "user",
+            profile: {
+                avatar: "/placeholder.svg?height=200&width=200",
+                bio: "",
+                joinedAt: new Date().toISOString(),
+                language: "english",
+                timezone: "utc",
+                ...userData.profile,
+            },
+        }
+
+        setUser(completeUser)
+        localStorage.setItem("user", JSON.stringify(completeUser))
+    }
+
+    const updateProfile = (profileData: Partial<User["profile"]>) => {
+        if (!user) return
+
+        const updatedUser = {
+            ...user,
+            profile: {
+                ...user.profile,
+                ...profileData,
+            },
+        }
+
+        setUser(updatedUser)
+        localStorage.setItem("user", JSON.stringify(updatedUser))
+    }
+
+    const updateUser = (userData: Partial<Omit<User, "profile">>) => {
+        if (!user) return
+
+        const updatedUser = {
+            ...user,
+            ...userData,
+        }
+
+        setUser(updatedUser)
+        localStorage.setItem("user", JSON.stringify(updatedUser))
     }
 
     const logout = () => {
@@ -59,6 +114,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isLoading,
                 login,
                 logout,
+                updateProfile,
+                updateUser,
             }}
         >
             {children}
