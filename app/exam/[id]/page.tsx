@@ -171,7 +171,7 @@ export default function TakeExam({ params }: Props) {
                                 </div>
                             </div>
                         </CardContent>
-                        <CardFooter className="flex flex-col sm:flex-row gap-4">
+                        <CardFooter className="flex flex-col sm:flex-row gap-4 flex-wrap">
                             <Button variant="outline" className="w-full" onClick={() => setShowSummary(!showSummary)}>
                                 {showSummary ? "Hide Content Summary" : "View Content Summary"}
                             </Button>
@@ -234,6 +234,7 @@ export default function TakeExam({ params }: Props) {
                     </CardHeader>
                     <CardContent>
                         <RadioGroup
+                            key={currentQuestion}
                             value={answers[currentQuestion] !== undefined ? `option-${answers[currentQuestion]}` : undefined}
                             onValueChange={handleAnswerChange}
                         >
