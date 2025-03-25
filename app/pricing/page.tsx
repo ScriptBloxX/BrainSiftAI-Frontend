@@ -42,8 +42,8 @@ export default function Pricing() {
                     <PricingFeature>Up to 20 questions per exam</PricingFeature>
                     <PricingFeature>Basic content summaries</PricingFeature>
                     <PricingFeature>Community support</PricingFeature>
-                    <PricingFeatureDemotion>Private exams</PricingFeatureDemotion>
-                    <PricingFeatureDemotion>Create classes</PricingFeatureDemotion>
+                    {/* <PricingFeatureDemotion>Private exams</PricingFeatureDemotion>
+                    <PricingFeatureDemotion>Create classes</PricingFeatureDemotion> */}
                   </ul>
                 </CardContent>
                 <CardFooter>
