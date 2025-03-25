@@ -11,7 +11,7 @@ import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { MockSummary } from "@/components/mock/mocksummary"
 import { useAuth } from "@/components/auth-context"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 
 type Props = {
     params: Promise<{ id: string }>
