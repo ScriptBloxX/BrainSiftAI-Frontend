@@ -5,7 +5,8 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 type User = {
     email: string
     name: string
-    role: "user" | "admin" | "instructor"
+    role: "user" | "admin" | "sadmin"
+    plan: "free" | "pro" | "enterprise"
     profile: {
         avatar?: string
         bio?: string
