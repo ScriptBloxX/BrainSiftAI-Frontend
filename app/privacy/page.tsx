@@ -22,7 +22,7 @@ export default function PrivacyPolicy() {
         {/* Privacy Policy Content */}
         <section className="py-20 px-4 md:px-6">
           <div className="container mx-auto max-w-4xl">
-            <div className="prose prose-lg max-w-none">
+            <div className="privacy prose prose-lg max-w-none">
               <h2>Introduction</h2>
               <p>
                 At BrainSiftAI, we take your privacy seriously. This Privacy Policy explains how we collect, use,
