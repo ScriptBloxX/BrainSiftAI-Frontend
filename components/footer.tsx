@@ -74,8 +74,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/security" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Data Protection
+                </Link>
+              </li>
+              <li>
                 <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Terms of Service
                 </Link>
               </li>
             </ul>
