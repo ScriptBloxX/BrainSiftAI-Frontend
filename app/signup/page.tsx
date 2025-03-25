@@ -72,7 +72,7 @@ export default function Signup() {
         <>
             <Navbar />
             <div className="flex flex-col min-h-screen items-center">
-                <main className="flex-1 container flex items-center justify-center py-12 px-4">
+                <main className="flex-1 container flex items-center justify-center py-12 px-4 mt-8">
                     <Card className="w-full max-w-md">
                         <CardHeader className="space-y-1">
                             <CardTitle className="text-2xl font-bold">Create an account</CardTitle>

@@ -8,7 +8,7 @@ import Footer from "@/components/footer"
 
 export default function Pricing() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen mt-8">
       <Navbar />
 
       <main className="flex-1">
@@ -63,7 +63,7 @@ export default function Pricing() {
                 <CardHeader className="pb-8">
                   <CardTitle className="text-2xl">Pro</CardTitle>
                   <div className="mt-4 flex items-baseline text-5xl font-extrabold">
-                    $19
+                    $10
                     <span className="ml-1 text-xl font-medium text-muted-foreground">/month</span>
                   </div>
                   <CardDescription className="mt-4">For educators and content creators</CardDescription>
