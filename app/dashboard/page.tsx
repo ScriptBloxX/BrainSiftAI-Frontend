@@ -38,10 +38,10 @@ export default function Dashboard() {
         }
     }, [isAuthenticated, isLoading, router])
 
-    // // If still loading or not authenticated, don't render the dashboard
-    // if (isLoading || !isAuthenticated) {
-    //     return null
-    // }
+    // If still loading or not authenticated, don't render the dashboard
+    if (isLoading || !isAuthenticated) {
+        return null
+    }
 
     // Mock data for exams
     const myExams = [

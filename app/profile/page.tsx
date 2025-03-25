@@ -16,13 +16,8 @@ import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 
 export default function Profile() {
-    // const { user, isAuthenticated, isLoading } = useAuth;
+    const { user, isAuthenticated, isLoading } = useAuth();
     // Mock data for test
-    const { user, isAuthenticated, isLoading } = {
-        user: { name: "John Doe", email: "john.doe@example.com" },
-        isAuthenticated: true,
-        isLoading: false,
-    }
     const router = useRouter()
 
     useEffect(() => {

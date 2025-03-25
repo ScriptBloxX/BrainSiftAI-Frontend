@@ -37,9 +37,9 @@ export default function CreateClass() {
   }, [isAuthenticated, isLoading, router])
 
   // If still loading or not authenticated, don't render the page
-//   if (isLoading || !isAuthenticated) {
-//     return null
-//   }
+  if (isLoading || !isAuthenticated) {
+    return null
+  }
 
   const handleAddEmail = () => {
     if (currentEmail && !emails.includes(currentEmail) && isValidEmail(currentEmail)) {
