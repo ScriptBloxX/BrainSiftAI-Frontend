@@ -9,7 +9,9 @@ import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
-import {MockSummary}  from "@/components/mock/mocksummary"
+import { MockSummary } from "@/components/mock/mocksummary"
+import { useAuth } from "@/components/auth-context"
+import { useRouter } from "next/router"
 
 type Props = {
     params: Promise<{ id: string }>
@@ -21,6 +23,21 @@ export default function TakeExam({ params }: Props) {
     const [answers, setAnswers] = useState<Record<number, number>>({})
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [showSummary, setShowSummary] = useState(false)
+
+    const { isAuthenticated, isLoading } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push("/login")
+        }
+    }, [isAuthenticated, isLoading, router])
+
+    // If still loading or not authenticated, don't render the dashboard
+    if (isLoading || !isAuthenticated) {
+        return null
+    }
+
 
     // useEffect(() => {
     //     params.then(({ id }) => setExamId(id))
