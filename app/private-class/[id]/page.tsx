@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,12 +13,23 @@ import { BookOpen, Mail, Plus, MoreHorizontal } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
-export default function PrivateClass({ params }: { params: { id: string } }) {
+export default function PrivateClass({ params }: { params: Promise<{ id: string }> }) {
   const [inviteEmail, setInviteEmail] = useState("")
+  const [classId, setClassId] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchParams() {
+      const resolvedParams = await params
+      setClassId(resolvedParams.id)
+    }
+    fetchParams()
+  }, [params])
+
+  if (!classId) return <div>Loading...</div>
 
   // Mock class data
   const classData = {
-    id: params.id,
+    id: classId,
     name: "Biology 101",
     description: "Introduction to basic biological concepts and principles",
     createdBy: "John Smith",
@@ -79,7 +90,7 @@ export default function PrivateClass({ params }: { params: { id: string } }) {
           </div>
           <div className="flex gap-4">
             <Button variant="outline" asChild>
-              <a href={`/create-exam?class=${params.id}`}>
+              <a href={`/create-exam?class=${classId}`}>
                 <Plus className="mr-2 h-4 w-4" /> Add Exam
               </a>
             </Button>
@@ -108,7 +119,7 @@ export default function PrivateClass({ params }: { params: { id: string } }) {
                           This class doesn't have any exams yet. Create your first exam to get started.
                         </p>
                         <Button asChild>
-                          <a href={`/create-exam?class=${params.id}`}>
+                          <a href={`/create-exam?class=${classId}`}>
                             <Plus className="mr-2 h-4 w-4" /> Create Exam
                           </a>
                         </Button>
@@ -235,11 +246,11 @@ export default function PrivateClass({ params }: { params: { id: string } }) {
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">
-                  <Input readOnly value={`https://brainsiftai.com/join-class/${params.id}`} />
+                  <Input readOnly value={`https://brainsiftai.com/join-class/${classId}`} />
                   <Button
                     variant="outline"
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://brainsiftai.com/join-class/${params.id}`)
+                      navigator.clipboard.writeText(`https://brainsiftai.com/join-class/${classId}`)
                       alert("Link copied to clipboard!")
                     }}
                   >

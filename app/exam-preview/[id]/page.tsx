@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -12,9 +12,22 @@ import { Copy, Share2, Edit, Check } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
-export default function ExamPreview({ params }: { params: { id: string } }) {
+type Props = {
+  params: Promise<{ id: string }>
+}
+
+export default function ExamPreview({ params }: Props) {
+    const [examId, setExamId] = useState<string | null>(null)
     const [isPrivate, setIsPrivate] = useState(false)
     const [copied, setCopied] = useState(false)
+
+    useEffect(() => {
+        params.then(({ id }) => setExamId(id))
+    }, [params])
+
+    if (!examId) {
+        return <div>Loading...</div>
+    }
 
     // Mock exam data
     const examData = {
@@ -56,7 +69,7 @@ export default function ExamPreview({ params }: { params: { id: string } }) {
     }
 
     const copyShareLink = () => {
-        const shareLink = `https://brainsiftai.com/exam/${params.id}`
+        const shareLink = `https://brainsiftai.com/exam/${examId}`
         navigator.clipboard.writeText(shareLink)
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
@@ -85,7 +98,7 @@ export default function ExamPreview({ params }: { params: { id: string } }) {
                             )}
                         </Button>
                         <Button asChild>
-                            <a href={`/exam/${params.id}`}>Take Exam</a>
+                            <a href={`/exam/${examId}`}>Take Exam</a>
                         </Button>
                     </div>
                 </div>
@@ -182,4 +195,3 @@ export default function ExamPreview({ params }: { params: { id: string } }) {
         </div>
     )
 }
-

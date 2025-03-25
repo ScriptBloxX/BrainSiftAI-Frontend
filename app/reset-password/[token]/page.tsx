@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -14,14 +14,22 @@ import { Loader2, AlertCircle } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
-export default function ResetPassword({ params }: { params: { token: string } }) {
+export default function ResetPassword({ params }: { params: Promise<{ token: string }> }) {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [token, setToken] = useState<string | null>(null)
 
   const router = useRouter()
-  const { token } = params
+
+  useEffect(() => {
+    async function fetchParams() {
+      const resolvedParams = await params
+      setToken(resolvedParams.token)
+    }
+    fetchParams()
+  }, [params])
 
   // In a real app, you would validate the token here
   const isValidToken = token && token.length > 10

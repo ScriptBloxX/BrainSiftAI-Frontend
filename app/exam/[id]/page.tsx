@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -10,11 +10,24 @@ import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
-export default function TakeExam({ params }: { params: { id: string } }) {
+type Props = {
+    params: Promise<{ id: string }>
+}
+
+export default function TakeExam({ params }: Props) {
+    // const [examId, setExamId] = useState<string | null>(null)
     const [currentQuestion, setCurrentQuestion] = useState(0)
     const [answers, setAnswers] = useState<Record<number, number>>({})
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [showSummary, setShowSummary] = useState(false)
+
+    // useEffect(() => {
+    //     params.then(({ id }) => setExamId(id))
+    // }, [params])
+
+    // if (!examId) {
+    //     return <div>Loading...</div>
+    // }
 
     // Mock exam data
     const examData = {
