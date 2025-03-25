@@ -98,3 +98,6 @@
 .terms ul li,.privacy ul li{
   list-style: disc;
 }
+button,a{
+  cursor: pointer;
+}
