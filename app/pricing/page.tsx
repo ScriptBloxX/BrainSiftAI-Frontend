@@ -132,7 +132,7 @@ export default function Pricing() {
               />
               <FaqItem
                 question="Is there a free trial?"
-                answer="Yes, all paid plans come with a 14-day free trial. No credit card required to start."
+                answer="Yes, all paid plans come with a 3-day free trial. No credit card required to start."
               />
               <FaqItem
                 question="What payment methods do you accept?"
