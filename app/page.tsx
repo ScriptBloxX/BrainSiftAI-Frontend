@@ -4,49 +4,51 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, BookOpen, FileText, Users } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision"
+import { ThreeDMarqueeDemo } from "@/components/review"
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex flex-col md:flex-row items-center gap-12">
-              <div className="flex-1 space-y-6">
-                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-                  Transform Your Content Into <span className="text-primary">Interactive Exams</span>
-                </h1>
-                <p className="text-lg text-muted-foreground">
-                  Upload your PDF documents or text content and let our AI generate customized exams and concise
-                  summaries instantly.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button asChild size="lg" className="gap-2">
-                    <Link href="/dashboard">
-                      Get Started <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg">
-                    <Link href="/explore">Explore Public Exams</Link>
-                  </Button>
+          <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
+          <BackgroundBeamsWithCollision>
+            <div className="container mx-auto max-w-6xl">
+              <div className="flex flex-col md:flex-row items-center gap-12">
+                <div className="flex-1 space-y-6">
+                  <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+                    Transform Your Content Into <span className="text-primary">Interactive Exams</span>
+                  </h1>
+                  <p className="text-lg text-muted-foreground">
+                    Upload your PDF documents or text content and let our AI generate customized exams and concise
+                    summaries instantly.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                    <Button asChild size="lg" className="gap-2">
+                      <Link href="/dashboard">
+                        Get Started <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" size="lg">
+                      <Link href="/explore">Explore Public Exams</Link>
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1">
-                <div className="relative rounded-lg overflow-hidden shadow-2xl border border-border">
-                  <img
-                    src="/brain.gif"
-                    alt="BrainSiftAI Platform Preview"
-                    className="w-full h-auto"
-                  />
+                <div className="flex-1">
+                  <div className="relative rounded-lg overflow-hidden border border-border">
+                    <img
+                      src="/brain.gif"
+                      alt="BrainSiftAI Platform Preview"
+                      className="w-full h-auto"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
+          </BackgroundBeamsWithCollision>
+          </section>
         {/* Features Section */}
         <section className="py-20 px-4 md:px-6">
           <div className="container mx-auto max-w-6xl">
@@ -103,6 +105,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* New CTA Section */}
+        {/* <ThreeDMarqueeDemo></ThreeDMarqueeDemo> */}
 
         {/* CTA Section */}
         <section className="py-20 px-4 md:px-6">
