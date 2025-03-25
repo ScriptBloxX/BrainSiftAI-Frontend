@@ -87,9 +87,6 @@ export default function Navbar() {
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -159,12 +156,6 @@ export default function Navbar() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Button variant="outline" asChild className="justify-start">
-                    <Link href="/profile" onClick={toggleMenu}>
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </Link>
-                  </Button>
                   <Button
                     variant="outline"
                     className="justify-start text-destructive"
