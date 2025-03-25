@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -20,7 +19,6 @@ import {
     Mail,
     Lock,
     Bell,
-    Globe,
     Palette,
     Moon,
     Sun,
@@ -600,8 +598,22 @@ export default function Settings() {
                                         <CardDescription>Customize how BrainSiftAI looks for you</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
+                                        {successMessage && (
+                                            <Alert className="border-green-500 text-green-500">
+                                                <CheckCircle2 className="h-4 w-4" />
+                                                <AlertDescription>{successMessage}</AlertDescription>
+                                            </Alert>
+                                        )}
+
+                                        {errorMessage && (
+                                            <Alert variant="destructive">
+                                                <AlertCircle className="h-4 w-4" />
+                                                <AlertDescription>{errorMessage}</AlertDescription>
+                                            </Alert>
+                                        )}
+
                                         <div className="space-y-2">
-                                            <Label>Theme</Label>
+                                            <Label>Theme Mode</Label>
                                             <div className="grid grid-cols-3 gap-4">
                                                 <Button
                                                     variant={theme === "light" ? "default" : "outline"}
@@ -632,44 +644,271 @@ export default function Settings() {
 
                                         <Separator />
 
-                                        <div className="space-y-2">
-                                            <Label>Color Scheme</Label>
-                                            <div className="grid grid-cols-3 gap-4">
-                                                <div className="flex flex-col items-center">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <Label>Premium Themes</Label>
+                                                {user?.plan === "free" && (
+                                                    <Button variant="outline" size="sm" className="text-xs">
+                                                        Upgrade to Pro
+                                                    </Button>
+                                                )}
+                                            </div>
+
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                <div className="relative">
                                                     <Button
                                                         variant="outline"
-                                                        className="w-full h-12 mb-2 bg-blue-500 hover:bg-blue-600 text-white border-0"
+                                                        className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800"
+                                                        disabled={user?.plan === "free"}
                                                     >
-                                                        <Palette className="h-5 w-5" />
+                                                        <div className="h-6 w-6 rounded-full bg-blue-500" />
+                                                        <span>Ocean</span>
                                                     </Button>
-                                                    <span className="text-sm">Blue</span>
+                                                    {user?.plan === "free" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-muted-foreground" />
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <div className="flex flex-col items-center">
+
+                                                <div className="relative">
                                                     <Button
                                                         variant="outline"
-                                                        className="w-full h-12 mb-2 bg-purple-500 hover:bg-purple-600 text-white border-0"
+                                                        className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800"
+                                                        disabled={user?.plan === "free"}
                                                     >
-                                                        <Palette className="h-5 w-5" />
+                                                        <div className="h-6 w-6 rounded-full bg-purple-500" />
+                                                        <span>Lavender</span>
                                                     </Button>
-                                                    <span className="text-sm">Purple</span>
+                                                    {user?.plan === "free" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-muted-foreground" />
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <div className="flex flex-col items-center">
+
+                                                <div className="relative">
                                                     <Button
                                                         variant="outline"
-                                                        className="w-full h-12 mb-2 bg-green-500 hover:bg-green-600 text-white border-0"
+                                                        className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800"
+                                                        disabled={user?.plan === "free"}
                                                     >
-                                                        <Palette className="h-5 w-5" />
+                                                        <div className="h-6 w-6 rounded-full bg-amber-500" />
+                                                        <span>Sunset</span>
                                                     </Button>
-                                                    <span className="text-sm">Green</span>
+                                                    {user?.plan === "free" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-muted-foreground" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800"
+                                                        disabled={user?.plan === "free"}
+                                                    >
+                                                        <div className="h-6 w-6 rounded-full bg-emerald-500" />
+                                                        <span>Forest</span>
+                                                    </Button>
+                                                    {user?.plan === "free" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-muted-foreground" />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
-                                            <p className="text-xs text-muted-foreground mt-2">
-                                                Note: Color scheme customization is available on Pro and Enterprise plans.
+
+                                            <p className="text-xs text-muted-foreground">
+                                                {user?.plan === "free"
+                                                    ? "Premium themes are available on Pro and Enterprise plans."
+                                                    : "Select a theme to customize the appearance of your dashboard."}
                                             </p>
                                         </div>
+
+                                        <Separator />
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <Label>Color Scheme</Label>
+                                                {user?.plan !== "pro" && (
+                                                    <Button variant="outline" size="sm" className="text-xs">
+                                                        Upgrade to Pro
+                                                    </Button>
+                                                )}
+                                            </div>
+
+                                            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full aspect-square mb-2 bg-blue-500 hover:bg-blue-600 text-white border-0"
+                                                        disabled={user?.plan !== "pro"}
+                                                    >
+                                                        <Palette className="h-5 w-5" />
+                                                    </Button>
+                                                    <span className="text-sm block text-center">Blue</span>
+                                                    {user?.plan !== "pro" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full aspect-square mb-2 bg-purple-500 hover:bg-purple-600 text-white border-0"
+                                                        disabled={user?.plan !== "pro"}
+                                                    >
+                                                        <Palette className="h-5 w-5" />
+                                                    </Button>
+                                                    <span className="text-sm block text-center">Purple</span>
+                                                    {user?.plan !== "pro" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full aspect-square mb-2 bg-green-500 hover:bg-green-600 text-white border-0"
+                                                        disabled={user?.plan !== "pro"}
+                                                    >
+                                                        <Palette className="h-5 w-5" />
+                                                    </Button>
+                                                    <span className="text-sm block text-center">Green</span>
+                                                    {user?.plan !== "pro" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full aspect-square mb-2 bg-red-500 hover:bg-red-600 text-white border-0"
+                                                        disabled={user?.plan !== "pro"}
+                                                    >
+                                                        <Palette className="h-5 w-5" />
+                                                    </Button>
+                                                    <span className="text-sm block text-center">Red</span>
+                                                    {user?.plan !== "pro" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full aspect-square mb-2 bg-amber-500 hover:bg-amber-600 text-white border-0"
+                                                        disabled={user?.plan !== "pro"}
+                                                    >
+                                                        <Palette className="h-5 w-5" />
+                                                    </Button>
+                                                    <span className="text-sm block text-center">Amber</span>
+                                                    {user?.plan !== "pro" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full aspect-square mb-2 bg-pink-500 hover:bg-pink-600 text-white border-0"
+                                                        disabled={user?.plan !== "pro"}
+                                                    >
+                                                        <Palette className="h-5 w-5" />
+                                                    </Button>
+                                                    <span className="text-sm block text-center">Pink</span>
+                                                    {user?.plan !== "pro" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-white" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <p className="text-xs text-muted-foreground">
+                                                {user?.plan !== "pro"
+                                                    ? "Custom color schemes are available on Pro plans only."
+                                                    : "Select a primary color to customize your experience."}
+                                            </p>
+                                        </div>
+
+                                        <Separator />
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <Label>Font Style</Label>
+                                                {user?.plan !== "pro" && (
+                                                    <div className="text-xs text-muted-foreground">Pro Only</div>
+                                                )}
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full h-16 font-sans"
+                                                        disabled={user?.plan !== "pro"}
+                                                    >
+                                                        Sans Serif
+                                                    </Button>
+                                                    {user?.plan !== "pro" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-muted-foreground" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full h-16 font-serif"
+                                                        disabled={user?.plan !== "pro"}
+                                                    >
+                                                        Serif
+                                                    </Button>
+                                                    {user?.plan !== "pro" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-muted-foreground" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {user?.plan === "free" && (
+                                            <div className="mt-6 p-4 bg-muted rounded-lg">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="p-2 rounded-full bg-primary/10">
+                                                        <Palette className="h-5 w-5 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-medium">Unlock all appearance options</h4>
+                                                        <p className="text-sm text-muted-foreground mt-1">
+                                                            Upgrade to Pro or Enterprise to access premium themes, custom color schemes, and font
+                                                            options.
+                                                        </p>
+                                                        <Button className="mt-3" size="sm">
+                                                            View Plans
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </CardContent>
                                     <CardFooter>
-                                        <Button>
+                                        <Button onClick={() => setSuccessMessage("Appearance settings saved successfully")}>
                                             <Save className="mr-2 h-4 w-4" />
                                             Save Appearance
                                         </Button>
