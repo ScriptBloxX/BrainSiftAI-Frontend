@@ -648,9 +648,7 @@ export default function Settings() {
                                             <div className="flex items-center justify-between">
                                                 <Label>Premium Themes</Label>
                                                 {user?.plan === "free" && (
-                                                    <Button variant="outline" size="sm" className="text-xs">
-                                                        Upgrade to Pro
-                                                    </Button>
+                                                    <div className="text-xs text-muted-foreground">Pro Only</div>
                                                 )}
                                             </div>
 
@@ -733,9 +731,7 @@ export default function Settings() {
                                             <div className="flex items-center justify-between">
                                                 <Label>Color Scheme</Label>
                                                 {user?.plan !== "pro" && (
-                                                    <Button variant="outline" size="sm" className="text-xs">
-                                                        Upgrade to Pro
-                                                    </Button>
+                                                    <div className="text-xs text-muted-foreground">Pro Only</div>
                                                 )}
                                             </div>
 
@@ -899,7 +895,7 @@ export default function Settings() {
                                                             Upgrade to Pro or Enterprise to access premium themes, custom color schemes, and font
                                                             options.
                                                         </p>
-                                                        <Button className="mt-3" size="sm">
+                                                        <Button className="mt-3" size="sm" onClick={()=>window.location.href="/pricing"}>
                                                             View Plans
                                                         </Button>
                                                     </div>

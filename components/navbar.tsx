@@ -64,8 +64,9 @@ export default function Navbar() {
               href="/pricing"
               className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/pricing") ? "text-primary" : "text-foreground/70"}`}
             >
-              Pricing
+              {isAuthenticated&&user?.plan=="free"?"Upgrade to Pro":isAuthenticated&&user?.plan=="pro"? "Upgrade to Enterprise" : !isAuthenticated ? "Pricing" : null}
             </Link>
+
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
