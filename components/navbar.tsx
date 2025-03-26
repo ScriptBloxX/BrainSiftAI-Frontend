@@ -149,15 +149,22 @@ export default function Navbar() {
               <div className="border-t border-border pt-4 mt-2">
                 <div className="flex items-center gap-3 mb-4">
                   <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.profile?.avatar} alt={user?.name} />
                     <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <AvatarImage src={user?.profile?.avatar} alt={user?.name} />
                     <p className="font-medium">{user?.name}</p>
                     <p className="text-sm text-muted-foreground">{user?.email}</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
+                  <Link
+                    href="/settings"
+                    className={`rounded-md border bg-background dark:bg-input/30 dark:border-input h-9 px-4 text-sm font-medium py-2 hover:text-primary ${isActive("/settings") ? "text-primary" : "text-foreground/70"}`}
+                    onClick={toggleMenu}
+                  >
+                    Settings
+                  </Link>
                   <Button
                     variant="outline"
                     className="justify-start text-destructive"
