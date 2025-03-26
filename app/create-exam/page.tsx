@@ -145,6 +145,26 @@ export default function CreateExam() {
                             <Label htmlFor="exam-title">Exam Title</Label>
                             <Input id="exam-title" placeholder="Enter a title for your exam" className="mt-2" />
                         </div>
+                        
+                        <div className="flex items-center justify-between flex-wrap">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="exam-timer">Timer (minutes)</Label>
+                                <p className="text-sm text-muted-foreground">Set a time limit for the exam in minutes</p>
+                            </div>
+                            <Input
+                                id="exam-timer"
+                                type="number"
+                                placeholder="Enter time in minutes"
+                                className="mt-2 w-full"
+                                min={1}
+                                onChange={(e) => {
+                                    const value = parseInt(e.target.value, 10);
+                                    if (!isNaN(value) && value > 0) {
+                                        // Handle timer value change (wait state)
+                                    }
+                                }}
+                            />
+                        </div>
 
                         <div className="flex items-center justify-between">
                             <div className="space-y-0.5">

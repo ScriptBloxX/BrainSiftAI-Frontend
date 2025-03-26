@@ -626,7 +626,7 @@ export default function TakeExam({ params }: Props) {
                             <MockSummary></MockSummary>
                             {showSummary ?
                                 <div className="mt-4 cursor-pointer w-full bg-primary text-center text-primary-foreground rounded-md py-2" onClick={() => setShowSummary(!showSummary)}>
-                                    {showSummary ? "Start Test" : "View Summary"}
+                                    {showSummary ? "Ready" : "View Summary"}
                                 </div>
                                 : null
                             }

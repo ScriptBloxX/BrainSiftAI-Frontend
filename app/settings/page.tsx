@@ -658,6 +658,7 @@ export default function Settings() {
                                                         variant="outline"
                                                         className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800"
                                                         disabled={user?.plan === "free"}
+                                                        onClick={() => setTheme("ocean")}
                                                     >
                                                         <div className="h-6 w-6 rounded-full bg-blue-500" />
                                                         <span>Ocean</span>
@@ -674,6 +675,7 @@ export default function Settings() {
                                                         variant="outline"
                                                         className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800"
                                                         disabled={user?.plan === "free"}
+                                                        onClick={() => setTheme("lavender")}
                                                     >
                                                         <div className="h-6 w-6 rounded-full bg-purple-500" />
                                                         <span>Lavender</span>
@@ -690,6 +692,7 @@ export default function Settings() {
                                                         variant="outline"
                                                         className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800"
                                                         disabled={user?.plan === "free"}
+                                                        onClick={() => setTheme("sunset")}
                                                     >
                                                         <div className="h-6 w-6 rounded-full bg-amber-500" />
                                                         <span>Sunset</span>
@@ -706,6 +709,7 @@ export default function Settings() {
                                                         variant="outline"
                                                         className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800"
                                                         disabled={user?.plan === "free"}
+                                                        onClick={() => setTheme("forest")}
                                                     >
                                                         <div className="h-6 w-6 rounded-full bg-emerald-500" />
                                                         <span>Forest</span>
