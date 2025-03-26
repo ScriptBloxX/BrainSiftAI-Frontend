@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
-import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
+import { ArrowLeft, ArrowRight, CheckCircle, Timer } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { MockSummary } from "@/components/mock/mocksummary"
@@ -23,6 +23,7 @@ export default function TakeExam({ params }: Props) {
     const [answers, setAnswers] = useState<Record<number, number>>({})
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [showSummary, setShowSummary] = useState(true)
+    const [timer, setTimer] = useState(10)
 
     const { isAuthenticated, isLoading } = useAuth()
     const router = useRouter()
@@ -32,6 +33,16 @@ export default function TakeExam({ params }: Props) {
             router.push("/login")
         }
     }, [isAuthenticated, isLoading, router])
+    useEffect(() => {
+        if (!showSummary && timer > 0) {
+            const interval = setInterval(() => {
+                setTimer((prev) => prev - 1)
+            }, 1000)
+            return () => clearInterval(interval)
+        } else if (timer === 0) {
+            setIsSubmitted(true)
+        }
+    }, [showSummary, timer])
 
     // If still loading or not authenticated, don't render the dashboard
     if (isLoading || !isAuthenticated) {
@@ -584,9 +595,19 @@ export default function TakeExam({ params }: Props) {
                     <h1 className="text-3xl font-bold tracking-tight">{examData.title}</h1>
                     <div className="flex items-center justify-between mt-4">
                         {showSummary ? null :
-                            <p className="text-sm text-muted-foreground">
-                                Question {currentQuestion + 1} of {examData.questions.length}
-                            </p>
+                            <>
+                                <p className="text-sm text-muted-foreground">
+                                    Question {currentQuestion + 1} of {examData.questions.length}
+                                </p>
+                                <div className="flex items-center justify-center gap-2">
+                                    <p>{`${Math.floor(timer / 60)
+                                        .toString()
+                                        .padStart(2, "0")}:${(timer % 60)
+                                            .toString()
+                                            .padStart(2, "0")}s`}</p>
+                                    <Timer />
+                                </div>
+                            </>
                         }
                     </div>
                     {showSummary ? null :
@@ -603,12 +624,12 @@ export default function TakeExam({ params }: Props) {
                         <CardContent>
                             <p className="whitespace-pre-line">{examData.summary}</p>
                             <MockSummary></MockSummary>
-                        {showSummary ?
-                            <Button className="mt-4 w-full bg-primary" variant="outline" size="sm" onClick={() => setShowSummary(!showSummary)}>
-                                {showSummary ? "Start Test" : "View Summary"}
-                            </Button>
-                            : null
-                        }
+                            {showSummary ?
+                                <Button className="mt-4 w-full bg-primary" variant="outline" size="sm" onClick={() => setShowSummary(!showSummary)}>
+                                    {showSummary ? "Start Test" : "View Summary"}
+                                </Button>
+                                : null
+                            }
                         </CardContent>
                     </Card>
                 )}
