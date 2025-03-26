@@ -249,7 +249,7 @@ export default function PrivateClass({ params }: { params: Promise<{ id: string 
                       <Card key={exam.id}>
                         <CardHeader>
                           <CardTitle>{exam.title}</CardTitle>
-                          <CardDescription>Created on {formatDate(exam.createdAt)}</CardDescription>
+                          <CardDescription>Created on {exam.createdAt}</CardDescription>
                         </CardHeader>
                         <CardContent>
                           <div className="flex justify-between text-sm">
@@ -406,7 +406,7 @@ export default function PrivateClass({ params }: { params: Promise<{ id: string 
                 </div>
                 <div>
                   <p className="text-sm font-medium">Created on</p>
-                  <p className="text-sm text-muted-foreground">{formatDate(classData.createdAt)}</p>
+                  <p className="text-sm text-muted-foreground">{classData.createdAt}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium">Members</p>
