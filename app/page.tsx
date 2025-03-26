@@ -12,7 +12,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20">
+        <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20 min-h-screen flex items-center">
           <BackgroundBeamsWithCollision>
             <div className="container mx-auto max-w-6xl">
               <div className="flex flex-col md:flex-row items-center gap-12">

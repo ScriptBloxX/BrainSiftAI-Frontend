@@ -23,7 +23,7 @@ export default function TakeExam({ params }: Props) {
     const [answers, setAnswers] = useState<Record<number, number>>({})
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [showSummary, setShowSummary] = useState(true)
-    const [timer, setTimer] = useState(10)
+    const [timer, setTimer] = useState(60*60)
 
     const { isAuthenticated, isLoading } = useAuth()
     const router = useRouter()
@@ -625,9 +625,9 @@ export default function TakeExam({ params }: Props) {
                             <p className="whitespace-pre-line">{examData.summary}</p>
                             <MockSummary></MockSummary>
                             {showSummary ?
-                                <Button className="mt-4 w-full bg-primary" variant="outline" size="sm" onClick={() => setShowSummary(!showSummary)}>
+                                <div className="mt-4 cursor-pointer w-full bg-primary text-center text-primary-foreground rounded-md py-2" onClick={() => setShowSummary(!showSummary)}>
                                     {showSummary ? "Start Test" : "View Summary"}
-                                </Button>
+                                </div>
                                 : null
                             }
                         </CardContent>

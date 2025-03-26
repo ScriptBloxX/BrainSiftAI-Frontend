@@ -283,7 +283,7 @@ export default function Settings() {
 
                     <div className="md:w-3/4">
                         <Tabs defaultValue="account" className="w-full">
-                            <TabsList className="mb-6 grid grid-cols-4">
+                            <TabsList className="mb-6 flex flex-wrap h-max justify-center">
                                 <TabsTrigger value="account">Account</TabsTrigger>
                                 <TabsTrigger value="security">Security</TabsTrigger>
                                 <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -327,13 +327,13 @@ export default function Settings() {
                                                     <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="flex flex-col gap-2">
-                                                    <div className="flex gap-2">
-                                                        <Button variant="outline" size="sm" onClick={triggerFileInput} disabled={isUploadingAvatar}>
+                                                    <div className="flex gap-2 flex-wrap">
+                                                        <Button className="w-full sm:w-max" variant="outline" size="sm" onClick={triggerFileInput} disabled={isUploadingAvatar}>
                                                             <Upload className="mr-2 h-4 w-4" />
                                                             Select Image
                                                         </Button>
                                                         {avatarFile && (
-                                                            <Button size="sm" onClick={handleAvatarUpload} disabled={isUploadingAvatar}>
+                                                            <Button className="w-full sm:w-max" size="sm" onClick={handleAvatarUpload} disabled={isUploadingAvatar}>
                                                                 {isUploadingAvatar ? (
                                                                     <>
                                                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

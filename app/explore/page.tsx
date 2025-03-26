@@ -233,6 +233,11 @@ export default function Explore() {
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     <div className="md:col-span-1 space-y-6">
+                        {(selectedTags.length > 0 || selectedQuestionFilter || selectedDateFilter) && (
+                            <Button variant="ghost" size="sm" onClick={clearFilters}>
+                                Clear All
+                            </Button>
+                        )}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Popular Tags</CardTitle>
@@ -257,11 +262,6 @@ export default function Explore() {
                             <CardHeader>
                                 <CardTitle className="flex justify-between items-center">
                                     <span>Filters</span>
-                                    {(selectedTags.length > 0 || selectedQuestionFilter || selectedDateFilter) && (
-                                        <Button variant="ghost" size="sm" onClick={clearFilters}>
-                                            Clear All
-                                        </Button>
-                                    )}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
