@@ -22,7 +22,7 @@ export default function TakeExam({ params }: Props) {
     const [currentQuestion, setCurrentQuestion] = useState(0)
     const [answers, setAnswers] = useState<Record<number, number>>({})
     const [isSubmitted, setIsSubmitted] = useState(false)
-    const [showSummary, setShowSummary] = useState(false)
+    const [showSummary, setShowSummary] = useState(true)
 
     const { isAuthenticated, isLoading } = useAuth()
     const router = useRouter()
@@ -582,14 +582,15 @@ export default function TakeExam({ params }: Props) {
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold tracking-tight">{examData.title}</h1>
                     <div className="flex items-center justify-between mt-4">
-                        <p className="text-sm text-muted-foreground">
-                            Question {currentQuestion + 1} of {examData.questions.length}
-                        </p>
-                        <Button variant="outline" size="sm" onClick={() => setShowSummary(!showSummary)}>
-                            {showSummary ? "Hide Summary" : "View Summary"}
-                        </Button>
+                        {showSummary ? null :
+                            <p className="text-sm text-muted-foreground">
+                                Question {currentQuestion + 1} of {examData.questions.length}
+                            </p>
+                        }
                     </div>
-                    <Progress value={progress} className="mt-2" />
+                    {showSummary ? null :
+                        <Progress value={progress} className="mt-2" />
+                    }
                 </div>
 
                 {showSummary && (
@@ -601,48 +602,55 @@ export default function TakeExam({ params }: Props) {
                         <CardContent>
                             <p className="whitespace-pre-line">{examData.summary}</p>
                             <MockSummary></MockSummary>
+                        {showSummary ?
+                            <Button className="mt-4 w-full bg-primary" variant="outline" size="sm" onClick={() => setShowSummary(!showSummary)}>
+                                {showSummary ? "Start Test" : "View Summary"}
+                            </Button>
+                            : null
+                        }
                         </CardContent>
                     </Card>
                 )}
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-xl">{currentQuestionData.question}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <RadioGroup
-                            key={currentQuestion}
-                            value={answers[currentQuestion] !== undefined ? `option-${answers[currentQuestion]}` : undefined}
-                            onValueChange={handleAnswerChange}
-                        >
-                            {currentQuestionData.options.map((option, i) => (
-                                <div key={i} className="flex items-center space-x-2 py-2">
-                                    <RadioGroupItem value={`option-${i}`} id={`option-${i}`} />
-                                    <Label htmlFor={`option-${i}`} className="flex-1">
-                                        {option}
-                                    </Label>
-                                </div>
-                            ))}
-                        </RadioGroup>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                        <Button variant="outline" onClick={prevQuestion} disabled={currentQuestion === 0}>
-                            <ArrowLeft className="mr-2 h-4 w-4" /> Previous
-                        </Button>
-
-                        {currentQuestion === examData.questions.length - 1 ? (
-                            <Button onClick={submitExam} disabled={Object.keys(answers).length < examData.questions.length}>
-                                <CheckCircle className="mr-2 h-4 w-4" /> Submit Exam
+                {showSummary ? null :
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-xl">{currentQuestionData.question}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <RadioGroup
+                                key={currentQuestion}
+                                value={answers[currentQuestion] !== undefined ? `option-${answers[currentQuestion]}` : undefined}
+                                onValueChange={handleAnswerChange}
+                            >
+                                {currentQuestionData.options.map((option, i) => (
+                                    <div key={i} className="flex items-center space-x-2 py-2">
+                                        <RadioGroupItem value={`option-${i}`} id={`option-${i}`} />
+                                        <Label htmlFor={`option-${i}`} className="flex-1">
+                                            {option}
+                                        </Label>
+                                    </div>
+                                ))}
+                            </RadioGroup>
+                        </CardContent>
+                        <CardFooter className="flex justify-between">
+                            <Button variant="outline" onClick={prevQuestion} disabled={currentQuestion === 0}>
+                                <ArrowLeft className="mr-2 h-4 w-4" /> Previous
                             </Button>
-                        ) : (
-                            <Button onClick={nextQuestion} disabled={!hasAnsweredCurrent}>
-                                Next <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        )}
-                    </CardFooter>
-                </Card>
 
-                {Object.keys(answers).length < examData.questions.length && (
+                            {currentQuestion === examData.questions.length - 1 ? (
+                                <Button onClick={submitExam} disabled={Object.keys(answers).length < examData.questions.length}>
+                                    <CheckCircle className="mr-2 h-4 w-4" /> Submit Exam
+                                </Button>
+                            ) : (
+                                <Button onClick={nextQuestion} disabled={!hasAnsweredCurrent}>
+                                    Next <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            )}
+                        </CardFooter>
+                    </Card>
+                }
+                {Object.keys(answers).length < examData.questions.length && !showSummary && (
                     <div className="mt-4 text-sm text-muted-foreground text-center">Answer all questions to submit the exam</div>
                 )}
             </main>
