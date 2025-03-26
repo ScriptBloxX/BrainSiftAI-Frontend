@@ -616,7 +616,7 @@ export default function TakeExam({ params }: Props) {
                 {showSummary ? null :
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-xl">{currentQuestionData.question}</CardTitle>
+                            <CardTitle className="text-xl select-none cursor-default">{currentQuestionData.question}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <RadioGroup
