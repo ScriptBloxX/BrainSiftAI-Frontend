@@ -563,7 +563,8 @@ export default function TakeExam({ params }: Props) {
                                 <CardTitle>Content Summary</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="whitespace-pre-line">{examData.summary}</p>
+                                {/* <p className="whitespace-pre-line">{examData.summary}</p> */}
+                                <MockSummary></MockSummary>
                             </CardContent>
                         </Card>
                     )}
