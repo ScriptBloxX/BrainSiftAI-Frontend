@@ -1,0 +1,50 @@
+name: Disable Deployment for New Branches
+
+on:
+  push:
+    branches:
+      - '**'  # Trigger on all branch pushes
+
+jobs:
+  disable-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      # Set up Node.js for jq (JSON processor)
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      # Disable auto-deploy for new branches in vercel.json
+      - name: Disable auto-deploy for new branch
+        run: |
+          # Get the current branch name
+          BRANCH_NAME=$(git symbolic-ref --short HEAD)
+
+          # Check if the branch is already in vercel.json
+          if ! jq -e ".git.deploymentEnabled[\"$BRANCH_NAME\"]" vercel.json > /dev/null; then
+            echo "Disabling auto-deploy for branch $BRANCH_NAME"
+
+            # Add the new branch to vercel.json with deploymentDisabled (false)
+            jq ".git.deploymentEnabled[\"$BRANCH_NAME\"] = false" vercel.json > tmp.$$.json && mv tmp.$$.json vercel.json
+
+            # Commit the changes to vercel.json
+            git config --global user.name "github-actions"
+            git config --global user.email "github-actions@github.com"
+            git add vercel.json
+
+            # Check if there are any changes to commit
+            if git diff --cached --quiet; then
+              echo "No changes to commit, skipping git commit."
+            else
+              git commit -m "Disable auto deploy for branch $BRANCH_NAME"
+              git push
+            fi
+          else
+            echo "Branch $BRANCH_NAME already exists in vercel.json, skipping."
+          fi
