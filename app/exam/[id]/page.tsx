@@ -23,7 +23,7 @@ export default function TakeExam({ params }: Props) {
     const [answers, setAnswers] = useState<Record<number, number>>({})
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [showSummary, setShowSummary] = useState(true)
-    const [timer, setTimer] = useState(60*60)
+    const [timer, setTimer] = useState(60 * 60)
 
     const { isAuthenticated, isLoading } = useAuth()
     const router = useRouter()
@@ -60,398 +60,263 @@ export default function TakeExam({ params }: Props) {
 
     // Mock exam data
     const examData = {
-        title: "JavaScript: Arrays, Strings, and Regular Expressions",
+        title: "CSS Layout: Box Model, Float, and Flexbox",
         summary:
-            "This exam evaluates knowledge of JavaScript's built-in methods for arrays, strings, and regular expressions, covering concepts such as iteration, transformation, pattern matching, and manipulation.",
+            "This exam evaluates knowledge of CSS Box Model, Float, and Flexbox, covering concepts such as spacing, alignment, positioning, responsiveness, and layout strategies.",
         questions: [
-            // ---- Array Questions (20) ----
+            // ---- Box Model Questions (10) ----
             {
                 id: 1,
-                question: "Which method creates a new array with only the elements that pass a test?",
-                options: ["map()", "filter()", "reduce()", "slice()"],
+                question: "Which CSS property controls the space between the content and the border of an element?",
+                options: ["margin", "padding", "border", "outline"],
                 correctAnswer: 1,
             },
             {
                 id: 2,
-                question: "What does the `.map()` method return?",
-                options: ["A new array", "A single value", "The same array", "A boolean"],
+                question: "What is the default box-sizing property for most elements?",
+                options: ["content-box", "border-box", "padding-box", "margin-box"],
                 correctAnswer: 0,
             },
             {
                 id: 3,
-                question: "Which method removes the last element from an array?",
-                options: ["pop()", "shift()", "splice()", "slice()"],
-                correctAnswer: 0,
+                question: "Which property is used to specify the width of an element's border?",
+                options: ["border", "border-width", "outline-width", "box-sizing"],
+                correctAnswer: 1,
             },
             {
                 id: 4,
-                question: "What does `Array.isArray([1,2,3])` return?",
-                options: ["true", "false", "null", "undefined"],
-                correctAnswer: 0,
+                question: "What happens when you set margin: auto on a block element?",
+                options: ["It is ignored", "The element is centered horizontally", "The element gets maximum margin", "It collapses the margin"],
+                correctAnswer: 1,
             },
             {
                 id: 5,
-                question: "What will `[1, 2, 3].concat([4, 5])` return?",
-                options: ["[1, 2, 3, 4, 5]", "[[1, 2, 3], [4, 5]]", "[4, 5, 1, 2, 3]", "Error"],
-                correctAnswer: 0,
+                question: "Which CSS property controls whether an element's margins collapse with adjacent margins?",
+                options: ["display", "margin-collapse", "overflow", "margin"],
+                correctAnswer: 3,
             },
             {
                 id: 6,
-                question: "Which method adds one or more elements to the end of an array?",
-                options: ["push()", "unshift()", "concat()", "slice()"],
+                question: "What is the difference between border-box and content-box?",
+                options: ["border-box includes padding and border", "content-box includes border", "border-box excludes border", "content-box includes padding"],
                 correctAnswer: 0,
             },
             {
                 id: 7,
-                question: "What does `[1, 2, 3].reverse()` return?",
-                options: ["[1, 2, 3]", "[3, 2, 1]", "Error", "undefined"],
-                correctAnswer: 1,
+                question: "Which CSS property allows setting all four margins at once?",
+                options: ["margin", "padding", "border", "box-sizing"],
+                correctAnswer: 0,
             },
             {
                 id: 8,
-                question: "Which method merges two or more arrays into one?",
-                options: ["merge()", "concat()", "spread operator (...)", "Both B and C"],
+                question: "Which of the following does NOT affect an element's total width?",
+                options: ["margin", "padding", "border", "line-height"],
                 correctAnswer: 3,
             },
             {
                 id: 9,
-                question: "What does `[1, 2, 3].includes(2)` return?",
-                options: ["true", "false", "null", "undefined"],
-                correctAnswer: 0,
+                question: "What is the purpose of the outline property in CSS?",
+                options: ["To create a space around an element", "To add a border-like effect that does not affect layout", "To control spacing inside an element", "To define text decoration"],
+                correctAnswer: 1,
             },
             {
                 id: 10,
-                question: "Which method executes a function once per array element?",
-                options: ["map()", "forEach()", "filter()", "reduce()"],
-                correctAnswer: 1,
+                question: "If two adjacent block elements have margins, what happens by default?",
+                options: ["The margins add up", "The larger margin is used", "The smaller margin is used", "The margins collapse"],
+                correctAnswer: 3,
             },
+
+            // ---- Float Questions (10) ----
             {
                 id: 11,
-                question: "Which method removes the first element of an array and returns it?",
-                options: ["pop()", "shift()", "slice()", "splice()"],
-                correctAnswer: 1,
+                question: "What happens if you float all child elements inside a parent without clearing the float?",
+                options: [
+                    "The parent collapses and has zero height",
+                    "The parent expands to fit the children",
+                    "The float property is ignored",
+                    "An error occurs"
+                ],
+                correctAnswer: 0,
             },
             {
                 id: 12,
-                question: "What will `[1, 2, 3, 4].slice(1, 3)` return?",
-                options: ["[1, 2, 3]", "[2, 3]", "[3, 4]", "[2, 3, 4]"],
+                question: "Which CSS property can be used to clear a float?",
+                options: ["display", "clear", "overflow", "position"],
                 correctAnswer: 1,
             },
             {
                 id: 13,
-                question: "Which method sorts the elements of an array in place?",
-                options: ["sort()", "order()", "reverse()", "map()"],
-                correctAnswer: 0,
+                question: "What value of 'clear' is used to clear floating elements on both sides?",
+                options: ["left", "right", "both", "none"],
+                correctAnswer: 2,
             },
             {
                 id: 14,
-                question: "What does `[1, 2, 3].some(x => x > 2)` return?",
-                options: ["true", "false", "[3]", "undefined"],
+                question: "Which technique ensures a parent element contains floated children?",
+                options: ["Adding overflow: hidden to the parent", "Using position: relative", "Applying display: block", "Setting a fixed height"],
                 correctAnswer: 0,
             },
             {
                 id: 15,
-                question: "Which method flattens a nested array into a single-level array?",
-                options: ["reduce()", "concat()", "flat()", "map()"],
+                question: "What happens when multiple floated elements are placed next to each other?",
+                options: ["They overlap", "They stack vertically", "They align horizontally", "They disappear"],
                 correctAnswer: 2,
             },
             {
                 id: 16,
-                question: "What will `[1, 2, 3].fill(0, 1, 3)` return?",
-                options: ["[1, 2, 3]", "[1, 0, 3]", "[1, 0, 0]", "[0, 0, 0]"],
-                correctAnswer: 2,
+                question: "How does setting 'display: inline-block' differ from using 'float'?",
+                options: ["It allows block elements to sit inline", "It clears floats automatically", "It prevents elements from wrapping", "It forces elements into a grid"],
+                correctAnswer: 0,
             },
             {
                 id: 17,
-                question: "Which method finds the index of the first element that satisfies a condition?",
-                options: ["find()", "findIndex()", "indexOf()", "some()"],
-                correctAnswer: 1,
+                question: "What is a common issue when using floats for layouts?",
+                options: ["Elements may overlap unexpectedly", "Floats require flexbox", "Floated elements are always block-level", "The float property cannot be overridden"],
+                correctAnswer: 0,
             },
             {
                 id: 18,
-                question: "What does `[1, 2, 3].every(x => x > 0)` return?",
-                options: ["true", "false", "[1, 2, 3]", "undefined"],
+                question: "What CSS property is often used as an alternative to floats for layout design?",
+                options: ["grid", "position", "display", "overflow"],
                 correctAnswer: 0,
             },
             {
                 id: 19,
-                question: "Which of the following creates a shallow copy of an array?",
-                options: ["slice()", "copy()", "duplicate()", "spread operator (...)"],
-                correctAnswer: 3,
+                question: "What happens if a floated element is wider than its container?",
+                options: ["It overflows", "It shrinks", "It wraps", "It disappears"],
+                correctAnswer: 0,
             },
             {
                 id: 20,
-                question: "What will `[1, 2, 3].reduce((acc, cur) => acc + cur, 0)` return?",
-                options: ["6", "[1, 2, 3]", "0", "Error"],
-                correctAnswer: 0,
-            },
-            // ---- String Questions (20) ----
-            {
-                id: 21,
-                question: "Which method converts a string into an array?",
-                options: ["split()", "slice()", "substring()", "trim()"],
-                correctAnswer: 0,
-            },
-            {
-                id: 22,
-                question: "What does `str.toUpperCase()` do?",
-                options: ["Converts string to lowercase", "Removes spaces", "Converts string to uppercase", "Does nothing"],
+                question: "Which method can be used to stop text from wrapping around a floated element?",
+                options: ["display: inline-block", "overflow: auto", "clear: both", "width: 100%"],
                 correctAnswer: 2,
             },
             {
-                id: 23,
-                question: "Which method removes whitespace from both ends of a string?",
-                options: ["trim()", "slice()", "substring()", "replace()"],
-                correctAnswer: 0,
+                "id": 21,
+                "question": "Which CSS property defines how flex items are placed in the flex container along the main axis?",
+                "options": ["align-items", "justify-content", "flex-direction", "align-self"],
+                "correctAnswer": 1
             },
             {
-                id: 24,
-                question: "What will `'hello'.charAt(1)` return?",
-                options: ["'h'", "'e'", "'l'", "'o'"],
-                correctAnswer: 1,
+                "id": 22,
+                "question": "What is the default value of the 'flex-direction' property?",
+                "options": ["row", "column", "row-reverse", "column-reverse"],
+                "correctAnswer": 0
             },
             {
-                id: 25,
-                question: "Which method replaces text in a string?",
-                options: ["replace()", "splice()", "slice()", "split()"],
-                correctAnswer: 0,
+                "id": 23,
+                "question": "Which flexbox property is used to allow items to grow and shrink within the container?",
+                "options": ["flex-basis", "flex-wrap", "flex", "order"],
+                "correctAnswer": 2
             },
             {
-                id: 26,
-                question: "What will `'Hello'.charCodeAt(1)` return?",
-                options: ["'e'", "101", "1", "NaN"],
-                correctAnswer: 1,
+                "id": 24,
+                "question": "What value of 'align-items' should be used to align flex items at the start of the cross axis?",
+                "options": ["center", "flex-end", "flex-start", "stretch"],
+                "correctAnswer": 2
             },
             {
-                id: 27,
-                question: "Which method checks if a string starts with a specified substring?",
-                options: ["startsWith()", "endsWith()", "includes()", "match()"],
-                correctAnswer: 0,
+                "id": 25,
+                "question": "Which property prevents flex items from shrinking?",
+                "options": ["flex-grow", "flex-shrink", "flex-wrap", "align-content"],
+                "correctAnswer": 1
             },
             {
-                id: 28,
-                question: "What will `'hello world'.indexOf('o')` return?",
-                options: ["4", "5", "-1", "Error"],
-                correctAnswer: 0,
+                "id": 26,
+                "question": "What does 'flex-wrap: wrap' do?",
+                "options": ["Forces items to stay in a single line", "Allows items to wrap onto multiple lines", "Aligns items in a column", "Disables flexbox"],
+                "correctAnswer": 1
             },
             {
-                id: 29,
-                question: "Which method extracts a portion of a string and returns it as a new string?",
-                options: ["substring()", "split()", "replace()", "toUpperCase()"],
-                correctAnswer: 0,
+                "id": 27,
+                "question": "How do you change the order of flex items?",
+                "options": ["Using 'order'", "Using 'align-items'", "Using 'justify-content'", "Using 'flex-basis'"],
+                "correctAnswer": 0
             },
             {
-                id: 30,
-                question: "What does `'apple,banana,grape'.split(',')` return?",
-                options: ["['apple', 'banana', 'grape']", "'apple banana grape'", "'apple, banana, grape'", "null"],
-                correctAnswer: 0,
+                "id": 28,
+                "question": "Which property sets the initial size of a flex item before any growing or shrinking?",
+                "options": ["flex-grow", "flex-basis", "flex-shrink", "order"],
+                "correctAnswer": 1
             },
             {
-                id: 31,
-                question: "What is the result of `'hello'.repeat(3)`?",
-                options: ["'hellohellohello'", "'hello hello hello'", "'hello3'", "Error"],
-                correctAnswer: 0,
+                "id": 29,
+                "question": "What is the purpose of 'align-content' in flexbox?",
+                "options": ["Aligns items along the cross-axis", "Aligns lines of flex items in a multi-line flex container", "Justifies content along the main axis", "Changes item order"],
+                "correctAnswer": 1
             },
             {
-                id: 32,
-                question: "Which method converts a string to lowercase?",
-                options: ["toUpperCase()", "toLowerCase()", "charAt()", "concat()"],
-                correctAnswer: 1,
+                "id": 30,
+                "question": "Which property controls how a flex item grows relative to other items?",
+                "options": ["flex-basis", "flex-grow", "align-items", "justify-content"],
+                "correctAnswer": 1
             },
             {
-                id: 33,
-                question: "What will `'abcdef'.slice(2, 5)` return?",
-                options: ["'cde'", "'bcde'", "'def'", "'cdef'"],
-                correctAnswer: 0,
+                "id": 31,
+                "question": "Which value of 'justify-content' places items evenly with equal space around them?",
+                "options": ["space-between", "space-around", "center", "flex-start"],
+                "correctAnswer": 1
             },
             {
-                id: 34,
-                question: "Which method returns the Unicode value of a character at a specified index?",
-                options: ["charAt()", "charCodeAt()", "fromCharCode()", "codePointAt()"],
-                correctAnswer: 1,
+                "id": 32,
+                "question": "If you want a flex item to take twice the space of others, which value of 'flex-grow' should you use?",
+                "options": ["0", "1", "2", "3"],
+                "correctAnswer": 2
             },
             {
-                id: 35,
-                question: "What does `'hello'.replace('h', 'y')` return?",
-                options: ["'yello'", "'hello'", "'hyello'", "Error"],
-                correctAnswer: 0,
+                "id": 33,
+                "question": "Which property specifies whether flex items are forced onto a single line or can wrap?",
+                "options": ["align-items", "flex-wrap", "order", "flex-direction"],
+                "correctAnswer": 1
             },
             {
-                id: 36,
-                question: "Which method joins two strings together?",
-                options: ["concat()", "split()", "join()", "push()"],
-                correctAnswer: 0,
+                "id": 34,
+                "question": "What is the purpose of 'align-self' in flexbox?",
+                "options": ["Aligns all items in the container", "Aligns a single flex item individually", "Justifies items along the main axis", "Controls item growth"],
+                "correctAnswer": 1
             },
             {
-                id: 37,
-                question: "What does `'Hello World'.endsWith('World')` return?",
-                options: ["true", "false", "null", "Error"],
-                correctAnswer: 0,
+                "id": 35,
+                "question": "Which value of 'justify-content' aligns items to the start of the main axis?",
+                "options": ["center", "flex-start", "flex-end", "space-between"],
+                "correctAnswer": 1
             },
             {
-                id: 38,
-                question: "Which of the following checks whether a string contains a substring?",
-                options: ["contains()", "match()", "includes()", "substring()"],
-                correctAnswer: 2,
+                "id": 36,
+                "question": "Which value of 'align-items' stretches flex items to fill the container?",
+                "options": ["flex-start", "flex-end", "center", "stretch"],
+                "correctAnswer": 3
             },
             {
-                id: 39,
-                question: "What will `'hello world'.lastIndexOf('o')` return?",
-                options: ["4", "7", "-1", "Error"],
-                correctAnswer: 1,
+                "id": 37,
+                "question": "What does 'order: -1' do to a flex item?",
+                "options": ["Moves it to the end", "Moves it to the start", "Hides it", "Removes it from flexbox"],
+                "correctAnswer": 1
             },
             {
-                id: 40,
-                question: "Which method converts a Unicode code point to a character?",
-                options: ["charCodeAt()", "codePointAt()", "fromCharCode()", "charAt()"],
-                correctAnswer: 2,
-            },
-            // ---- Regular Expression Questions (20) ----
-            {
-                id: 41,
-                question: "What does `/hello/i` do in JavaScript?",
-                options: ["Matches 'hello' case-sensitively", "Matches 'hello' case-insensitively", "Throws an error", "Nothing"],
-                correctAnswer: 1,
-            },
-            {
-                id: 42,
-                question: "What does the `g` flag in a regex do?",
-                options: ["Stops execution", "Matches all occurrences", "Ignores case", "Matches digits only"],
-                correctAnswer: 1,
-            },
-            {
-                id: 43,
-                question: "What will `'Hello123'.match(/\\d+/)` return?",
-                options: ["null", "['123']", "['Hello']", "['Hello', '123']"],
-                correctAnswer: 1,
-            },
-            {
-                id: 44,
-                question: "Which of the following matches any character except a newline?",
-                options: ["\\w", ".", "\\s", "\\d"],
-                correctAnswer: 1,
-            },
-            {
-                id: 45,
-                question: "Which method tests if a string matches a regex?",
-                options: ["test()", "match()", "search()", "replace()"],
-                correctAnswer: 0,
-            },
-            {
-                id: 46,
-                question: "What does `/\\d+/g` match in 'Year 2025 is amazing'?",
-                options: ["'2025'", "['2025']", "['Year', 'is', 'amazing']", "null"],
-                correctAnswer: 1,
-            },
-            {
-                id: 47,
-                question: "Which regex pattern matches any whitespace character?",
-                options: ["\\s", "\\d", "\\w", "\\b"],
-                correctAnswer: 0,
-            },
-            {
-                id: 48,
-                question: "What will `'hello123'.replace(/\\d+/g, 'X')` return?",
-                options: ["'helloX'", "'hello123'", "'hello'", "'helloXXX'"],
-                correctAnswer: 0,
-            },
-            {
-                id: 49,
-                question: "Which regex pattern matches the word 'JavaScript' at the start of a string?",
-                options: ["JavaScript$", "^JavaScript", "/JavaScript/i", "JavaScript?"],
-                correctAnswer: 1,
-            },
-            {
-                id: 50,
-                question: "What does `/\\bword\\b/` match?",
-                options: ["Only the word 'word'", "Any word containing 'word'", "Any character except 'word'", "Numbers only"],
-                correctAnswer: 0,
-            },
-            {
-                id: 51,
-                question: "What does `/[^a-z]/gi` match?",
-                options: ["Only lowercase letters", "Only uppercase letters", "Everything except letters", "Only numbers"],
-                correctAnswer: 2,
-            },
-            {
-                id: 52,
-                question: "Which flag makes regex match case-insensitively?",
-                options: ["g", "i", "m", "s"],
-                correctAnswer: 1,
-            },
-            {
-                id: 53,
-                question: "What does `/^\\d{4}$/` match?",
-                options: ["A four-digit number", "A number with at least 4 digits", "Any number", "No match"],
-                correctAnswer: 0,
-            },
-            {
-                id: 54,
-                question: "Which regex method returns an array of all matches?",
-                options: ["match()", "test()", "replace()", "exec()"],
-                correctAnswer: 0,
-            },
-            {
-                id: 55,
-                question: "Which regex pattern matches an email format?",
-                options: [
-                    "/[a-z]+@[a-z]+\\.[a-z]+/i",
-                    "/[a-z]*@[a-z]*\\.[a-z]*/",
-                    "/\\w+@\\w+\\.\\w+/",
-                    "/.*@.*\\..*/"
+                "id": 38,
+                "question": "How can you center an item both horizontally and vertically using flexbox?",
+                "options": [
+                    "justify-content: center; align-items: center;",
+                    "align-self: center;",
+                    "flex-direction: column;",
+                    "order: 0;"
                 ],
-                correctAnswer: 2,
+                "correctAnswer": 0
             },
             {
-                id: 56,
-                question: "What will `'apple banana mango'.split(/\\s+/)` return?",
-                options: [
-                    "['apple banana mango']",
-                    "['apple', 'banana', 'mango']",
-                    "['a', 'p', 'p', 'l', 'e', 'b', 'a', 'n', 'a', 'n', 'a', 'm', 'a', 'n', 'g', 'o']",
-                    "null"
-                ],
-                correctAnswer: 1,
+                "id": 39,
+                "question": "Which property is used to distribute extra space between flex items?",
+                "options": ["align-content", "justify-content", "flex-grow", "order"],
+                "correctAnswer": 2
             },
             {
-                id: 57,
-                question: "Which regex pattern matches a phone number format '123-456-7890'?",
-                options: [
-                    "/\\d{3}-\\d{3}-\\d{4}/",
-                    "/\\d{10}/",
-                    "/\\d{3}.\\d{3}.\\d{4}/",
-                    "/(\\d{3}-?\\d{3}-?\\d{4})/"
-                ],
-                correctAnswer: 0,
-            },
-            {
-                id: 58,
-                question: "Which regex pattern ensures that a password contains at least one uppercase letter, one lowercase letter, and one digit?",
-                options: [
-                    "/[a-zA-Z0-9]{8,}/",
-                    "/(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)/",
-                    "/[a-zA-Z0-9]+/",
-                    "/\\w+/"
-                ],
-                correctAnswer: 1,
-            },
-            {
-                id: 59,
-                question: "What will `'apple123banana'.match(/\\d+/g)` return?",
-                options: ["['123']", "123", "['apple', 'banana']", "null"],
-                correctAnswer: 0,
-            },
-            {
-                id: 60,
-                question: "Which of the following regex patterns matches a valid URL?",
-                options: [
-                    "/https?:\\/\\/[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}/",
-                    "/[a-z]+.com/",
-                    "/www\\..*/",
-                    "/[a-z0-9]/"
-                ],
-                correctAnswer: 0,
-            },
+                "id": 40,
+                "question": "Which flexbox property allows an item to be aligned differently from other items in the same container?",
+                "options": ["flex-grow", "flex-basis", "align-self", "justify-content"],
+                "correctAnswer": 2
+            }
         ],
     };
 
