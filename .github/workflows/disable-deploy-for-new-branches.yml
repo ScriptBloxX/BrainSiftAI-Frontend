@@ -37,6 +37,14 @@ jobs:
             git config --global user.name "github-actions"
             git config --global user.email "github-actions@github.com"
             git add vercel.json
-            git commit -m "Disable auto deploy for branch $BRANCH_NAME"
-            git push
+
+            # Check if there are any changes to commit
+            if git diff --cached --quiet; then
+              echo "No changes to commit, skipping git commit."
+            else
+              git commit -m "Disable auto deploy for branch $BRANCH_NAME"
+              git push
+            fi
+          else
+            echo "Branch $BRANCH_NAME already exists in vercel.json, skipping."
           fi
