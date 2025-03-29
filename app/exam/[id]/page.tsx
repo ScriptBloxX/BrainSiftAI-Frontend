@@ -25,7 +25,7 @@ export default function TakeExam({ params }: Props) {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [showSummary, setShowSummary] = useState(true)
     const [timer, setTimer] = useState(-1)
-    const [examData, setExamData] = useState<{ title?: string; summary?: []; questions: { question: string; options: string[]; correctAnswer: number }[] }>({ questions: [] });
+    const [examData, setExamData] = useState<{ title?: string; summary?: []; questions: { questionText: string; options: string[]; correctAnswer: number }[] }>({ questions: [] });
     
     const { isAuthenticated, isLoading } = useAuth()
     const router = useRouter()
@@ -44,7 +44,6 @@ export default function TakeExam({ params }: Props) {
                 .get(`${API_BASE_URL}/api/exam/${examId}`)
                 .then((response) => {
                     setExamData(response.data);
-                    console.log(response.data)
                     setTimer(response.data.timer_minute*60);
                 })
                 .catch(() => {
@@ -253,7 +252,7 @@ export default function TakeExam({ params }: Props) {
                 {showSummary ? null :
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-xl select-none cursor-default">{currentQuestionData.question}</CardTitle>
+                            <CardTitle className="text-xl select-none cursor-default">{currentQuestionData.questionText}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <RadioGroup
