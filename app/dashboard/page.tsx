@@ -240,7 +240,7 @@ function ExamCard({
                 <Button variant="outline" size="sm" onClick={handleEdit}>
                     Edit
                 </Button>
-                <Button size="sm" onClick={handleView}>
+                <Button size="sm" onClick={handleView} disabled>
                     Take Exam
                 </Button>
             </CardFooter>
