@@ -29,6 +29,8 @@ export default function Signup() {
     const router = useRouter()
     const { login } = useAuth()
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
@@ -54,7 +56,7 @@ export default function Signup() {
             }
 
             // Set authenticated state
-            const response = await axios.post("https://brain-sift-ai-backend.onrender.com/api/user/", {
+            const response = await axios.post(`${API_BASE_URL}/api/user/`, {
                 username: name,
                 password: password,
                 email: email,

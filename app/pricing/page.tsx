@@ -1,3 +1,5 @@
+"use client"
+
 import type React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -5,8 +7,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Check, X } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { useAuth } from "@/components/auth-context"
 
 export default function Pricing() {
+  const { isAuthenticated } = useAuth()
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -48,7 +53,9 @@ export default function Pricing() {
                 </CardContent>
                 <CardFooter>
                   <Button asChild className="w-full" variant="outline">
-                    <Link href="/signup">Get Started</Link>
+                    <Link href={isAuthenticated ? "#" : "/signup"}>
+                      Get Started
+                    </Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -81,7 +88,9 @@ export default function Pricing() {
                 </CardContent>
                 <CardFooter>
                   <Button asChild className="w-full">
-                    <Link href="/signup">Get Started</Link>
+                    <Link href={isAuthenticated ? "#" : "/signup"}>
+                      Get Started
+                    </Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -183,15 +192,15 @@ function PricingFeature({ children }: { children: React.ReactNode }) {
   )
 }
 function PricingFeatureDemotion({ children }: { children: React.ReactNode }) {
-    return (
-      <li className="flex items-start">
-        <div className="flex-shrink-0">
-          <X className="h-5 w-5 text-red-500" />
-        </div>
-        <p className="ml-3 text-base">{children}</p>
-      </li>
-    )
-  }
+  return (
+    <li className="flex items-start">
+      <div className="flex-shrink-0">
+        <X className="h-5 w-5 text-red-500" />
+      </div>
+      <p className="ml-3 text-base">{children}</p>
+    </li>
+  )
+}
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   return (
