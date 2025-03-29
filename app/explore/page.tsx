@@ -13,6 +13,7 @@ import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import axios from "axios";
+import LoadingScreen from "@/components/loading-screen"
 
 export default function Explore() {
     // State for search and filters
@@ -39,6 +40,7 @@ export default function Explore() {
         createdAt: string;
         tags: string[];
     }[]>([]);
+    const [loadingScreen, setLoadingScreen] = useState(true);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
@@ -58,8 +60,10 @@ export default function Explore() {
                 }));
                 setFilteredExams(formattedExams);
                 setPublicExams(formattedExams);
+                setLoadingScreen(false);
             } catch (error) {
                 console.error("Error fetching exams:", error);
+                setLoadingScreen(false);
             }
         };
 
@@ -75,7 +79,6 @@ export default function Explore() {
         "Software Development Tools",
         "English",
         "Computer Networks Lab",
-        "Computer Science",
     ]
 
     // Filter exams based on selected filters
@@ -193,6 +196,8 @@ export default function Explore() {
         setSelectedDateFilter(null)
         setSearchQuery("")
     }
+
+    if (loadingScreen) return <LoadingScreen />
 
     return (
         <div className="flex flex-col min-h-screen">

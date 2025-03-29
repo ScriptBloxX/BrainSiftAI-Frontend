@@ -61,8 +61,8 @@ export default function ForgotPassword() {
                         </CardHeader>
                         <CardContent>
                             {error && (
-                                <Alert variant="destructive" className="mb-4">
-                                    <AlertCircle className="h-4 w-4" />
+                                <Alert variant="destructive" className="mb-4 flex items-center gap-4">
+                                    <div><AlertCircle className="h-4 w-4" /></div>
                                     <AlertDescription>{error}</AlertDescription>
                                 </Alert>
                             )}
