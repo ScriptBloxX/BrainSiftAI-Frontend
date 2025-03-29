@@ -13,6 +13,7 @@ import { useAuth } from "@/components/auth-context"
 import { useRouter } from "next/navigation"
 import axios from "axios";
 import Summary from "@/components/summary"
+import LoadingScreen from "@/components/loading-screen"
 
 type Props = {
     params: Promise<{ id: string }>
@@ -26,9 +27,11 @@ export default function TakeExam({ params }: Props) {
     const [showSummary, setShowSummary] = useState(true)
     const [timer, setTimer] = useState(-1)
     const [examData, setExamData] = useState<{ title?: string; summary?: []; questions: { questionText: string; options: string[]; correctAnswer: number }[] }>({ questions: [] });
+    const [loadingScreen,setLoadingScreen] = useState(true);
     
     const { isAuthenticated, isLoading } = useAuth()
     const router = useRouter()
+
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
@@ -48,7 +51,9 @@ export default function TakeExam({ params }: Props) {
                 })
                 .catch(() => {
                     router.push("/explore");
-                });
+                }).finally(()=>{
+                    setLoadingScreen(false);
+                })
         }
     }, [examId]);
     useEffect(() => {
@@ -115,8 +120,10 @@ export default function TakeExam({ params }: Props) {
     const currentQuestionData = examData.questions[currentQuestion]
     const hasAnsweredCurrent = answers[currentQuestion] !== undefined
 
+    if (loadingScreen) return <LoadingScreen/>
+
     if (isSubmitted) {
-        return (
+        return (            
             <div className="flex flex-col min-h-screen">
                 <Navbar />
 
