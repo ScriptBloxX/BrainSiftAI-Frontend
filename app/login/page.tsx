@@ -14,6 +14,7 @@ import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
+import axios from "axios";
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -25,6 +26,8 @@ export default function Login() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { login } = useAuth()
+
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
   useEffect(() => {
     // Check for password reset success message
@@ -42,26 +45,39 @@ export default function Login() {
 
     try {
       // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      // Simple validation
       if (!email || !password) {
         throw new Error("Please fill in all fields")
       }
 
-      // In a real app, you would make an API call to authenticate
-      // For demo purposes, we'll accept any valid-looking email/password
-      if (password.length < 6) {
-        throw new Error("Invalid email or password")
+      const response = await axios.post(`${API_BASE_URL}/api/authentication/login`, {
+        usernameOrEmail: email,
+        password: password,
+      });
+
+      if (response.status !== 200) {
+        throw new Error(response.data.message || "Invalid username/email or password");
       }
 
       // Set authenticated state
-      login({ email, name: email.split("@")[0] })
+      login({
+        email: response.data.email,
+        name: response.data.username,
+        token: response.data.token,
+        role: response.data.role,
+        plan: response.data.plan,
+        isEmailVerified: response.data.isEmailVerified,
+        profileUrl: response.data.profileUrl,
+      })
 
       // Redirect to dashboard
       router.push("/dashboard")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      if (axios.isAxiosError(err) && err.response) {
+        setError(err.response.data.error_message || err.response.data.error);
+      } else {
+        setError(err instanceof Error ? err.message : String(err));
+      }
     } finally {
       setIsLoading(false)
     }
@@ -80,8 +96,8 @@ export default function Login() {
             </CardHeader>
             <CardContent>
               {error && (
-                <Alert variant="destructive" className="mb-4">
-                  <AlertCircle className="h-4 w-4" />
+                <Alert variant="destructive" className="mb-4 flex items-center gap-4">
+                  <div> <AlertCircle className="h-5 w-5" /> </div>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
@@ -95,10 +111,10 @@ export default function Login() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email or Username</Label>
                   <Input
                     id="email"
-                    type="email"
+                    type="text"
                     placeholder="name@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
