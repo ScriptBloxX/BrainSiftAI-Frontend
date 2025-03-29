@@ -12,6 +12,7 @@ import { Search, BookOpen, Clock, User } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import axios from "axios";
 
 export default function Explore() {
     // State for search and filters
@@ -20,78 +21,61 @@ export default function Explore() {
     const [selectedQuestionFilter, setSelectedQuestionFilter] = useState<string | null>(null)
     const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState("all")
-    const [filteredExams, setFilteredExams] = useState<any[]>([])
+    const [filteredExams, setFilteredExams] = useState<{
+        id: number;
+        title: string;
+        creator: string;
+        questions: number;
+        completions: number;
+        createdAt: string;
+        tags: string[];
+    }[]>([]);
+    const [publicExams, setPublicExams] = useState<{
+        id: number;
+        title: string;
+        creator: string;
+        questions: number;
+        completions: number;
+        createdAt: string;
+        tags: string[];
+    }[]>([]);
 
-    // Mock data for public exams
-    const publicExams = [
-        {
-            id: 1,
-            title: "Introduction to Biology",
-            creator: "John Smith",
-            questions: 15,
-            completions: 156,
-            createdAt: "2025-10-15",
-            tags: ["Biology", "Science", "Beginner"],
-        },
-        {
-            id: 2,
-            title: "Advanced Mathematics",
-            creator: "Jane Doe",
-            questions: 20,
-            completions: 89,
-            createdAt: "2025-11-02",
-            tags: ["Mathematics", "Advanced"],
-        },
-        {
-            id: 3,
-            title: "World History Overview",
-            creator: "Robert Johnson",
-            questions: 25,
-            completions: 210,
-            createdAt: "2025-12-10",
-            tags: ["History", "Global"],
-        },
-        {
-            id: 4,
-            title: "Introduction to Psychology",
-            creator: "Sarah Williams",
-            questions: 18,
-            completions: 124,
-            createdAt: "2024-01-05",
-            tags: ["Psychology", "Social Science"],
-        },
-        {
-            id: 5,
-            title: "Basic Chemistry Concepts",
-            creator: "Michael Brown",
-            questions: 22,
-            completions: 98,
-            createdAt: "2024-01-20",
-            tags: ["Chemistry", "Science"],
-        },
-        {
-            id: 6,
-            title: "English Literature Classics",
-            creator: "Emily Davis",
-            questions: 30,
-            completions: 76,
-            createdAt: "2024-02-08",
-            tags: ["Literature", "English", "Classics"],
-        },
-    ]
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
+
+    useEffect(() => {
+        const fetchExams = async () => {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/api/exam/explore`);
+                console.log(response.data);
+                const formattedExams = response.data.map((exam: any) => ({
+                    id: exam.id,
+                    title: exam.title,
+                    creator: exam.creator.username || "Unknown",
+                    questions: exam.questionsCount || 0,
+                    completions: exam.completions || 0,
+                    createdAt: exam.createdAt || new Date().toISOString(),
+                    tags: exam.tags || [],
+                }));
+                setFilteredExams(formattedExams);
+                setPublicExams(formattedExams);
+            } catch (error) {
+                console.error("Error fetching exams:", error);
+            }
+        };
+
+        fetchExams();
+    }, []);
 
     // Popular tags
     const popularTags = [
-        "Science",
-        "Mathematics",
-        "History",
-        "Literature",
-        "Psychology",
-        "Biology",
-        "Chemistry",
-        "Physics",
+        "Web Technology",
+        "Computer Networks",
+        "Basic Security",
+        "Basic Programming",
+        "Software Development Tools",
+        "English",
+        "Computer Networks Lab",
         "Computer Science",
-        "Art",
     ]
 
     // Filter exams based on selected filters
