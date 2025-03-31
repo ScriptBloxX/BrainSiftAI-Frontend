@@ -3,8 +3,8 @@ updates:
   - package-ecosystem: "npm"
     directory: "/" 
     schedule:
-      interval: "daily"
-    ignore:
-      - dependency-type: "all"
+      interval: "weekly"
+    allow:
+      - dependency-type: "security"
     open-pull-requests-limit: 10
     security-updates: true
