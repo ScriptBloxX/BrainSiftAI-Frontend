@@ -7,6 +7,7 @@ type User = {
     name: string
     role: "user" | "admin" | "sadmin"
     plan: "free" | "pro" | "enterprise"
+    isEmailVerified: boolean
     profile: {
         avatar?: string
         bio?: string
@@ -14,13 +15,23 @@ type User = {
         language?: string
         timezone?: string
     }
+    token?: string
+    profileUrl?: string
 }
 
 type AuthContextType = {
     user: User | null
     isAuthenticated: boolean
     isLoading: boolean
-    login: (user: Omit<User, "profile" | "role" | "plan"> & { profile?: Partial<User["profile"]>; role?: User["role"]; plan?: User["plan"] }) => void
+    login: (user: {
+        email: string
+        name: string
+        token: string
+        role: User["role"]
+        plan: User["plan"]
+        isEmailVerified: boolean
+        profileUrl?: string
+    }) => void
     logout: () => void
     updateProfile: (profile: Partial<User["profile"]>) => void
     updateUser: (userData: Partial<Omit<User, "profile">>) => void
@@ -30,7 +41,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     isAuthenticated: false,
     isLoading: true,
-    login: (user: Omit<User, "profile" | "role" | "plan"> & { profile?: Partial<User["profile"]>; role?: User["role"]; plan?: User["plan"] }) => { },
+    login: () => { },
     logout: () => { },
     updateProfile: () => { },
     updateUser: () => { },
@@ -41,7 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        // Check if user is stored in localStorage
         const storedUser = localStorage.getItem("user")
         if (storedUser) {
             try {
@@ -54,21 +64,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false)
     }, [])
 
-    const login = (
-        userData: Omit<User, "profile" | "role" | "plan"> & { profile?: Partial<User["profile"]>; role?: User["role"]; plan?: User["plan"] },
-    ) => {
-        // Create a complete user object with default values for missing fields
+    const login = ({
+        email,
+        name,
+        token,
+        role,
+        plan,
+        isEmailVerified,
+        profileUrl,
+    }: {
+        email: string
+        name: string
+        token: string
+        role: User["role"]
+        plan: User["plan"]
+        isEmailVerified: boolean
+        profileUrl?: string
+    }) => {
         const completeUser: User = {
-            ...userData,
-            role: userData.role || "user",
-            plan: userData.plan || "free",
+            email,
+            name,
+            token,
+            role,
+            plan,
+            isEmailVerified,
             profile: {
-                avatar: "/placeholder.svg?height=200&width=200",
+                avatar: profileUrl || "/placeholder.svg?height=200&width=200",
                 bio: "",
                 joinedAt: new Date().toISOString(),
                 language: "english",
                 timezone: "utc",
-                ...userData.profile,
             },
         }
 
@@ -126,4 +151,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export const useAuth = () => useContext(AuthContext)
-

@@ -2,8 +2,7 @@
   "git": {
     "deploymentEnabled": {
       "dev": false,
-      "test": false,
-      "main": false
+      "test": false
     }
   }
 }

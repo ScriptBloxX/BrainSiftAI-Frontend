@@ -15,6 +15,7 @@ import { Loader2, AlertCircle } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
+import axios from "axios";
 
 export default function Signup() {
     const [name, setName] = useState("")
@@ -28,22 +29,22 @@ export default function Signup() {
     const router = useRouter()
     const { login } = useAuth()
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
         setError(null)
 
         try {
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1500))
 
             // Simple validation
             if (!name || !email || !password || !confirmPassword) {
                 throw new Error("Please fill in all fields")
             }
 
-            if (password.length < 6) {
-                throw new Error("Password must be at least 6 characters")
+            if (password.length < 8) {
+                throw new Error("Password must be at least 8 characters")
             }
 
             if (password !== confirmPassword) {
@@ -54,15 +55,32 @@ export default function Signup() {
                 throw new Error("You must accept the terms and conditions")
             }
 
-            // In a real app, you would make an API call to register the user
-
             // Set authenticated state
-            login({ email, name })
+            const response = await axios.post(`${API_BASE_URL}/api/user/`, {
+                username: name,
+                password: password,
+                email: email,
+            });
+
+            login({
+                email: response.data.email,
+                name: response.data.username,
+                token: response.data.token,
+                role: response.data.role,
+                plan: response.data.plan,
+                isEmailVerified: response.data.isEmailVerified,
+                profileUrl: response.data.profileUrl,
+            })
 
             // Redirect to dashboard
             router.push("/dashboard")
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred")
+            console.log(err)
+            if (axios.isAxiosError(err) && err.response) {
+                setError(err.response.data.error_message || err.response.data.error);
+            } else {
+                setError(err instanceof Error ? err.message : String(err));
+            }
         } finally {
             setIsLoading(false)
         }
@@ -80,8 +98,8 @@ export default function Signup() {
                         </CardHeader>
                         <CardContent>
                             {error && (
-                                <Alert variant="destructive" className="mb-4">
-                                    <AlertCircle className="h-4 w-4" />
+                                <Alert variant="destructive" className="mb-4 flex items-center gap-4">
+                                    <div> <AlertCircle className="h-5 w-5" /> </div>
                                     <AlertDescription>{error}</AlertDescription>
                                 </Alert>
                             )}

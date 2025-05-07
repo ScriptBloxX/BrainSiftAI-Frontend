@@ -30,11 +30,17 @@ import {
     CheckCircle2,
     Upload,
     Loader2,
+    Check,
 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 import { useTheme } from "next-themes"
+
+// Theme types
+type PremiumTheme = "ocean" | "lavender" | "sunset" | "forest"
+type ColorScheme = "default" | "blue" | "purple" | "green" | "red" | "amber" | "pink"
+type FontStyle = "sans" | "serif"
 
 export default function Settings() {
     const { user, isAuthenticated, isLoading, logout, updateUser, updateProfile } = useAuth()
@@ -57,6 +63,11 @@ export default function Settings() {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
     const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // Appearance settings
+    const [selectedPremiumTheme, setSelectedPremiumTheme] = useState<PremiumTheme | null>(null)
+    const [selectedColorScheme, setSelectedColorScheme] = useState<ColorScheme>("default")
+    const [selectedFontStyle, setSelectedFontStyle] = useState<FontStyle>("sans")
 
     // Notification preferences
     const [emailNotifications, setEmailNotifications] = useState(true)
@@ -248,6 +259,46 @@ export default function Settings() {
         router.push("/")
     }
 
+    const handleSaveAppearance = async () => {
+        setIsSaving(true)
+        setSuccessMessage(null)
+        setErrorMessage(null)
+
+        try {
+            // Simulate API call delay
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+
+            // In a real app, you would save these preferences to the user's profile
+            // For now, we'll just show a success message
+            setSuccessMessage("Appearance settings saved successfully")
+        } catch (error) {
+            setErrorMessage("Failed to save appearance settings. Please try again.")
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    const handleSelectPremiumTheme = (theme: PremiumTheme) => {
+        if (user?.plan === "free") return
+        setSelectedPremiumTheme(theme)
+        // In a real app, this would apply the theme to the application
+        setTheme(theme)
+    }
+
+    const handleSelectColorScheme = (scheme: ColorScheme) => {
+        if (user?.plan == "free") return
+        setSelectedColorScheme(scheme)
+        // In a real app, this would apply the color scheme to the application
+        // For now, we'll just update the state
+    }
+
+    const handleSelectFontStyle = (style: FontStyle) => {
+        if (user?.plan == "free") return
+        setSelectedFontStyle(style)
+        // In a real app, this would apply the font style to the application
+        // For now, we'll just update the state
+    }
+
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
@@ -328,12 +379,23 @@ export default function Settings() {
                                                 </Avatar>
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex gap-2 flex-wrap">
-                                                        <Button className="w-full sm:w-max" variant="outline" size="sm" onClick={triggerFileInput} disabled={isUploadingAvatar}>
+                                                        <Button
+                                                            className="w-full sm:w-max"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={triggerFileInput}
+                                                            disabled={isUploadingAvatar}
+                                                        >
                                                             <Upload className="mr-2 h-4 w-4" />
                                                             Select Image
                                                         </Button>
                                                         {avatarFile && (
-                                                            <Button className="w-full sm:w-max" size="sm" onClick={handleAvatarUpload} disabled={isUploadingAvatar}>
+                                                            <Button
+                                                                className="w-full sm:w-max"
+                                                                size="sm"
+                                                                onClick={handleAvatarUpload}
+                                                                disabled={isUploadingAvatar}
+                                                            >
                                                                 {isUploadingAvatar ? (
                                                                     <>
                                                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -647,21 +709,30 @@ export default function Settings() {
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <Label>Premium Themes</Label>
-                                                {user?.plan === "free" && (
-                                                    <div className="text-xs text-muted-foreground">Pro Only</div>
-                                                )}
+                                                {user?.plan === "free" && <div className="text-xs text-muted-foreground">Pro Only</div>}
                                             </div>
 
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                {/* Ocean Theme */}
                                                 <div className="relative">
                                                     <Button
-                                                        variant="outline"
-                                                        className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800"
+                                                        variant={selectedPremiumTheme === "ocean" ? "default" : "outline"}
+                                                        className={`w-full h-24 flex flex-col items-center justify-center gap-2 overflow-hidden ${user?.plan === "free" ? "opacity-70" : ""
+                                                            }`}
                                                         disabled={user?.plan === "free"}
-                                                        onClick={() => setTheme("ocean")}
+                                                        onClick={() => handleSelectPremiumTheme("ocean")}
                                                     >
-                                                        <div className="h-6 w-6 rounded-full bg-blue-500" />
-                                                        <span>Ocean</span>
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-600 opacity-20 dark:opacity-30"></div>
+                                                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-blue-200 to-transparent opacity-30 dark:from-blue-400 dark:opacity-20"></div>
+                                                        <div className="z-10 flex flex-col items-center">
+                                                            <div className="h-6 w-6 rounded-full bg-blue-500 shadow-lg mb-1"></div>
+                                                            <span className="font-medium">Ocean</span>
+                                                        </div>
+                                                        {selectedPremiumTheme === "ocean" && (
+                                                            <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5">
+                                                                <Check className="h-3 w-3" />
+                                                            </div>
+                                                        )}
                                                     </Button>
                                                     {user?.plan === "free" && (
                                                         <div className="absolute top-2 right-2">
@@ -670,15 +741,26 @@ export default function Settings() {
                                                     )}
                                                 </div>
 
+                                                {/* Lavender Theme */}
                                                 <div className="relative">
                                                     <Button
-                                                        variant="outline"
-                                                        className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800"
+                                                        variant={selectedPremiumTheme === "lavender" ? "default" : "outline"}
+                                                        className={`w-full h-24 flex flex-col items-center justify-center gap-2 overflow-hidden ${user?.plan === "free" ? "opacity-70" : ""
+                                                            }`}
                                                         disabled={user?.plan === "free"}
-                                                        onClick={() => setTheme("lavender")}
+                                                        onClick={() => handleSelectPremiumTheme("lavender")}
                                                     >
-                                                        <div className="h-6 w-6 rounded-full bg-purple-500" />
-                                                        <span>Lavender</span>
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-indigo-600 opacity-20 dark:opacity-30"></div>
+                                                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-purple-200 to-transparent opacity-30 dark:from-purple-400 dark:opacity-20"></div>
+                                                        <div className="z-10 flex flex-col items-center">
+                                                            <div className="h-6 w-6 rounded-full bg-purple-500 shadow-lg mb-1"></div>
+                                                            <span className="font-medium">Lavender</span>
+                                                        </div>
+                                                        {selectedPremiumTheme === "lavender" && (
+                                                            <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5">
+                                                                <Check className="h-3 w-3" />
+                                                            </div>
+                                                        )}
                                                     </Button>
                                                     {user?.plan === "free" && (
                                                         <div className="absolute top-2 right-2">
@@ -687,15 +769,26 @@ export default function Settings() {
                                                     )}
                                                 </div>
 
+                                                {/* Sunset Theme */}
                                                 <div className="relative">
                                                     <Button
-                                                        variant="outline"
-                                                        className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800"
+                                                        variant={selectedPremiumTheme === "sunset" ? "default" : "outline"}
+                                                        className={`w-full h-24 flex flex-col items-center justify-center gap-2 overflow-hidden ${user?.plan === "free" ? "opacity-70" : ""
+                                                            }`}
                                                         disabled={user?.plan === "free"}
-                                                        onClick={() => setTheme("sunset")}
+                                                        onClick={() => handleSelectPremiumTheme("sunset")}
                                                     >
-                                                        <div className="h-6 w-6 rounded-full bg-amber-500" />
-                                                        <span>Sunset</span>
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-600 opacity-20 dark:opacity-30"></div>
+                                                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-amber-200 to-transparent opacity-30 dark:from-amber-400 dark:opacity-20"></div>
+                                                        <div className="z-10 flex flex-col items-center">
+                                                            <div className="h-6 w-6 rounded-full bg-amber-500 shadow-lg mb-1"></div>
+                                                            <span className="font-medium">Sunset</span>
+                                                        </div>
+                                                        {selectedPremiumTheme === "sunset" && (
+                                                            <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5">
+                                                                <Check className="h-3 w-3" />
+                                                            </div>
+                                                        )}
                                                     </Button>
                                                     {user?.plan === "free" && (
                                                         <div className="absolute top-2 right-2">
@@ -704,15 +797,26 @@ export default function Settings() {
                                                     )}
                                                 </div>
 
+                                                {/* Forest Theme */}
                                                 <div className="relative">
                                                     <Button
-                                                        variant="outline"
-                                                        className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800"
+                                                        variant={selectedPremiumTheme === "forest" ? "default" : "outline"}
+                                                        className={`w-full h-24 flex flex-col items-center justify-center gap-2 overflow-hidden ${user?.plan === "free" ? "opacity-70" : ""
+                                                            }`}
                                                         disabled={user?.plan === "free"}
-                                                        onClick={() => setTheme("forest")}
+                                                        onClick={() => handleSelectPremiumTheme("forest")}
                                                     >
-                                                        <div className="h-6 w-6 rounded-full bg-emerald-500" />
-                                                        <span>Forest</span>
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-600 opacity-20 dark:opacity-30"></div>
+                                                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-green-200 to-transparent opacity-30 dark:from-green-400 dark:opacity-20"></div>
+                                                        <div className="z-10 flex flex-col items-center">
+                                                            <div className="h-6 w-6 rounded-full bg-emerald-500 shadow-lg mb-1"></div>
+                                                            <span className="font-medium">Forest</span>
+                                                        </div>
+                                                        {selectedPremiumTheme === "forest" && (
+                                                            <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5">
+                                                                <Check className="h-3 w-3" />
+                                                            </div>
+                                                        )}
                                                     </Button>
                                                     {user?.plan === "free" && (
                                                         <div className="absolute top-2 right-2">
@@ -734,102 +838,141 @@ export default function Settings() {
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <Label>Color Scheme</Label>
-                                                {user?.plan !== "pro" && (
+                                                {user?.plan == "free" && (
                                                     <div className="text-xs text-muted-foreground">Pro Only</div>
                                                 )}
                                             </div>
 
                                             <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                                                {/* Default (White) Scheme */}
                                                 <div className="relative">
                                                     <Button
                                                         variant="outline"
-                                                        className="w-full aspect-square mb-2 bg-blue-500 hover:bg-blue-600 text-white border-0"
-                                                        disabled={user?.plan !== "pro"}
+                                                        className={`w-full aspect-square mb-2 bg-white dark:bg-gray-900 border-2 ${selectedColorScheme === "default" && (user?.plan === "pro" || user?.plan === "enterprise")
+                                                                ? "border-primary"
+                                                                : "border-gray-200 dark:border-gray-700"
+                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
+                                                        disabled={user?.plan == "free"}
+                                                        onClick={() => handleSelectColorScheme("default")}
                                                     >
-                                                        <Palette className="h-5 w-5" />
+                                                        {selectedColorScheme === "default" &&
+                                                            (user?.plan === "pro" || user?.plan === "enterprise") && (
+                                                                <Check className="h-5 w-5 text-primary" />
+                                                            )}
+                                                    </Button>
+                                                    <span className="text-sm block text-center">Default</span>
+                                                    {user?.plan == "free" && (
+                                                        <div className="absolute top-2 right-2">
+                                                            <Lock className="h-4 w-4 text-muted-foreground" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Blue Scheme */}
+                                                <div className="relative">
+                                                    <Button
+                                                        variant="outline"
+                                                        className={`w-full aspect-square mb-2 bg-blue-500 hover:bg-blue-600 text-white border-0 dark:bg-blue-500 dark:hover:bg-blue-600 ${selectedColorScheme === "blue" && (user?.plan === "pro" || user?.plan === "enterprise")
+                                                                ? "ring-2 ring-offset-2 ring-blue-500"
+                                                                : ""
+                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
+                                                        disabled={user?.plan == "free"}
+                                                        onClick={() => handleSelectColorScheme("blue")}
+                                                    >
+                                                        {selectedColorScheme === "blue" &&
+                                                            (user?.plan === "pro" || user?.plan === "enterprise") && <Check className="h-5 w-5" />}
                                                     </Button>
                                                     <span className="text-sm block text-center">Blue</span>
-                                                    {user?.plan !== "pro" && (
+                                                    {user?.plan == "free" && (
                                                         <div className="absolute top-2 right-2">
                                                             <Lock className="h-4 w-4 text-white" />
                                                         </div>
                                                     )}
                                                 </div>
 
+                                                {/* Purple Scheme */}
                                                 <div className="relative">
                                                     <Button
                                                         variant="outline"
-                                                        className="w-full aspect-square mb-2 bg-purple-500 hover:bg-purple-600 text-white border-0"
-                                                        disabled={user?.plan !== "pro"}
+                                                        className={`w-full aspect-square mb-2 bg-purple-500 hover:bg-purple-600 text-white border-0 dark:bg-purple-500 dark:hover:bg-purple-600 ${selectedColorScheme === "purple" && (user?.plan === "pro" || user?.plan === "enterprise")
+                                                                ? "ring-2 ring-offset-2 ring-purple-500"
+                                                                : ""
+                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
+                                                        disabled={user?.plan == "free"}
+                                                        onClick={() => handleSelectColorScheme("purple")}
                                                     >
-                                                        <Palette className="h-5 w-5" />
+                                                        {selectedColorScheme === "purple" &&
+                                                            (user?.plan === "pro" || user?.plan === "enterprise") && <Check className="h-5 w-5" />}
                                                     </Button>
                                                     <span className="text-sm block text-center">Purple</span>
-                                                    {user?.plan !== "pro" && (
+                                                    {user?.plan == "free" && (
                                                         <div className="absolute top-2 right-2">
                                                             <Lock className="h-4 w-4 text-white" />
                                                         </div>
                                                     )}
                                                 </div>
 
+                                                {/* Green Scheme */}
                                                 <div className="relative">
                                                     <Button
                                                         variant="outline"
-                                                        className="w-full aspect-square mb-2 bg-green-500 hover:bg-green-600 text-white border-0"
-                                                        disabled={user?.plan !== "pro"}
+                                                        className={`w-full aspect-square mb-2 bg-green-500 hover:bg-green-600 text-white border-0 dark:bg-green-500 dark:hover:bg-green-600 ${selectedColorScheme === "green" && (user?.plan === "pro" || user?.plan === "enterprise")
+                                                                ? "ring-2 ring-offset-2 ring-green-500"
+                                                                : ""
+                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
+                                                        disabled={user?.plan == "free"}
+                                                        onClick={() => handleSelectColorScheme("green")}
                                                     >
-                                                        <Palette className="h-5 w-5" />
+                                                        {selectedColorScheme === "green" &&
+                                                            (user?.plan === "pro" || user?.plan === "enterprise") && <Check className="h-5 w-5" />}
                                                     </Button>
                                                     <span className="text-sm block text-center">Green</span>
-                                                    {user?.plan !== "pro" && (
+                                                    {user?.plan == "free" && (
                                                         <div className="absolute top-2 right-2">
                                                             <Lock className="h-4 w-4 text-white" />
                                                         </div>
                                                     )}
                                                 </div>
 
+                                                {/* Red Scheme */}
                                                 <div className="relative">
                                                     <Button
                                                         variant="outline"
-                                                        className="w-full aspect-square mb-2 bg-red-500 hover:bg-red-600 text-white border-0"
-                                                        disabled={user?.plan !== "pro"}
+                                                        className={`w-full aspect-square mb-2 bg-red-500 hover:bg-red-600 text-white border-0 dark:bg-red-500 dark:hover:bg-red-600 ${selectedColorScheme === "red" && (user?.plan === "pro" || user?.plan === "enterprise")
+                                                                ? "ring-2 ring-offset-2 ring-red-500"
+                                                                : ""
+                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
+                                                        disabled={user?.plan == "free"}
+                                                        onClick={() => handleSelectColorScheme("red")}
                                                     >
-                                                        <Palette className="h-5 w-5" />
+                                                        {selectedColorScheme === "red" && (user?.plan === "pro" || user?.plan === "enterprise") && (
+                                                            <Check className="h-5 w-5" />
+                                                        )}
                                                     </Button>
                                                     <span className="text-sm block text-center">Red</span>
-                                                    {user?.plan !== "pro" && (
+                                                    {user?.plan == "free" && (
                                                         <div className="absolute top-2 right-2">
                                                             <Lock className="h-4 w-4 text-white" />
                                                         </div>
                                                     )}
                                                 </div>
 
+                                                {/* Amber Scheme */}
                                                 <div className="relative">
                                                     <Button
                                                         variant="outline"
-                                                        className="w-full aspect-square mb-2 bg-amber-500 hover:bg-amber-600 text-white border-0"
-                                                        disabled={user?.plan !== "pro"}
+                                                        className={`w-full aspect-square mb-2 bg-amber-500 hover:bg-amber-600 text-white border-0 dark:bg-amber-500 dark:hover:bg-amber-600 ${selectedColorScheme === "amber" && (user?.plan === "pro" || user?.plan === "enterprise")
+                                                                ? "ring-2 ring-offset-2 ring-amber-500"
+                                                                : ""
+                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
+                                                        disabled={user?.plan == "free"}
+                                                        onClick={() => handleSelectColorScheme("amber")}
                                                     >
-                                                        <Palette className="h-5 w-5" />
+                                                        {selectedColorScheme === "amber" &&
+                                                            (user?.plan === "pro" || user?.plan === "enterprise") && <Check className="h-5 w-5" />}
                                                     </Button>
                                                     <span className="text-sm block text-center">Amber</span>
-                                                    {user?.plan !== "pro" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-white" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="relative">
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full aspect-square mb-2 bg-pink-500 hover:bg-pink-600 text-white border-0"
-                                                        disabled={user?.plan !== "pro"}
-                                                    >
-                                                        <Palette className="h-5 w-5" />
-                                                    </Button>
-                                                    <span className="text-sm block text-center">Pink</span>
-                                                    {user?.plan !== "pro" && (
+                                                    {user?.plan == "free" && (
                                                         <div className="absolute top-2 right-2">
                                                             <Lock className="h-4 w-4 text-white" />
                                                         </div>
@@ -838,7 +981,7 @@ export default function Settings() {
                                             </div>
 
                                             <p className="text-xs text-muted-foreground">
-                                                {user?.plan !== "pro"
+                                                {user?.plan == "free"
                                                     ? "Custom color schemes are available on Pro plans only."
                                                     : "Select a primary color to customize your experience."}
                                             </p>
@@ -849,7 +992,7 @@ export default function Settings() {
                                         <div className="space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <Label>Font Style</Label>
-                                                {user?.plan !== "pro" && (
+                                                {user?.plan == "free" && (
                                                     <div className="text-xs text-muted-foreground">Pro Only</div>
                                                 )}
                                             </div>
@@ -857,13 +1000,18 @@ export default function Settings() {
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="relative">
                                                     <Button
-                                                        variant="outline"
-                                                        className="w-full h-16 font-sans"
-                                                        disabled={user?.plan !== "pro"}
+                                                        variant={
+                                                            selectedFontStyle === "sans" && (user?.plan === "pro" || user?.plan === "enterprise")
+                                                                ? "default"
+                                                                : "outline"
+                                                        }
+                                                        className={`w-full h-16 font-sans ${user?.plan == "free" ? "opacity-70" : ""}`}
+                                                        disabled={user?.plan == "free"}
+                                                        onClick={() => handleSelectFontStyle("sans")}
                                                     >
                                                         Sans Serif
                                                     </Button>
-                                                    {user?.plan !== "pro" && (
+                                                    {user?.plan == "free" && (
                                                         <div className="absolute top-2 right-2">
                                                             <Lock className="h-4 w-4 text-muted-foreground" />
                                                         </div>
@@ -872,13 +1020,18 @@ export default function Settings() {
 
                                                 <div className="relative">
                                                     <Button
-                                                        variant="outline"
-                                                        className="w-full h-16 font-serif"
-                                                        disabled={user?.plan !== "pro"}
+                                                        variant={
+                                                            selectedFontStyle === "serif" && (user?.plan === "pro" || user?.plan === "enterprise")
+                                                                ? "default"
+                                                                : "outline"
+                                                        }
+                                                        className={`w-full h-16 font-serif ${user?.plan == "free" ? "opacity-70" : ""}`}
+                                                        disabled={user?.plan == "free"}
+                                                        onClick={() => handleSelectFontStyle("serif")}
                                                     >
                                                         Serif
                                                     </Button>
-                                                    {user?.plan !== "pro" && (
+                                                    {user?.plan == "free" && (
                                                         <div className="absolute top-2 right-2">
                                                             <Lock className="h-4 w-4 text-muted-foreground" />
                                                         </div>
@@ -899,7 +1052,7 @@ export default function Settings() {
                                                             Upgrade to Pro or Enterprise to access premium themes, custom color schemes, and font
                                                             options.
                                                         </p>
-                                                        <Button className="mt-3" size="sm" onClick={()=>window.location.href="/pricing"}>
+                                                        <Button className="mt-3" size="sm" onClick={() => (window.location.href = "/pricing")}>
                                                             View Plans
                                                         </Button>
                                                     </div>
@@ -908,9 +1061,9 @@ export default function Settings() {
                                         )}
                                     </CardContent>
                                     <CardFooter>
-                                        <Button onClick={() => setSuccessMessage("Appearance settings saved successfully")}>
+                                        <Button onClick={handleSaveAppearance} disabled={isSaving}>
                                             <Save className="mr-2 h-4 w-4" />
-                                            Save Appearance
+                                            {isSaving ? "Saving..." : "Save Appearance"}
                                         </Button>
                                     </CardFooter>
                                 </Card>
