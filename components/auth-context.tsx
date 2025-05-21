@@ -35,8 +35,8 @@ type AuthContextType = {
     logout: () => void
     updateProfile: (profile: Partial<User["profile"]>) => void
     updateUser: (userData: Partial<Omit<User, "profile">>) => void
+    getToken: () => string | null
 }
-
 const AuthContext = createContext<AuthContextType>({
     user: null,
     isAuthenticated: false,
@@ -45,6 +45,7 @@ const AuthContext = createContext<AuthContextType>({
     logout: () => { },
     updateProfile: () => { },
     updateUser: () => { },
+    getToken: () => null,
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -143,6 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 logout,
                 updateProfile,
                 updateUser,
+                getToken: () => user?.token || null,
             }}
         >
             {children}

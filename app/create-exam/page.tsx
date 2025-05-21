@@ -28,7 +28,7 @@ export default function CreateExam() {
     const [examTimer, setExamTimer] = useState<number | null>(null)
     const [errors, setErrors] = useState<{ title?: string; timer?: string }>({})
 
-    const { isAuthenticated, isLoading } = useAuth()
+    const { isAuthenticated, isLoading, getToken } = useAuth()
     const router = useRouter()
 
     useEffect(() => {
@@ -77,19 +77,27 @@ export default function CreateExam() {
 
         setIsGenerating(true)
         try {
+            // Get authentication token
+            const token = localStorage.getItem('token');
+            
             const response = await axios.post('http://localhost:3001/api/exam/generate', {
                 content: fileName ? { type: 'file', name: fileName } : { type: 'text', text: textContent },
                 isPrivate: isPrivate,
                 title: examTitle,
                 timer: examTimer,
                 // Add any other fields you need to send
+            }, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                    'Content-Type': 'application/json'
+                }
             });
-
+            
             // Redirect to exam preview page with the ID from the response
             router.push(`/exam-preview/${response.data.examId || '123'}`);
-        } catch (error) {
+        } catch (error: any) {
             // Show error toast with dark theme
-            toast.error('(Server is busy)\nFailed to generate exam. Please try again later.', {
+            toast.error(error.response?.data?.message || "(Server is busy)\nFailed to generate exam. Please try again later.", {
                 position: 'bottom-right',
                 duration: 4000,
                 style: {
