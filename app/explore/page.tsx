@@ -221,7 +221,7 @@ export default function Explore() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                    <div className="md:col-span-1 space-y-6">
+                    <div className="md:col-span-1 space-y-6 md:sticky md:top-[9.5rem] md:self-start">
                         {(selectedTags.length > 0 || selectedQuestionFilter || selectedDateFilter) && (
                             <Button variant="ghost" size="sm" onClick={clearFilters}>
                                 Clear All
