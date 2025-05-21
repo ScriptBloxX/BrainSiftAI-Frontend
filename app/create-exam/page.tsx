@@ -76,22 +76,37 @@ export default function CreateExam() {
         }
 
         setIsGenerating(true)
-        try {
-            // Get authentication token
-            const token = localStorage.getItem('token');
+        try {            
+            // Create form data to handle file uploads
+            const formData = new FormData();
             
-            const response = await axios.post('http://localhost:3001/api/exam/generate', {
-                content: fileName ? { type: 'file', name: fileName } : { type: 'text', text: textContent },
-                isPrivate: isPrivate,
-                title: examTitle,
-                timer: examTimer,
-                // Add any other fields you need to send
-            }, {
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                    'Content-Type': 'application/json'
+            // Add file or text content
+            if (fileName) {
+                const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                const file = fileInput?.files?.[0];
+                if (file) {
+                    formData.append('file', file);
+                    formData.append('contentType', 'file');
                 }
-            });
+            } else {
+                formData.append('text', textContent);
+                formData.append('contentType', 'text');
+            }
+            
+            // Add other exam data
+            formData.append('isPrivate', isPrivate.toString());
+            formData.append('title', examTitle);
+            formData.append('timer', examTimer?.toString() || '');
+            
+            const response = await axios.post('http://localhost:3001/api/exam/generate', 
+                formData, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                        'Content-Type': 'multipart/form-data' // Important for file uploads
+                    }
+                }
+            );
             
             // Redirect to exam preview page with the ID from the response
             router.push(`/exam-preview/${response.data.examId || '123'}`);
