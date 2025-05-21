@@ -15,6 +15,8 @@ import { FileUp, Upload, Loader2 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
+import axios from "axios"
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function CreateExam() {
     const [isUploading, setIsUploading] = useState(false)
@@ -22,6 +24,9 @@ export default function CreateExam() {
     const [fileName, setFileName] = useState<string | null>(null)
     const [textContent, setTextContent] = useState("")
     const [isPrivate, setIsPrivate] = useState(false)
+    const [examTitle, setExamTitle] = useState("")
+    const [examTimer, setExamTimer] = useState<number | null>(null)
+    const [errors, setErrors] = useState<{ title?: string; timer?: string }>({})
 
     const { isAuthenticated, isLoading } = useAuth()
     const router = useRouter()
@@ -50,21 +55,68 @@ export default function CreateExam() {
         }
     }
 
-    const handleGenerate = () => {
-        setIsGenerating(true)
+    const validateForm = () => {
+        const newErrors: { title?: string; timer?: string } = {}
 
-        // Simulate AI processing delay
-        setTimeout(() => {
-            setIsGenerating(false)
-            // In a real app, we would redirect to the exam preview page
-            router.push("/exam-preview/123")
-        }, 3000)
+        if (!examTitle.trim()) {
+            newErrors.title = "Exam title is required"
+        }
+
+        if (!examTimer || examTimer <= 0) {
+            newErrors.timer = "Valid timer value is required"
+        }
+
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
+
+    const handleGenerate = async () => {
+        if (!validateForm()) {
+            return
+        }
+
+        setIsGenerating(true)
+        try {
+            const response = await axios.post('http://localhost:3001/api/exam/generate', {
+                content: fileName ? { type: 'file', name: fileName } : { type: 'text', text: textContent },
+                isPrivate: isPrivate,
+                title: examTitle,
+                timer: examTimer,
+                // Add any other fields you need to send
+            });
+
+            // Redirect to exam preview page with the ID from the response
+            router.push(`/exam-preview/${response.data.examId || '123'}`);
+        } catch (error) {
+            // Show error toast with dark theme
+            toast.error('(Server is busy)\nFailed to generate exam. Please try again later.', {
+                position: 'bottom-right',
+                duration: 4000,
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+                iconTheme: {
+                    primary: '#ff4b4b',
+                    secondary: '#fff',
+                },
+            });
+            // Set error message in state as well
+            setErrors(prev => ({
+                ...prev,
+                general: '(Server is busy)\nFailed to generate exam. Please try again later.'
+            }));
+        } finally {
+            setIsGenerating(false);
+        }
     }
 
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
-
+            <Toaster
+                position="bottom-right"
+            />
             <main className="flex-1 container mx-auto max-w-4xl px-4 md:px-6 py-8 mt-16">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold tracking-tight">Create New Exam</h1>
@@ -82,7 +134,7 @@ export default function CreateExam() {
                             <TabsContent value="upload" className="space-y-6">
                                 <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                                     <div className="flex flex-col items-center justify-center gap-4">
-                                        <div className="p-3 rounded-full bg-primary/10">
+                                        <div className="p-3 ro</TabsContent>unded-full bg-primary/10">
                                             <FileUp className="h-8 w-8 text-primary" />
                                         </div>
                                         <div>
@@ -143,9 +195,16 @@ export default function CreateExam() {
                     <CardContent className="pt-6 space-y-6">
                         <div>
                             <Label htmlFor="exam-title">Exam Title</Label>
-                            <Input id="exam-title" placeholder="Enter a title for your exam" className="mt-2" />
+                            <Input
+                                id="exam-title"
+                                placeholder="Enter a title for your exam"
+                                className="mt-2"
+                                value={examTitle}
+                                onChange={(e) => setExamTitle(e.target.value)}
+                            />
+                            {errors.title && <p className="text-sm text-destructive mt-1">{errors.title}</p>}
                         </div>
-                        
+
                         <div className="flex items-center justify-between flex-wrap">
                             <div className="space-y-0.5">
                                 <Label htmlFor="exam-timer">Timer (minutes)</Label>
@@ -157,13 +216,13 @@ export default function CreateExam() {
                                 placeholder="Enter time in minutes"
                                 className="mt-2 w-full"
                                 min={1}
+                                value={examTimer || ''}
                                 onChange={(e) => {
                                     const value = parseInt(e.target.value, 10);
-                                    if (!isNaN(value) && value > 0) {
-                                        // Handle timer value change (wait state)
-                                    }
+                                    setExamTimer(isNaN(value) ? null : value);
                                 }}
                             />
+                            {errors.timer && <p className="text-sm text-destructive mt-1 w-full">{errors.timer}</p>}
                         </div>
 
                         <div className="flex items-center justify-between">
