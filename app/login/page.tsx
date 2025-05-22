@@ -61,6 +61,7 @@ export default function Login() {
 
       // Set authenticated state
       login({
+        id: response.data.id,
         email: response.data.email,
         name: response.data.username,
         token: response.data.token,

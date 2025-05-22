@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
 type User = {
+    id: number;
     email: string
     name: string
     role: "user" | "admin" | "sadmin"
@@ -24,6 +25,7 @@ type AuthContextType = {
     isAuthenticated: boolean
     isLoading: boolean
     login: (user: {
+        id: number;
         email: string
         name: string
         token: string
@@ -66,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [])
 
     const login = ({
+        id,
         email,
         name,
         token,
@@ -74,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isEmailVerified,
         profileUrl,
     }: {
+        id: number;
         email: string
         name: string
         token: string
@@ -83,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profileUrl?: string
     }) => {
         const completeUser: User = {
+            id,
             email,
             name,
             token,
@@ -99,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         setUser(completeUser)
+        console.log('set,',completeUser)
         localStorage.setItem("user", JSON.stringify(completeUser))
     }
 

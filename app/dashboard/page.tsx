@@ -7,11 +7,12 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileUp, Plus, BookOpen, Users } from "lucide-react"
+import { FileUp, Plus, BookOpen, Users, Loader2 } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
+import axios from "axios"
 import {
     Dialog,
     DialogContent,
@@ -28,9 +29,26 @@ import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 
+type ExamType = {
+    id: string
+    title: string
+    tags: string[]
+    timer_minute: number
+    visibility: boolean
+    completions: number
+    createdAt: string
+    questionsCount: number
+    creator: {
+        id: number
+        username: string
+    }
+}
+
 export default function Dashboard() {
-    const { isAuthenticated, isLoading } = useAuth()
+    const { isAuthenticated, isLoading, user, getToken } = useAuth()
     const router = useRouter()
+    const [myExams, setMyExams] = useState<ExamType[]>([])
+    const [loadingExams, setLoadingExams] = useState(true)
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -38,17 +56,37 @@ export default function Dashboard() {
         }
     }, [isAuthenticated, isLoading, router])
 
+    useEffect(() => {
+        const fetchExams = async () => {
+            if (!isAuthenticated || !user) return
+
+            try {
+                setLoadingExams(true)
+                const response = await axios.get("http://localhost:3001/api/exam/explore", {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                    },
+                })
+
+                // Filter exams to only show those created by the current user
+                const userExams = response.data.filter((exam: ExamType) => exam.creator.id === user.id)
+                setMyExams(userExams)
+            } catch (error) {
+                console.error("Failed to fetch exams:", error)
+            } finally {
+                setLoadingExams(false)
+            }
+        }
+
+        if (isAuthenticated && user) {
+            fetchExams()
+        }
+    }, [isAuthenticated, user, getToken])
+
     // If still loading or not authenticated, don't render the dashboard
     if (isLoading || !isAuthenticated) {
         return null
     }
-
-    // Mock data for exams
-    const myExams = [
-        { id: 1, title: "Introduction to Biology", questions: 15, visibility: "public", createdAt: "2025-3-15" },
-        { id: 2, title: "Advanced Mathematics", questions: 20, visibility: "private", createdAt: "2025-3-02" },
-        { id: 3, title: "World History Overview", questions: 25, visibility: "public", createdAt: "2025-3-10" },
-    ]
 
     // Mock data for classes
     const myClasses = [
@@ -83,8 +121,8 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <StatsCard
                         title="Total Exams"
-                        value="12"
-                        description="3 created this month"
+                        value={myExams.length.toString()}
+                        description={`${myExams.filter((exam) => new Date(exam.createdAt).getMonth() === new Date().getMonth()).length} created this month`}
                         icon={<BookOpen className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
@@ -95,8 +133,8 @@ export default function Dashboard() {
                     />
                     <StatsCard
                         title="Exam Completions"
-                        value="156"
-                        description="24 in the last week"
+                        value={myExams.reduce((sum, exam) => sum + exam.completions, 0).toString()}
+                        description="from all your exams"
                         icon={<FileUp className="h-5 w-5 text-muted-foreground" />}
                     />
                 </div>
@@ -108,32 +146,52 @@ export default function Dashboard() {
                     </TabsList>
 
                     <TabsContent value="exams">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <Link href="/create-exam">
-                                <Card className="bg-primary/5 border-dashed border-primary/20 hover:border-primary/50 transition-colors cursor-pointer">
-                                    <CardHeader className="flex flex-col items-center justify-center pt-8">
-                                        <div className="p-3 rounded-full bg-primary/10 mb-4">
-                                            <Plus className="h-8 w-8 text-primary" />
-                                        </div>
-                                        <CardTitle className="text-center">Create New Exam</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-center pb-8">
-                                        <p className="text-sm text-muted-foreground">Upload a PDF or enter text to generate an exam</p>
-                                    </CardContent>
-                                </Card>
-                            </Link>
+                        {loadingExams ? (
+                            <div className="flex justify-center items-center py-12">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <Link href="/create-exam">
+                                    <Card className="bg-primary/5 border-dashed border-primary/20 hover:border-primary/50 transition-colors cursor-pointer">
+                                        <CardHeader className="flex flex-col items-center justify-center pt-8">
+                                            <div className="p-3 rounded-full bg-primary/10 mb-4">
+                                                <Plus className="h-8 w-8 text-primary" />
+                                            </div>
+                                            <CardTitle className="text-center">Create New Exam</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="text-center pb-8">
+                                            <p className="text-sm text-muted-foreground">Upload a PDF or enter text to generate an exam</p>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
 
-                            {myExams.map((exam) => (
-                                <ExamCard
-                                    key={exam.id}
-                                    title={exam.title}
-                                    questions={exam.questions}
-                                    visibility={exam.visibility}
-                                    createdAt={exam.createdAt}
-                                    id={exam.id}
-                                />
-                            ))}
-                        </div>
+                                {myExams.length === 0 ? (
+                                    <Card className="col-span-1 md:col-span-2 lg:col-span-2">
+                                        <CardContent className="flex flex-col items-center justify-center py-12">
+                                            <p className="text-muted-foreground mb-4">You haven't created any exams yet</p>
+                                            <Button asChild>
+                                                <Link href="/create-exam">
+                                                    <Plus className="mr-2 h-4 w-4" /> Create Your First Exam
+                                                </Link>
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                ) : (
+                                    myExams.map((exam) => (
+                                        <ExamCard
+                                            key={exam.id}
+                                            title={exam.title}
+                                            questions={exam.questionsCount}
+                                            visibility={exam.visibility ? "public" : "private"}
+                                            createdAt={exam.createdAt}
+                                            id={exam.id}
+                                            tags={exam.tags}
+                                        />
+                                    ))
+                                )}
+                            </div>
+                        )}
                     </TabsContent>
 
                     <TabsContent value="classes">
@@ -194,13 +252,15 @@ function ExamCard({
     questions,
     visibility,
     createdAt,
-    id = Math.floor(Math.random() * 1000),
+    id,
+    tags = [],
 }: {
     title: string
     questions: number
     visibility: string
     createdAt: string
-    id?: number
+    id: string
+    tags?: string[]
 }) {
     const router = useRouter()
     const [showEditDialog, setShowEditDialog] = useState(false)
@@ -215,6 +275,14 @@ function ExamCard({
         setShowEditDialog(true)
     }
 
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        })
+    }
+
     const handleSaveChanges = () => {
         // In a real app, you would make an API call to update the exam
         setShowEditDialog(false)
@@ -226,21 +294,30 @@ function ExamCard({
         <Card>
             <CardHeader>
                 <CardTitle className="line-clamp-1">{title}</CardTitle>
-                <CardDescription>Created on {createdAt}</CardDescription>
+                <CardDescription>Created on {formatDate(createdAt)}</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-sm mb-2">
                     <span>{questions} questions</span>
                     <span className={`capitalize ${visibility === "public" ? "text-green-500" : "text-amber-500"}`}>
                         {visibility}
                     </span>
                 </div>
+                {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                        {tags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                            </Badge>
+                        ))}
+                    </div>
+                )}
             </CardContent>
             <CardFooter className="flex justify-between">
                 <Button variant="outline" size="sm" onClick={handleEdit}>
                     Edit
                 </Button>
-                <Button size="sm" onClick={handleView} disabled>
+                <Button size="sm" onClick={handleView}>
                     Take Exam
                 </Button>
             </CardFooter>

@@ -63,6 +63,7 @@ export default function Signup() {
             });
 
             login({
+                id: response.data.id,
                 email: response.data.email,
                 name: response.data.username,
                 token: response.data.token,
