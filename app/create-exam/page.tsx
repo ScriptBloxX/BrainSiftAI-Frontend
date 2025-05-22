@@ -27,12 +27,12 @@ export default function CreateExam() {
     const [isPrivate, setIsPrivate] = useState(false)
     const [examTitle, setExamTitle] = useState("")
     const [examTimer, setExamTimer] = useState<number | null>(null)
-    const [errors, setErrors] = useState<{ title?: string; timer?: string; questionCount?: string }>({})
+    const [errors, setErrors] = useState<{ title?: string; timer?: string; questionCount?: string; credits?: string }>({})
     const [tags, setTags] = useState<string[]>([])
     const [tagInput, setTagInput] = useState("")
     const [questionCount, setQuestionCount] = useState<number | null>(null)
 
-    const { isAuthenticated, isLoading, getToken } = useAuth()
+    const { isAuthenticated, isLoading, getToken, user } = useAuth()
     const router = useRouter()
 
     useEffect(() => {
@@ -51,11 +51,6 @@ export default function CreateExam() {
         if (file) {
             setIsUploading(true)
             setFileName(file.name)
-
-            // Simulate upload delay
-            setTimeout(() => {
-                setIsUploading(false)
-            }, 2000)
         }
     }
 
@@ -74,7 +69,7 @@ export default function CreateExam() {
     }
 
     const validateForm = () => {
-        const newErrors: { title?: string; timer?: string; questionCount?: string } = {}
+        const newErrors: { title?: string; timer?: string; questionCount?: string; credits?: string } = {}
 
         if (!examTitle.trim()) {
             newErrors.title = "Exam title is required"
@@ -88,6 +83,11 @@ export default function CreateExam() {
             newErrors.questionCount = "Minimum 3 questions required"
         } else if (questionCount > 30) {
             newErrors.questionCount = "Maximum 30 questions allowed for 'Free' plan"
+        }
+        
+        // Check if user has enough credits
+        if (user && user.creditsRemaining <= 0) {
+            newErrors.credits = "You don't have enough credits to generate an exam"
         }
 
         setErrors(newErrors)
@@ -138,6 +138,20 @@ export default function CreateExam() {
             );
 
             // Redirect to exam preview page with the data from the response
+            if (user) {
+                const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                storedUser.creditsRemaining -= 1;
+                localStorage.setItem('user', JSON.stringify(storedUser));
+            }
+            
+            toast.success('Exam generated successfully!', {
+                position: 'bottom-right',
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+            });
+            
             router.push(`/exam-preview/${response.data.id}`);
         } catch (error: any) {
             // Show error toast with dark theme
@@ -332,9 +346,30 @@ export default function CreateExam() {
                     </CardContent>
                 </Card>
 
+                {user && (
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="text-sm text-muted-foreground">
+                            Plan: <span className="font-medium capitalize">{user.plan}</span>
+                        </div>
+                        <div className="text-sm">
+                            Credits remaining: <span className="font-medium">{user.creditsRemaining}</span>
+                        </div>
+                    </div>
+                )}
+
+                {errors.credits && (
+                    <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-6">
+                        <p>{errors.credits}</p>
+                        <p className="text-sm mt-1">Please upgrade your plan to get more credits.</p>
+                    </div>
+                )}
+
                 <div className="flex justify-end gap-4">
                     <Button variant="outline">Cancel</Button>
-                    <Button onClick={handleGenerate} disabled={isGenerating || (!fileName && !textContent)}>
+                    <Button 
+                        onClick={handleGenerate} 
+                        disabled={!!isGenerating || (!fileName && !textContent)}
+                    >
                         {isGenerating ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

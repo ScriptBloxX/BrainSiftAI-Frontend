@@ -71,6 +71,7 @@ export default function Signup() {
                 plan: response.data.plan,
                 isEmailVerified: response.data.isEmailVerified,
                 profileUrl: response.data.profileUrl,
+                creditsRemaining: response.data.creditsRemaining
             })
 
             // Redirect to dashboard

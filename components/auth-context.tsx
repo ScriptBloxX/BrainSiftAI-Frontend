@@ -9,6 +9,7 @@ type User = {
     role: "user" | "admin" | "sadmin"
     plan: "free" | "pro" | "enterprise"
     isEmailVerified: boolean
+    creditsRemaining: number;
     profile: {
         avatar?: string
         bio?: string
@@ -32,6 +33,7 @@ type AuthContextType = {
         role: User["role"]
         plan: User["plan"]
         isEmailVerified: boolean
+        creditsRemaining?: number;
         profileUrl?: string
     }) => void
     logout: () => void
@@ -75,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role,
         plan,
         isEmailVerified,
+        creditsRemaining,
         profileUrl,
     }: {
         id: number;
@@ -84,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: User["role"]
         plan: User["plan"]
         isEmailVerified: boolean
+        creditsRemaining?: number;
         profileUrl?: string
     }) => {
         const completeUser: User = {
@@ -94,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             role,
             plan,
             isEmailVerified,
+            creditsRemaining: creditsRemaining ?? 0,
             profile: {
                 avatar: profileUrl || "/placeholder.svg?height=200&width=200",
                 bio: "",
