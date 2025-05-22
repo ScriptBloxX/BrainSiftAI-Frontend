@@ -49,6 +49,7 @@ export default function Dashboard() {
     const router = useRouter()
     const [myExams, setMyExams] = useState<ExamType[]>([])
     const [loadingExams, setLoadingExams] = useState(true)
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -62,7 +63,7 @@ export default function Dashboard() {
 
             try {
                 setLoadingExams(true)
-                const response = await axios.get("http://localhost:3001/api/exam/explore", {
+                const response = await axios.get(`${API_BASE_URL}/api/exam/explore`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
                     },

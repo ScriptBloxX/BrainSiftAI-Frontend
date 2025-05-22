@@ -35,6 +35,8 @@ export default function CreateExam() {
     const { isAuthenticated, isLoading, getToken, user } = useAuth()
     const router = useRouter()
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
+
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
             router.push("/login")
@@ -127,7 +129,7 @@ export default function CreateExam() {
                 formData.append('tags', JSON.stringify(tags));
             }
 
-            const response = await axios.post('http://localhost:3001/api/exam/generate',
+            const response = await axios.post(`${API_BASE_URL}/api/exam/generate`,
                 formData,
                 {
                     headers: {
@@ -143,7 +145,7 @@ export default function CreateExam() {
                 storedUser.creditsRemaining -= 1;
                 localStorage.setItem('user', JSON.stringify(storedUser));
             }
-            
+
             toast.success('Exam generated successfully!', {
                 position: 'bottom-right',
                 style: {

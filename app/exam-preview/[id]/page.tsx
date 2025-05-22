@@ -59,8 +59,9 @@ export default function ExamPreview({ params }: Props) {
     const [timer, setTimer] = useState<boolean>(true)
     const [loading, setLoading] = useState<boolean>(true)
 
-
     const { getToken } = useAuth()
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
+
 
     useEffect(() => {
         // Fetch the exam data using the ID from the URL
@@ -68,7 +69,7 @@ export default function ExamPreview({ params }: Props) {
             try {
                 setExamId(id);
 
-                const response = await fetch(`http://localhost:3001/api/exam/${id}`, {
+                const response = await fetch(`${API_BASE_URL}/api/exam/${id}`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`
                     }
