@@ -11,9 +11,10 @@ import { Switch } from "@/components/ui/switch"
 import { Copy, Share2, Edit, Check } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import toast, { Toaster } from "react-hot-toast"
 
 type Props = {
-  params: Promise<{ id: string }>
+    params: Promise<{ id: string }>
 }
 
 export default function ExamPreview({ params }: Props) {
@@ -78,6 +79,9 @@ export default function ExamPreview({ params }: Props) {
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
+            <Toaster
+                position="bottom-right"
+            />
 
             <main className="flex-1 container mx-auto max-w-4xl px-4 md:px-6 py-8 mt-16">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -111,7 +115,7 @@ export default function ExamPreview({ params }: Props) {
                     <CardContent className="space-y-6">
                         <div>
                             <Label htmlFor="exam-title">Exam Title</Label>
-                            <Input id="exam-title" defaultValue={examData.title} className="mt-2" />
+                            <Input disabled id="exam-title" defaultValue={examData.title} className="mt-2" />
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -127,7 +131,18 @@ export default function ExamPreview({ params }: Props) {
                                 <Label htmlFor="invite-email">Invite Users</Label>
                                 <div className="flex gap-2 mt-2">
                                     <Input id="invite-email" placeholder="Enter email address" type="email" />
-                                    <Button>Invite</Button>
+                                    <Button onClick={() => toast.error(`This feature is under development and will be available in a future update.`, {
+                                        position: 'bottom-right',
+                                        duration: 4000,
+                                        style: {
+                                            background: '#020817',
+                                            color: '#fff',
+                                        },
+                                        iconTheme: {
+                                            primary: '#ff4b4b',
+                                            secondary: '#fff',
+                                        },
+                                    })}>Invite</Button>
                                 </div>
                             </div>
                         )}
@@ -147,7 +162,18 @@ export default function ExamPreview({ params }: Props) {
                                     <CardHeader className="pb-2">
                                         <div className="flex justify-between">
                                             <CardTitle className="text-lg">Question {index + 1}</CardTitle>
-                                            <Button variant="ghost" size="icon">
+                                            <Button variant="ghost" size="icon" onClick={() => toast.error(`This feature is under development and will be available in a future update.`, {
+                                                position: 'bottom-right',
+                                                duration: 4000,
+                                                style: {
+                                                    background: '#020817',
+                                                    color: '#fff',
+                                                },
+                                                iconTheme: {
+                                                    primary: '#ff4b4b',
+                                                    secondary: '#fff',
+                                                },
+                                            })}>
                                                 <Edit className="h-4 w-4" />
                                             </Button>
                                         </div>
