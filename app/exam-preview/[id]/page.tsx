@@ -43,11 +43,11 @@ type ExamData = {
 }
 
 type Props = {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }
 
 export default function ExamPreview({ params }: Props) {
-    const unwrappedParams = React.use(params as any) as { id: string };
+    const unwrappedParams = React.use(params);
     const { id } = unwrappedParams;
 
     const [examId, setExamId] = useState<string | null>(null)
