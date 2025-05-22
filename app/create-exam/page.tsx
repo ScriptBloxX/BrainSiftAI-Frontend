@@ -123,11 +123,8 @@ export default function CreateExam() {
             formData.append('timer', examTimer?.toString() || '');
             formData.append('number_of_question', questionCount?.toString() || '');
 
-            // Add tags - make sure to format them correctly for the backend
             if (tags.length > 0) {
-                tags.forEach(tag => {
-                    formData.append('tags[]', tag);
-                });
+                formData.append('tags', JSON.stringify(tags));
             }
 
             const response = await axios.post('http://localhost:3001/api/exam/generate',
