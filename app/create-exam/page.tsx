@@ -27,9 +27,10 @@ export default function CreateExam() {
     const [isPrivate, setIsPrivate] = useState(false)
     const [examTitle, setExamTitle] = useState("")
     const [examTimer, setExamTimer] = useState<number | null>(null)
-    const [errors, setErrors] = useState<{ title?: string; timer?: string }>({})
+    const [errors, setErrors] = useState<{ title?: string; timer?: string; questionCount?: string }>({})
     const [tags, setTags] = useState<string[]>([])
     const [tagInput, setTagInput] = useState("")
+    const [questionCount, setQuestionCount] = useState<number | null>(null)
 
     const { isAuthenticated, isLoading, getToken } = useAuth()
     const router = useRouter()
@@ -73,7 +74,7 @@ export default function CreateExam() {
     }
 
     const validateForm = () => {
-        const newErrors: { title?: string; timer?: string } = {}
+        const newErrors: { title?: string; timer?: string; questionCount?: string } = {}
 
         if (!examTitle.trim()) {
             newErrors.title = "Exam title is required"
@@ -81,6 +82,12 @@ export default function CreateExam() {
 
         if (!examTimer || examTimer <= 0) {
             newErrors.timer = "Valid timer value is required"
+        }
+        
+        if (!questionCount || questionCount < 3) {
+            newErrors.questionCount = "Minimum 3 questions required"
+        } else if (questionCount > 30) {
+            newErrors.questionCount = "Maximum 30 questions allowed for 'Free' plan"
         }
 
         setErrors(newErrors)
@@ -114,6 +121,7 @@ export default function CreateExam() {
             formData.append('isPrivate', isPrivate.toString());
             formData.append('title', examTitle);
             formData.append('timer', examTimer?.toString() || '');
+            formData.append('number_of_question', questionCount?.toString() || '');
 
             // Add tags - make sure to format them correctly for the backend
             if (tags.length > 0) {
@@ -252,24 +260,41 @@ export default function CreateExam() {
                             {errors.title && <p className="text-sm text-destructive mt-1">{errors.title}</p>}
                         </div>
 
-                        <div className="flex items-center justify-between flex-wrap">
-                            <div className="space-y-0.5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
                                 <Label htmlFor="exam-timer">Timer (minutes)</Label>
                                 <p className="text-sm text-muted-foreground">Set a time limit for the exam in minutes</p>
+                                <Input
+                                    id="exam-timer"
+                                    type="number"
+                                    placeholder="Enter time in minutes"
+                                    min={1}
+                                    value={examTimer || ''}
+                                    onChange={(e) => {
+                                        const value = parseInt(e.target.value, 10);
+                                        setExamTimer(isNaN(value) ? null : value);
+                                    }}
+                                />
+                                {errors.timer && <p className="text-sm text-destructive mt-1">{errors.timer}</p>}
                             </div>
-                            <Input
-                                id="exam-timer"
-                                type="number"
-                                placeholder="Enter time in minutes"
-                                className="mt-2 w-full"
-                                min={1}
-                                value={examTimer || ''}
-                                onChange={(e) => {
-                                    const value = parseInt(e.target.value, 10);
-                                    setExamTimer(isNaN(value) ? null : value);
-                                }}
-                            />
-                            {errors.timer && <p className="text-sm text-destructive mt-1 w-full">{errors.timer}</p>}
+
+                            <div className="space-y-2">
+                                <Label htmlFor="question-count">Number of Questions</Label>
+                                <p className="text-sm text-muted-foreground">Set how many questions to generate (3-30)</p>
+                                <Input
+                                    id="question-count"
+                                    type="number"
+                                    placeholder="Enter number of questions"
+                                    min={3}
+                                    max={30}
+                                    value={questionCount || ''}
+                                    onChange={(e) => {
+                                        const value = parseInt(e.target.value, 10);
+                                        setQuestionCount(isNaN(value) ? null : value);
+                                    }}
+                                />
+                                {errors.questionCount && <p className="text-sm text-destructive mt-1">{errors.questionCount}</p>}
+                            </div>
                         </div>
 
                         <div>
