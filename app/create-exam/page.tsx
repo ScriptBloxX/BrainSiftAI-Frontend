@@ -11,12 +11,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { FileUp, Upload, Loader2 } from "lucide-react"
+import { FileUp, Upload, Loader2, X, Tag as TagIcon } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 import axios from "axios"
 import toast, { Toaster } from 'react-hot-toast'
+import { Badge } from "@/components/ui/badge"
 
 export default function CreateExam() {
     const [isUploading, setIsUploading] = useState(false)
@@ -27,6 +28,8 @@ export default function CreateExam() {
     const [examTitle, setExamTitle] = useState("")
     const [examTimer, setExamTimer] = useState<number | null>(null)
     const [errors, setErrors] = useState<{ title?: string; timer?: string }>({})
+    const [tags, setTags] = useState<string[]>([])
+    const [tagInput, setTagInput] = useState("")
 
     const { isAuthenticated, isLoading, getToken } = useAuth()
     const router = useRouter()
@@ -55,6 +58,20 @@ export default function CreateExam() {
         }
     }
 
+    const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && tagInput.trim()) {
+            e.preventDefault()
+            if (!tags.includes(tagInput.trim())) {
+                setTags([...tags, tagInput.trim()])
+            }
+            setTagInput("")
+        }
+    }
+
+    const handleRemoveTag = (tagToRemove: string) => {
+        setTags(tags.filter(tag => tag !== tagToRemove))
+    }
+
     const validateForm = () => {
         const newErrors: { title?: string; timer?: string } = {}
 
@@ -76,10 +93,10 @@ export default function CreateExam() {
         }
 
         setIsGenerating(true)
-        try {            
+        try {
             // Create form data to handle file uploads
             const formData = new FormData();
-            
+
             // Add file or text content
             if (fileName) {
                 const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -92,14 +109,21 @@ export default function CreateExam() {
                 formData.append('text', textContent);
                 formData.append('contentType', 'text');
             }
-            
+
             // Add other exam data
             formData.append('isPrivate', isPrivate.toString());
             formData.append('title', examTitle);
             formData.append('timer', examTimer?.toString() || '');
-            
-            const response = await axios.post('http://localhost:3001/api/exam/generate', 
-                formData, 
+
+            // Add tags - make sure to format them correctly for the backend
+            if (tags.length > 0) {
+                tags.forEach(tag => {
+                    formData.append('tags[]', tag);
+                });
+            }
+
+            const response = await axios.post('http://localhost:3001/api/exam/generate',
+                formData,
                 {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
@@ -107,9 +131,9 @@ export default function CreateExam() {
                     }
                 }
             );
-            
-            // Redirect to exam preview page with the ID from the response
-            router.push(`/exam-preview/${response.data.examId || '123'}`);
+
+            // Redirect to exam preview page with the data from the response
+            router.push(`/exam-preview/${response.data.id}`);
         } catch (error: any) {
             // Show error toast with dark theme
             toast.error(error.response?.data?.message || "(Server is busy)\nFailed to generate exam. Please try again later.", {
@@ -246,6 +270,34 @@ export default function CreateExam() {
                                 }}
                             />
                             {errors.timer && <p className="text-sm text-destructive mt-1 w-full">{errors.timer}</p>}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="exam-tags">Tags</Label>
+                            <p className="text-sm text-muted-foreground">Add tags to categorize your exam (press Enter to add)</p>
+                            <div className="flex items-center gap-2 mt-2">
+                                <Input
+                                    id="exam-tags"
+                                    placeholder="Add a tag..."
+                                    value={tagInput}
+                                    onChange={(e) => setTagInput(e.target.value)}
+                                    onKeyDown={handleAddTag}
+                                />
+                            </div>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {tags.map(tag => (
+                                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                                        {tag}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveTag(tag)}
+                                            className="text-muted-foreground hover:text-foreground"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </Badge>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-between">

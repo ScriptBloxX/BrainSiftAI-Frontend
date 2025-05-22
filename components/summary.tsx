@@ -18,7 +18,7 @@ export default function Summary({ content }: SummaryProps) {
             {content.map((block, index) => {
         switch (block.type) {
           case "heading":
-            return <h2 key={index} className="text-xl font-semibold mb-4">{block.text}</h2>;
+            return <h2 key={index} className="text-xl font-semibold mt-4">{block.text}</h2>;
           case "paragraph":
             return <p key={index}>{block.text}</p>;
           case "list":
