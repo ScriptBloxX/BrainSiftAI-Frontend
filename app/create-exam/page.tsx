@@ -11,10 +11,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { FileUp, Upload, Loader2 } from "lucide-react"
+import { FileUp, Upload, Loader2, X, Tag as TagIcon } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
+import axios from "axios"
+import toast, { Toaster } from 'react-hot-toast'
+import { Badge } from "@/components/ui/badge"
 
 export default function CreateExam() {
     const [isUploading, setIsUploading] = useState(false)
@@ -22,9 +25,17 @@ export default function CreateExam() {
     const [fileName, setFileName] = useState<string | null>(null)
     const [textContent, setTextContent] = useState("")
     const [isPrivate, setIsPrivate] = useState(false)
+    const [examTitle, setExamTitle] = useState("")
+    const [examTimer, setExamTimer] = useState<number | null>(null)
+    const [errors, setErrors] = useState<{ title?: string; timer?: string; questionCount?: string; credits?: string }>({})
+    const [tags, setTags] = useState<string[]>([])
+    const [tagInput, setTagInput] = useState("")
+    const [questionCount, setQuestionCount] = useState<number | null>(null)
 
-    const { isAuthenticated, isLoading } = useAuth()
+    const { isAuthenticated, isLoading, getToken, user } = useAuth()
     const router = useRouter()
+
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -42,29 +53,138 @@ export default function CreateExam() {
         if (file) {
             setIsUploading(true)
             setFileName(file.name)
-
-            // Simulate upload delay
-            setTimeout(() => {
-                setIsUploading(false)
-            }, 2000)
         }
     }
 
-    const handleGenerate = () => {
-        setIsGenerating(true)
+    const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && tagInput.trim()) {
+            e.preventDefault()
+            if (!tags.includes(tagInput.trim())) {
+                setTags([...tags, tagInput.trim()])
+            }
+            setTagInput("")
+        }
+    }
 
-        // Simulate AI processing delay
-        setTimeout(() => {
-            setIsGenerating(false)
-            // In a real app, we would redirect to the exam preview page
-            router.push("/exam-preview/123")
-        }, 3000)
+    const handleRemoveTag = (tagToRemove: string) => {
+        setTags(tags.filter(tag => tag !== tagToRemove))
+    }
+
+    const validateForm = () => {
+        const newErrors: { title?: string; timer?: string; questionCount?: string; credits?: string } = {}
+
+        if (!examTitle.trim()) {
+            newErrors.title = "Exam title is required"
+        }
+
+        if (!examTimer || examTimer <= 0) {
+            newErrors.timer = "Valid timer value is required"
+        }
+        
+        if (!questionCount || questionCount < 3) {
+            newErrors.questionCount = "Minimum 3 questions required"
+        } else if (questionCount > 30) {
+            newErrors.questionCount = "Maximum 30 questions allowed for 'Free' plan"
+        }
+        
+        // Check if user has enough credits
+        if (user && user.creditsRemaining <= 0) {
+            newErrors.credits = "You don't have enough credits to generate an exam"
+        }
+
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
+
+    const handleGenerate = async () => {
+        if (!validateForm()) {
+            return
+        }
+
+        setIsGenerating(true)
+        try {
+            // Create form data to handle file uploads
+            const formData = new FormData();
+
+            // Add file or text content
+            if (fileName) {
+                const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                const file = fileInput?.files?.[0];
+                if (file) {
+                    formData.append('file', file);
+                    formData.append('contentType', 'file');
+                }
+            } else {
+                formData.append('text', textContent);
+                formData.append('contentType', 'text');
+            }
+
+            // Add other exam data
+            formData.append('isPrivate', isPrivate.toString());
+            formData.append('title', examTitle);
+            formData.append('timer', examTimer?.toString() || '');
+            formData.append('number_of_question', questionCount?.toString() || '');
+
+            if (tags.length > 0) {
+                formData.append('tags', JSON.stringify(tags));
+            }
+
+            const response = await axios.post(`${API_BASE_URL}/api/exam/generate`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                        'Content-Type': 'multipart/form-data' // Important for file uploads
+                    }
+                }
+            );
+
+            // Redirect to exam preview page with the data from the response
+            if (user) {
+                const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                storedUser.creditsRemaining -= 1;
+                localStorage.setItem('user', JSON.stringify(storedUser));
+            }
+
+            toast.success('Exam generated successfully!', {
+                position: 'bottom-right',
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+            });
+            
+            router.push(`/exam-preview/${response.data.id}`);
+        } catch (error: any) {
+            // Show error toast with dark theme
+            toast.error(error.response?.data?.message || "(Server is busy)\nFailed to generate exam. Please try again later.", {
+                position: 'bottom-right',
+                duration: 4000,
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+                iconTheme: {
+                    primary: '#ff4b4b',
+                    secondary: '#fff',
+                },
+            });
+            // Set error message in state as well
+            setErrors(prev => ({
+                ...prev,
+                general: '(Server is busy)\nFailed to generate exam. Please try again later.'
+            }));
+        } finally {
+            setIsGenerating(false);
+        }
     }
 
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
-
+            <Toaster
+                position="bottom-right"
+            />
             <main className="flex-1 container mx-auto max-w-4xl px-4 md:px-6 py-8 mt-16">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold tracking-tight">Create New Exam</h1>
@@ -82,7 +202,7 @@ export default function CreateExam() {
                             <TabsContent value="upload" className="space-y-6">
                                 <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                                     <div className="flex flex-col items-center justify-center gap-4">
-                                        <div className="p-3 rounded-full bg-primary/10">
+                                        <div className="p-3 ro</TabsContent>unded-full bg-primary/10">
                                             <FileUp className="h-8 w-8 text-primary" />
                                         </div>
                                         <div>
@@ -143,27 +263,79 @@ export default function CreateExam() {
                     <CardContent className="pt-6 space-y-6">
                         <div>
                             <Label htmlFor="exam-title">Exam Title</Label>
-                            <Input id="exam-title" placeholder="Enter a title for your exam" className="mt-2" />
+                            <Input
+                                id="exam-title"
+                                placeholder="Enter a title for your exam"
+                                className="mt-2"
+                                value={examTitle}
+                                onChange={(e) => setExamTitle(e.target.value)}
+                            />
+                            {errors.title && <p className="text-sm text-destructive mt-1">{errors.title}</p>}
                         </div>
-                        
-                        <div className="flex items-center justify-between flex-wrap">
-                            <div className="space-y-0.5">
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
                                 <Label htmlFor="exam-timer">Timer (minutes)</Label>
                                 <p className="text-sm text-muted-foreground">Set a time limit for the exam in minutes</p>
+                                <Input
+                                    id="exam-timer"
+                                    type="number"
+                                    placeholder="Enter time in minutes"
+                                    min={1}
+                                    value={examTimer || ''}
+                                    onChange={(e) => {
+                                        const value = parseInt(e.target.value, 10);
+                                        setExamTimer(isNaN(value) ? null : value);
+                                    }}
+                                />
+                                {errors.timer && <p className="text-sm text-destructive mt-1">{errors.timer}</p>}
                             </div>
-                            <Input
-                                id="exam-timer"
-                                type="number"
-                                placeholder="Enter time in minutes"
-                                className="mt-2 w-full"
-                                min={1}
-                                onChange={(e) => {
-                                    const value = parseInt(e.target.value, 10);
-                                    if (!isNaN(value) && value > 0) {
-                                        // Handle timer value change (wait state)
-                                    }
-                                }}
-                            />
+
+                            <div className="space-y-2">
+                                <Label htmlFor="question-count">Number of Questions</Label>
+                                <p className="text-sm text-muted-foreground">Set how many questions to generate (3-30)</p>
+                                <Input
+                                    id="question-count"
+                                    type="number"
+                                    placeholder="Enter number of questions"
+                                    min={3}
+                                    max={30}
+                                    value={questionCount || ''}
+                                    onChange={(e) => {
+                                        const value = parseInt(e.target.value, 10);
+                                        setQuestionCount(isNaN(value) ? null : value);
+                                    }}
+                                />
+                                {errors.questionCount && <p className="text-sm text-destructive mt-1">{errors.questionCount}</p>}
+                            </div>
+                        </div>
+
+                        <div>
+                            <Label htmlFor="exam-tags">Tags</Label>
+                            <p className="text-sm text-muted-foreground">Add tags to categorize your exam (press Enter to add)</p>
+                            <div className="flex items-center gap-2 mt-2">
+                                <Input
+                                    id="exam-tags"
+                                    placeholder="Add a tag..."
+                                    value={tagInput}
+                                    onChange={(e) => setTagInput(e.target.value)}
+                                    onKeyDown={handleAddTag}
+                                />
+                            </div>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {tags.map(tag => (
+                                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                                        {tag}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveTag(tag)}
+                                            className="text-muted-foreground hover:text-foreground"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </Badge>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -176,9 +348,30 @@ export default function CreateExam() {
                     </CardContent>
                 </Card>
 
+                {user && (
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="text-sm text-muted-foreground">
+                            Plan: <span className="font-medium capitalize">{user.plan}</span>
+                        </div>
+                        <div className="text-sm">
+                            Credits remaining: <span className="font-medium">{user.creditsRemaining}</span>
+                        </div>
+                    </div>
+                )}
+
+                {errors.credits && (
+                    <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-6">
+                        <p>{errors.credits}</p>
+                        <p className="text-sm mt-1">Please upgrade your plan to get more credits.</p>
+                    </div>
+                )}
+
                 <div className="flex justify-end gap-4">
                     <Button variant="outline">Cancel</Button>
-                    <Button onClick={handleGenerate} disabled={isGenerating || (!fileName && !textContent)}>
+                    <Button 
+                        onClick={handleGenerate} 
+                        disabled={!!isGenerating || (!fileName && !textContent)}
+                    >
                         {isGenerating ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

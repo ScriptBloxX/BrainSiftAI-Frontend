@@ -3,11 +3,13 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
 type User = {
+    id: number;
     email: string
     name: string
     role: "user" | "admin" | "sadmin"
     plan: "free" | "pro" | "enterprise"
     isEmailVerified: boolean
+    creditsRemaining: number;
     profile: {
         avatar?: string
         bio?: string
@@ -24,19 +26,21 @@ type AuthContextType = {
     isAuthenticated: boolean
     isLoading: boolean
     login: (user: {
+        id: number;
         email: string
         name: string
         token: string
         role: User["role"]
         plan: User["plan"]
         isEmailVerified: boolean
+        creditsRemaining?: number;
         profileUrl?: string
     }) => void
     logout: () => void
     updateProfile: (profile: Partial<User["profile"]>) => void
     updateUser: (userData: Partial<Omit<User, "profile">>) => void
+    getToken: () => string | null
 }
-
 const AuthContext = createContext<AuthContextType>({
     user: null,
     isAuthenticated: false,
@@ -45,6 +49,7 @@ const AuthContext = createContext<AuthContextType>({
     logout: () => { },
     updateProfile: () => { },
     updateUser: () => { },
+    getToken: () => null,
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -65,29 +70,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [])
 
     const login = ({
+        id,
         email,
         name,
         token,
         role,
         plan,
         isEmailVerified,
+        creditsRemaining,
         profileUrl,
     }: {
+        id: number;
         email: string
         name: string
         token: string
         role: User["role"]
         plan: User["plan"]
         isEmailVerified: boolean
+        creditsRemaining?: number;
         profileUrl?: string
     }) => {
         const completeUser: User = {
+            id,
             email,
             name,
             token,
             role,
             plan,
             isEmailVerified,
+            creditsRemaining: creditsRemaining ?? 0,
             profile: {
                 avatar: profileUrl || "/placeholder.svg?height=200&width=200",
                 bio: "",
@@ -98,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         setUser(completeUser)
+        console.log('set,',completeUser)
         localStorage.setItem("user", JSON.stringify(completeUser))
     }
 
@@ -143,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 logout,
                 updateProfile,
                 updateUser,
+                getToken: () => user?.token || null,
             }}
         >
             {children}

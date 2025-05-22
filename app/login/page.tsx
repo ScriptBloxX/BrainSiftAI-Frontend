@@ -61,6 +61,7 @@ export default function Login() {
 
       // Set authenticated state
       login({
+        id: response.data.id,
         email: response.data.email,
         name: response.data.username,
         token: response.data.token,
@@ -68,6 +69,7 @@ export default function Login() {
         plan: response.data.plan,
         isEmailVerified: response.data.isEmailVerified,
         profileUrl: response.data.profileUrl,
+        creditsRemaining: response.data.creditsRemaining
       })
 
       // Redirect to dashboard
