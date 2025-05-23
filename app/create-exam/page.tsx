@@ -53,6 +53,9 @@ export default function CreateExam() {
         if (file) {
             setIsUploading(true)
             setFileName(file.name)
+                        setTimeout(() => {
+                setIsUploading(false)
+            }, 500)
         }
     }
 
