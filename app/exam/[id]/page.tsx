@@ -28,6 +28,7 @@ export default function TakeExam({ params }: Props) {
     const [timer, setTimer] = useState(-1)
     const [examData, setExamData] = useState<{ title?: string; summary?: []; questions: { questionText: string; options: string[]; correctAnswer: number }[] }>({ questions: [] });
     const [loadingScreen,setLoadingScreen] = useState(true);
+    const [showAnswerKey, setShowAnswerKey] = useState(false)
     
     const { isAuthenticated, isLoading } = useAuth()
     const router = useRouter()
@@ -185,6 +186,9 @@ export default function TakeExam({ params }: Props) {
                             <Button variant="outline" className="w-full" onClick={() => setShowSummary(!showSummary)}>
                                 {showSummary ? "Hide Content Summary" : "View Content Summary"}
                             </Button>
+                            <Button variant="outline" className="w-full" onClick={() => setShowAnswerKey(!showAnswerKey)}>
+                                {showAnswerKey ? "Hide Answers" : "View Answers"}
+                            </Button>
                             <Button className="w-full" asChild>
                                 <a href="/dashboard">Return to Dashboard</a>
                             </Button>
@@ -201,13 +205,65 @@ export default function TakeExam({ params }: Props) {
                             </CardContent>
                         </Card>
                     )}
+
+                    {showAnswerKey && (
+                        <Card className="max-w-2xl mx-auto mt-8">
+                            <CardHeader>
+                                <CardTitle>Answer Key</CardTitle>
+                                <CardDescription>See correct answers and your responses</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-6">
+                                    {examData.questions.map((question, qIndex) => (
+                                        <div key={qIndex} className="border rounded-lg p-4">
+                                            <h3 className="font-medium mb-2">{qIndex + 1}. {question.questionText}</h3>
+                                            <div className="space-y-2">
+                                                {question.options.map((option, oIndex) => {
+                                                    const isCorrect = oIndex === question.correctAnswer;
+                                                    const userSelected = answers[qIndex] === oIndex;
+                                                    
+                                                    let bgColor = "";
+                                                    if (isCorrect) {
+                                                        bgColor = "bg-green-100 dark:bg-green-900/30";
+                                                    } else if (userSelected) {
+                                                        bgColor = "bg-red-100 dark:bg-red-900/30";
+                                                    }
+                                                    
+                                                    return (
+                                                        <div 
+                                                            key={oIndex} 
+                                                            className={`flex items-center p-2 rounded-md ${bgColor}`}
+                                                        >
+                                                            <div className="w-6 h-6 flex items-center justify-center mr-2">
+                                                                {isCorrect && (
+                                                                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                                                )}
+                                                                {userSelected && !isCorrect && (
+                                                                    <span className="h-5 w-5 text-red-600 dark:text-red-400 font-bold">✕</span>
+                                                                )}
+                                                            </div>
+                                                            <span>
+                                                                {option}
+                                                                {isCorrect && " (Correct Answer)"}
+                                                                {userSelected && !isCorrect && " (Your Answer)"}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                 </main>
 
                 <Footer />
             </div>
         )
     }
-
+    
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
