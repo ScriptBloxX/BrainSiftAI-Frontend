@@ -15,14 +15,14 @@ import Footer from "@/components/footer"
 import toast, { Toaster } from "react-hot-toast"
 import LoadingScreen from "@/components/loading-screen"
 import { useAuth } from "@/components/auth-context"
+import Summary from "@/components/summary"
 
-// Define types for the structured summary
-type SummaryItem = {
-    text?: string;
-    type: string;
-    items?: string[];
-    language?: string;
-}
+// Use the same SummaryItem type as defined in the Summary component
+type SummaryItem = 
+    | { text: string; type: 'heading' }
+    | { text: string; type: 'paragraph' }
+    | { type: 'list'; items: string[] }
+    | { text: string; type: 'code'; language?: string };
 
 type QuestionType = {
     questionText: string;
@@ -124,32 +124,7 @@ export default function ExamPreview({ params }: Props) {
         if (!examData?.summary) return null;
 
         return (
-            <div className="space-y-4">
-                {examData.summary.map((item, index) => {
-                    if (item.type === "heading") {
-                        return <h3 key={index} className="text-xl font-semibold mt-6">{item.text}</h3>;
-                    } else if (item.type === "paragraph") {
-                        return <p key={index}>{item.text}</p>;
-                    } else if (item.type === "list" && item.items) {
-                        return (
-                            <ul key={index} className="list-disc pl-6 space-y-1">
-                                {item.items.map((listItem, i) => (
-                                    <li key={i}>{listItem}</li>
-                                ))}
-                            </ul>
-                        );
-                    } else if (item.type === "code") {
-                        return (
-                            <pre key={index} className="bg-muted p-4 rounded-md overflow-x-auto my-4">
-                                <code className={item.language ? `language-${item.language}` : ''}>
-                                    {item.text}
-                                </code>
-                            </pre>
-                        );
-                    }
-                    return null;
-                })}
-            </div>
+            <Summary content={examData.summary} />
         );
     };
 
