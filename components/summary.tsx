@@ -14,31 +14,37 @@ interface SummaryProps {
 
 export default function Summary({ content }: SummaryProps) {
     return (
-        <div>
-            {content.map((block, index) => {
-        switch (block.type) {
-          case "heading":
-            return <h2 key={index} className="text-xl font-semibold mt-4">{block.text}</h2>;
-          case "paragraph":
+      <div className="space-y-4">
+        {content.map((block, index) => {
+          if (block.type === "heading") {
+            return <h3 key={index} className="text-xl font-semibold mt-6">{block.text}</h3>;
+          } else if (block.type === "paragraph") {
             return <p key={index}>{block.text}</p>;
-          case "list":
+          } else if (block.type === "list" && block.items) {
             return (
-              <ul key={index} className="list-disc pl-6">
-                {block.items.map((item, i) => (
-                  <li key={i}>{item}</li>
+              <ul key={index} className="list-disc pl-6 space-y-1">
+                {block.items.map((listItem, i) => (
+                  <li key={i}>{listItem}</li>
                 ))}
               </ul>
             );
-          case "code":
+          } else if (block.type === "code") {
             return (
-              <SyntaxHighlighter key={index} language={block.language || "javascript"} style={atomOneDark}>
-                {block.text}
-              </SyntaxHighlighter>
+              <pre key={index} className="bg-muted p-2 rounded-md overflow-x-auto my-4">
+                <SyntaxHighlighter 
+                  key={index} 
+                  language={block.language || "javascript"} 
+                  style={atomOneDark}
+                  customStyle={{ borderRadius: '0.375rem' }}
+                >
+                  {block.text}
+                </SyntaxHighlighter>
+              </pre>
             );
-          default:
-            return null;
-        }
-      })}
-        </div>
+          }
+          return null;
+        })}
+      </div>
     );
 }
+
