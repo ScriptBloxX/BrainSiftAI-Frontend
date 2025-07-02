@@ -22,20 +22,39 @@ type Props = {
 export default function TakeExam({ params }: Props) {
     const [examId, setExamId] = useState<string | null>(null)
     const [currentQuestion, setCurrentQuestion] = useState(0)
-    const [answers, setAnswers] = useState<Record<number, number>>({})
+    const [answers, setAnswers] = useState<Record<string, number>>({})
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [showSummary, setShowSummary] = useState(true)
     const [timer, setTimer] = useState(-1)
-    const [examData, setExamData] = useState<{ title?: string; summary?: []; questions: { questionText: string; options: string[]; correctAnswer: number }[] }>({ questions: [] });
+    const [examData, setExamData] = useState<{ 
+        title?: string; 
+        summary?: []; 
+        questions: { 
+            id: string;
+            questionText: string; 
+            options: string[]; 
+            correctAnswer?: number 
+        }[] 
+    }>({ questions: [] });
     const [loadingScreen,setLoadingScreen] = useState(true);
     const [showAnswerKey, setShowAnswerKey] = useState(false)
+    const [examResult, setExamResult] = useState<{
+        examId: string;
+        examTitle: string;
+        score: number;
+        correctAnswers: number;
+        totalQuestions: number;
+        percentage: number;
+        solutions: {
+            questionId: string;
+            correctAnswer: number;
+        }[];
+    } | null>(null)
     
-    const { isAuthenticated, isLoading } = useAuth()
+    const { isAuthenticated, isLoading, getToken } = useAuth()
     const router = useRouter()
 
-
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
-
     useEffect(() => {
         params.then(({ id }) => {
             const examIdFromUrl = window.location.pathname.split("/exam/")[1];
@@ -79,10 +98,13 @@ export default function TakeExam({ params }: Props) {
 
     const handleAnswerChange = (value: string) => {
         const answerIndex = Number.parseInt(value.split("-")[1])
-        setAnswers({
-            ...answers,
-            [currentQuestion]: answerIndex,
-        })
+        const currentQuestionId = examData.questions[currentQuestion]?.id
+        if (currentQuestionId) {
+            setAnswers({
+                ...answers,
+                [currentQuestionId]: answerIndex,
+            })
+        }
     }
 
     const nextQuestion = () => {
@@ -97,15 +119,53 @@ export default function TakeExam({ params }: Props) {
         }
     }
 
-    const submitExam = () => {
-        setIsSubmitted(true)
+    const submitExam = async () => {
+        if (!examId) return;
+        
+        // Convert answers to the required format
+        const formattedAnswers = Object.entries(answers).map(([questionId, answer]) => ({
+            questionId,
+            answer
+        }));
+
+        try {
+            const response = await axios.post(
+                `${API_BASE_URL}/api/exam/submit`,
+                {
+                    examId,
+                    answers: formattedAnswers
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                    }
+                }
+            );
+            
+            setExamResult(response.data);
+            setIsSubmitted(true);
+        } catch (error) {
+            console.error('Error submitting exam:', error);
+            // Fallback to old scoring method if API fails
+            setIsSubmitted(true);
+        }
     }
 
     const calculateScore = () => {
+        // If we have API result, use it
+        if (examResult) {
+            return {
+                correct: examResult.correctAnswers,
+                total: examResult.totalQuestions,
+                percentage: examResult.percentage,
+            };
+        }
+        
+        // Fallback to old method for backward compatibility
         let correctCount = 0
-        Object.entries(answers).forEach(([questionIndex, answerIndex]) => {
-            const question = examData.questions[Number.parseInt(questionIndex)]
-            if (answerIndex === question.correctAnswer) {
+        examData.questions.forEach((question, index) => {
+            const userAnswer = answers[question.id];
+            if (userAnswer !== undefined && userAnswer === question.correctAnswer) {
                 correctCount++
             }
         })
@@ -119,7 +179,9 @@ export default function TakeExam({ params }: Props) {
     const score = calculateScore()
     const progress = ((currentQuestion + 1) / examData.questions.length) * 100
     const currentQuestionData = examData.questions[currentQuestion]
-    const hasAnsweredCurrent = answers[currentQuestion] !== undefined
+    const currentQuestionId = currentQuestionData?.id
+    const hasAnsweredCurrent = currentQuestionId ? answers[currentQuestionId] !== undefined : false
+    const allQuestionsAnswered = examData.questions.every(q => q.id && answers[q.id] !== undefined)
 
     if (loadingScreen) return <LoadingScreen/>
 
@@ -132,7 +194,7 @@ export default function TakeExam({ params }: Props) {
                     <Card className="max-w-2xl mx-auto">
                         <CardHeader className="text-center">
                             <CardTitle className="text-2xl">Exam Completed!</CardTitle>
-                            <CardDescription>You've completed the {examData.title} exam</CardDescription>
+                            <CardDescription>You've completed the {examResult?.examTitle || examData.title} exam</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="flex flex-col items-center justify-center py-6">
@@ -214,45 +276,51 @@ export default function TakeExam({ params }: Props) {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-6">
-                                    {examData.questions.map((question, qIndex) => (
-                                        <div key={qIndex} className="border rounded-lg p-4">
-                                            <h3 className="font-medium mb-2">{qIndex + 1}. {question.questionText}</h3>
-                                            <div className="space-y-2">
-                                                {question.options.map((option, oIndex) => {
-                                                    const isCorrect = oIndex === question.correctAnswer;
-                                                    const userSelected = answers[qIndex] === oIndex;
-                                                    
-                                                    let bgColor = "";
-                                                    if (isCorrect) {
-                                                        bgColor = "bg-green-100 dark:bg-green-900/30";
-                                                    } else if (userSelected) {
-                                                        bgColor = "bg-red-100 dark:bg-red-900/30";
-                                                    }
-                                                    
-                                                    return (
-                                                        <div 
-                                                            key={oIndex} 
-                                                            className={`flex items-center p-2 rounded-md ${bgColor}`}
-                                                        >
-                                                            <div className="w-6 h-6 flex items-center justify-center mr-2">
-                                                                {isCorrect && (
-                                                                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                                                                )}
-                                                                {userSelected && !isCorrect && (
-                                                                    <span className="h-5 w-5 text-red-600 dark:text-red-400 font-bold">✕</span>
-                                                                )}
+                                    {examData.questions.map((question, qIndex) => {
+                                        // Get correct answer from API result or fallback to question data
+                                        const correctAnswer = examResult?.solutions.find(s => s.questionId === question.id)?.correctAnswer ?? question.correctAnswer;
+                                        const userSelected = answers[question.id];
+                                        
+                                        return (
+                                            <div key={qIndex} className="border rounded-lg p-4">
+                                                <h3 className="font-medium mb-2">{qIndex + 1}. {question.questionText}</h3>
+                                                <div className="space-y-2">
+                                                    {question.options.map((option, oIndex) => {
+                                                        const isCorrect = oIndex === correctAnswer;
+                                                        const isUserSelected = userSelected === oIndex;
+                                                        
+                                                        let bgColor = "";
+                                                        if (isCorrect) {
+                                                            bgColor = "bg-green-100 dark:bg-green-900/30";
+                                                        } else if (isUserSelected) {
+                                                            bgColor = "bg-red-100 dark:bg-red-900/30";
+                                                        }
+                                                        
+                                                        return (
+                                                            <div 
+                                                                key={oIndex} 
+                                                                className={`flex items-center p-2 rounded-md ${bgColor}`}
+                                                            >
+                                                                <div className="w-6 h-6 flex items-center justify-center mr-2">
+                                                                    {isCorrect && (
+                                                                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                                                    )}
+                                                                    {isUserSelected && !isCorrect && (
+                                                                        <span className="h-5 w-5 text-red-600 dark:text-red-400 font-bold">✕</span>
+                                                                    )}
+                                                                </div>
+                                                                <span>
+                                                                    {option}
+                                                                    {isCorrect && " (Correct Answer)"}
+                                                                    {isUserSelected && !isCorrect && " (Your Answer)"}
+                                                                </span>
                                                             </div>
-                                                            <span>
-                                                                {option}
-                                                                {isCorrect && " (Correct Answer)"}
-                                                                {userSelected && !isCorrect && " (Your Answer)"}
-                                                            </span>
-                                                        </div>
-                                                    );
-                                                })}
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </CardContent>
                         </Card>
@@ -320,7 +388,7 @@ export default function TakeExam({ params }: Props) {
                         <CardContent>
                             <RadioGroup
                                 key={currentQuestion}
-                                value={answers[currentQuestion] !== undefined ? `option-${answers[currentQuestion]}` : undefined}
+                                value={currentQuestionId && answers[currentQuestionId] !== undefined ? `option-${answers[currentQuestionId]}` : undefined}
                                 onValueChange={handleAnswerChange}
                             >
                                 {currentQuestionData.options.map((option, i) => (
@@ -339,7 +407,7 @@ export default function TakeExam({ params }: Props) {
                             </Button>
 
                             {currentQuestion === examData.questions.length - 1 ? (
-                                <Button onClick={submitExam} disabled={Object.keys(answers).length < examData.questions.length}>
+                                <Button onClick={submitExam} disabled={!allQuestionsAnswered}>
                                     <CheckCircle className="mr-2 h-4 w-4" /> Submit Exam
                                 </Button>
                             ) : (
@@ -350,7 +418,7 @@ export default function TakeExam({ params }: Props) {
                         </CardFooter>
                     </Card>
                 }
-                {Object.keys(answers).length < examData.questions.length && !showSummary && (
+                {!allQuestionsAnswered && !showSummary && (
                     <div className="mt-4 text-sm text-muted-foreground text-center">Answer all questions to submit the exam</div>
                 )}
             </main>

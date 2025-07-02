@@ -63,15 +63,12 @@ export default function Dashboard() {
 
             try {
                 setLoadingExams(true)
-                const response = await axios.get(`${API_BASE_URL}/api/exam/explore`, {
+                const response = await axios.get(`${API_BASE_URL}/api/exam/dashboard`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
                     },
                 })
-
-                // Filter exams to only show those created by the current user
-                const userExams = response.data.filter((exam: ExamType) => exam.creator.id === user.id)
-                setMyExams(userExams)
+                setMyExams(response.data)
             } catch (error) {
                 console.error("Failed to fetch exams:", error)
             } finally {
@@ -91,8 +88,8 @@ export default function Dashboard() {
 
     // Mock data for classes
     const myClasses = [
-        { id: 1, name: "Biology 101", members: 12, exams: 3 },
-        { id: 2, name: "Advanced Math Group", members: 8, exams: 5 },
+        { id: 1, name: "[Mock] Biology 101", members: 12, exams: 3 },
+        { id: 2, name: "[Mock] Advanced Math Group", members: 8, exams: 5 },
     ]
 
     return (
