@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import toast, { Toaster } from "react-hot-toast"
 
 type ExamType = {
     id: string
@@ -91,6 +92,21 @@ export default function Dashboard() {
         { id: 1, name: "[Mock] Biology 101", members: 12, exams: 3 },
         { id: 2, name: "[Mock] Advanced Math Group", members: 8, exams: 5 },
     ]
+
+    const refreshExams = async () => {
+        if (!isAuthenticated || !user) return
+
+        try {
+            const response = await axios.get(`${API_BASE_URL}/api/exam/dashboard`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            })
+            setMyExams(response.data)
+        } catch (error) {
+            console.error("Failed to fetch exams:", error)
+        }
+    }
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -185,6 +201,7 @@ export default function Dashboard() {
                                             createdAt={exam.createdAt}
                                             id={exam.id}
                                             tags={exam.tags}
+                                            onUpdate={refreshExams}
                                         />
                                     ))
                                 )}
@@ -216,6 +233,7 @@ export default function Dashboard() {
             </main>
 
             <Footer />
+            <Toaster />
         </div>
     )
 }
@@ -252,6 +270,7 @@ function ExamCard({
     createdAt,
     id,
     tags = [],
+    onUpdate,
 }: {
     title: string
     questions: number
@@ -259,11 +278,16 @@ function ExamCard({
     createdAt: string
     id: string
     tags?: string[]
+    onUpdate?: () => void
 }) {
     const router = useRouter()
+    const { getToken } = useAuth()
     const [showEditDialog, setShowEditDialog] = useState(false)
     const [examTitle, setExamTitle] = useState(title)
     const [examVisibility, setExamVisibility] = useState(visibility)
+    const [isSaving, setIsSaving] = useState(false)
+    const [currentVisibility, setCurrentVisibility] = useState(visibility)
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
     const handleView = () => {
         router.push(`/exam/${id}`)
@@ -281,11 +305,49 @@ function ExamCard({
         })
     }
 
-    const handleSaveChanges = () => {
-        // In a real app, you would make an API call to update the exam
-        setShowEditDialog(false)
-        // Show a success message
-        alert("Exam updated successfully")
+    const handleSaveChanges = async () => {
+        try {
+            setIsSaving(true)
+            
+            const payload = {
+                id: id,
+                visibility: examVisibility === "public"
+            }
+
+            await axios.patch(`${API_BASE_URL}/api/exam`, payload, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                    'Content-Type': 'application/json'
+                },
+            })
+
+            setCurrentVisibility(examVisibility)
+            setShowEditDialog(false)
+            
+            // Update parent component's state
+            if (onUpdate) {
+                onUpdate()
+            }
+            
+            toast.success("Exam updated successfully!", {
+                position: 'bottom-right',
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+            })
+        } catch (error) {
+            console.error("Failed to update exam:", error)
+            toast.error("Failed to update exam. Please try again.", {
+                position: 'bottom-right',
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+            })
+        } finally {
+            setIsSaving(false)
+        }
     }
 
     return (
@@ -297,8 +359,8 @@ function ExamCard({
             <CardContent>
                 <div className="flex items-center justify-between text-sm mb-2">
                     <span>{questions} questions</span>
-                    <span className={`capitalize ${visibility === "public" ? "text-green-500" : "text-amber-500"}`}>
-                        {visibility}
+                    <span className={`capitalize ${currentVisibility === "public" ? "text-green-500" : "text-amber-500"}`}>
+                        {currentVisibility}
                     </span>
                 </div>
                 {tags.length > 0 && (
@@ -346,10 +408,19 @@ function ExamCard({
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+                        <Button variant="outline" onClick={() => setShowEditDialog(false)} disabled={isSaving}>
                             Cancel
                         </Button>
-                        <Button onClick={handleSaveChanges}>Save Changes</Button>
+                        <Button onClick={handleSaveChanges} disabled={isSaving}>
+                            {isSaving ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : (
+                                "Save Changes"
+                            )}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
