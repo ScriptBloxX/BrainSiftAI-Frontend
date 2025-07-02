@@ -41,6 +41,7 @@ export default function Explore() {
         tags: string[];
     }[]>([]);
     const [loadingScreen, setLoadingScreen] = useState(true);
+    const [popularTags, setPopularTags] = useState<string[]>([]);
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
@@ -48,7 +49,6 @@ export default function Explore() {
         const fetchExams = async () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}/api/exam/explore`);
-                console.log(response.data);
                 const formattedExams = response.data.map((exam: any) => ({
                     id: exam.id,
                     title: exam.title,
@@ -58,6 +58,22 @@ export default function Explore() {
                     createdAt: exam.createdAt || new Date().toISOString(),
                     tags: exam.tags || [],
                 }));
+                
+                // Calculate popular tags
+                const tagCounts: { [key: string]: number } = {};
+                formattedExams.forEach((exam: any) => {
+                    exam.tags.forEach((tag: string) => {
+                        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                    });
+                });
+                
+                // Get top 10 most popular tags
+                const sortedTags = Object.entries(tagCounts)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10)
+                    .map(([tag]) => tag);
+                
+                setPopularTags(sortedTags);
                 setFilteredExams(formattedExams);
                 setPublicExams(formattedExams);
                 setLoadingScreen(false);
@@ -69,17 +85,6 @@ export default function Explore() {
 
         fetchExams();
     }, []);
-
-    // Popular tags
-    const popularTags = [
-        "Web Technology",
-        "Computer Networks",
-        "Basic Security",
-        "Basic Programming",
-        "Software Development Tools",
-        "English",
-        "Computer Networks Lab",
-    ]
 
     // Filter exams based on selected filters
     useEffect(() => {
