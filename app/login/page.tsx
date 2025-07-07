@@ -107,7 +107,6 @@ export default function Login() {
 
               {successMessage && (
                 <Alert className="mb-4 border-green-500 text-green-500">
-                  <CheckCircle2 className="h-4 w-4" />
                   <AlertDescription>{successMessage}</AlertDescription>
                 </Alert>
               )}
