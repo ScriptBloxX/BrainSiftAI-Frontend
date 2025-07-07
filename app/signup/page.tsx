@@ -15,7 +15,7 @@ import { Loader2, AlertCircle } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
-import axios from "axios";
+import axiosInstance from "@/lib/axios"
 
 export default function Signup() {
     const [name, setName] = useState("")
@@ -56,7 +56,7 @@ export default function Signup() {
             }
 
             // Set authenticated state
-            const response = await axios.post(`${API_BASE_URL}/api/user/`, {
+            const response = await axiosInstance.post(`/api/user/`, {
                 username: name,
                 password: password,
                 email: email,
@@ -67,6 +67,7 @@ export default function Signup() {
                 email: response.data.email,
                 name: response.data.username,
                 token: response.data.token,
+                refreshToken: response.data.refreshToken,
                 role: response.data.role,
                 plan: response.data.plan,
                 isEmailVerified: response.data.isEmailVerified,
@@ -76,12 +77,12 @@ export default function Signup() {
 
             // Redirect to dashboard
             router.push("/dashboard")
-        } catch (err) {
+        } catch (err: any) {
             console.log(err)
-            if (axios.isAxiosError(err) && err.response) {
+            if (err.response) {
                 setError(err.response.data.error_message || err.response.data.error);
             } else {
-                setError(err instanceof Error ? err.message : String(err));
+                setError(err.message || String(err));
             }
         } finally {
             setIsLoading(false)

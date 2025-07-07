@@ -18,6 +18,7 @@ type User = {
         timezone?: string
     }
     token?: string
+    refreshToken?: string
     profileUrl?: string
 }
 
@@ -30,6 +31,7 @@ type AuthContextType = {
         email: string
         name: string
         token: string
+        refreshToken?: string
         role: User["role"]
         plan: User["plan"]
         isEmailVerified: boolean
@@ -40,6 +42,8 @@ type AuthContextType = {
     updateProfile: (profile: Partial<User["profile"]>) => void
     updateUser: (userData: Partial<Omit<User, "profile">>) => void
     getToken: () => string | null
+    getRefreshToken: () => string | null
+    updateToken: (token: string) => void
 }
 const AuthContext = createContext<AuthContextType>({
     user: null,
@@ -50,6 +54,8 @@ const AuthContext = createContext<AuthContextType>({
     updateProfile: () => { },
     updateUser: () => { },
     getToken: () => null,
+    getRefreshToken: () => null,
+    updateToken: () => { },
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -74,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         name,
         token,
+        refreshToken,
         role,
         plan,
         isEmailVerified,
@@ -84,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: string
         name: string
         token: string
+        refreshToken?: string
         role: User["role"]
         plan: User["plan"]
         isEmailVerified: boolean
@@ -95,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email,
             name,
             token,
+            refreshToken,
             role,
             plan,
             isEmailVerified,
@@ -145,6 +154,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem("user")
     }
 
+    const updateToken = (token: string) => {
+        if (!user) return
+
+        const updatedUser = {
+            ...user,
+            token,
+        }
+
+        setUser(updatedUser)
+        localStorage.setItem("user", JSON.stringify(updatedUser))
+    }
+
     return (
         <AuthContext.Provider
             value={{
@@ -156,6 +177,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 updateProfile,
                 updateUser,
                 getToken: () => user?.token || null,
+                getRefreshToken: () => user?.refreshToken || null,
+                updateToken,
             }}
         >
             {children}

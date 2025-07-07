@@ -12,7 +12,7 @@ import { Search, BookOpen, Clock, User } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
-import axios from "axios";
+import axiosInstance from "@/lib/axios"
 import LoadingScreen from "@/components/loading-screen"
 
 export default function Explore() {
@@ -48,7 +48,7 @@ export default function Explore() {
     useEffect(() => {
         const fetchExams = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/api/exam/explore`);
+                const response = await axiosInstance.get(`/api/exam/explore`);
                 const formattedExams = response.data.map((exam: any) => ({
                     id: exam.id,
                     title: exam.title,

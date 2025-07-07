@@ -11,7 +11,7 @@ import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 import { useRouter } from "next/navigation"
-import axios from "axios";
+import axiosInstance from "@/lib/axios"
 import Summary from "@/components/summary"
 import LoadingScreen from "@/components/loading-screen"
 
@@ -63,9 +63,9 @@ export default function TakeExam({ params }: Props) {
     }, [params])
     useEffect(() => {
         if (examId) {
-            axios
-                .get(`${API_BASE_URL}/api/exam/${examId}`)
-                .then((response) => {
+            axiosInstance
+                .get(`/api/exam/${examId}`)
+                .then((response: any) => {
                     setExamData(response.data);
                     setTimer(response.data.timer_minute*60);
                 })
@@ -129,16 +129,11 @@ export default function TakeExam({ params }: Props) {
         }));
 
         try {
-            const response = await axios.post(
-                `${API_BASE_URL}/api/exam/submit`,
+            const response = await axiosInstance.post(
+                `/api/exam/submit`,
                 {
                     examId,
                     answers: formattedAnswers
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`,
-                    }
                 }
             );
             

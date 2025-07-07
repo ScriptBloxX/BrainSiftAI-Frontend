@@ -12,7 +12,7 @@ import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
-import axios from "axios"
+import axiosInstance from "@/lib/axios"
 import {
     Dialog,
     DialogContent,
@@ -64,11 +64,7 @@ export default function Dashboard() {
 
             try {
                 setLoadingExams(true)
-                const response = await axios.get(`${API_BASE_URL}/api/exam/dashboard`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                })
+                const response = await axiosInstance.get(`/api/exam/dashboard`)
                 setMyExams(response.data)
             } catch (error) {
                 console.error("Failed to fetch exams:", error)
@@ -97,11 +93,7 @@ export default function Dashboard() {
         if (!isAuthenticated || !user) return
 
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/exam/dashboard`, {
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
-            })
+            const response = await axiosInstance.get(`/api/exam/dashboard`)
             setMyExams(response.data)
         } catch (error) {
             console.error("Failed to fetch exams:", error)
@@ -314,9 +306,8 @@ function ExamCard({
                 visibility: examVisibility === "public"
             }
 
-            await axios.patch(`${API_BASE_URL}/api/exam`, payload, {
+            await axiosInstance.patch(`/api/exam`, payload, {
                 headers: {
-                    Authorization: `Bearer ${getToken()}`,
                     'Content-Type': 'application/json'
                 },
             })
