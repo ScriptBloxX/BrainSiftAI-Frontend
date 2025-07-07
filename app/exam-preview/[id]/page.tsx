@@ -15,6 +15,7 @@ import Footer from "@/components/footer"
 import toast, { Toaster } from "react-hot-toast"
 import LoadingScreen from "@/components/loading-screen"
 import { useAuth } from "@/components/auth-context"
+import axiosInstance from "@/lib/axios"
 import Summary from "@/components/summary"
 
 // Use the same SummaryItem type as defined in the Summary component
@@ -69,17 +70,9 @@ export default function ExamPreview({ params }: Props) {
             try {
                 setExamId(id);
 
-                const response = await fetch(`${API_BASE_URL}/api/exam/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch exam data: ${response.status}`);
-                }
-
-                const data = await response.json();
+                const response = await axiosInstance.get(`/api/exam/${id}`);
+                const data = response.data;
+                
                 setExamData(data);
                 setIsPrivate(data.isPrivate);
                 setTitle(data.title);

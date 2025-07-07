@@ -14,7 +14,7 @@ import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
-import axios from "axios";
+import axiosInstance from "@/lib/axios"
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -50,7 +50,7 @@ export default function Login() {
         throw new Error("Please fill in all fields")
       }
 
-      const response = await axios.post(`${API_BASE_URL}/api/authentication/login`, {
+      const response = await axiosInstance.post(`/api/authentication/login`, {
         usernameOrEmail: email,
         password: password,
       });
@@ -65,6 +65,7 @@ export default function Login() {
         email: response.data.email,
         name: response.data.username,
         token: response.data.token,
+        refreshToken: response.data.refreshToken,
         role: response.data.role,
         plan: response.data.plan,
         isEmailVerified: response.data.isEmailVerified,
@@ -74,11 +75,11 @@ export default function Login() {
 
       // Redirect to dashboard
       router.push("/dashboard")
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
+    } catch (err: any) {
+      if (err.response) {
         setError(err.response.data.error_message || err.response.data.error);
       } else {
-        setError(err instanceof Error ? err.message : String(err));
+        setError(err.message || String(err));
       }
     } finally {
       setIsLoading(false)

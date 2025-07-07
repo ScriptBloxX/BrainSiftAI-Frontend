@@ -15,7 +15,7 @@ import { FileUp, Upload, Loader2, X, Tag as TagIcon } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
-import axios from "axios"
+import axiosInstance from "@/lib/axios"
 import toast, { Toaster } from 'react-hot-toast'
 import { Badge } from "@/components/ui/badge"
 
@@ -132,11 +132,10 @@ export default function CreateExam() {
                 formData.append('tags', JSON.stringify(tags));
             }
 
-            const response = await axios.post(`${API_BASE_URL}/api/exam/generate`,
+            const response = await axiosInstance.post(`/api/exam/generate`,
                 formData,
                 {
                     headers: {
-                        Authorization: `Bearer ${getToken()}`,
                         'Content-Type': 'multipart/form-data' // Important for file uploads
                     }
                 }
