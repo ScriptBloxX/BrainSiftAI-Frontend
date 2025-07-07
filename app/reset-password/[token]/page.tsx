@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertCircle } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import axiosInstance from "@/lib/axios"
 
 export default function ResetPassword({ params }: { params: Promise<{ token: string }> }) {
   const [password, setPassword] = useState("")
@@ -31,7 +32,6 @@ export default function ResetPassword({ params }: { params: Promise<{ token: str
     fetchParams()
   }, [params])
 
-  // In a real app, you would validate the token here
   const isValidToken = token && token.length > 10
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,28 +40,34 @@ export default function ResetPassword({ params }: { params: Promise<{ token: str
     setError(null)
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
       // Simple validation
       if (!password || !confirmPassword) {
         throw new Error("Please fill in all fields")
       }
 
-      if (password.length < 6) {
-        throw new Error("Password must be at least 6 characters")
+      const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+      if (!passwordRequirements.test(password)) {
+        throw new Error("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
       }
 
       if (password !== confirmPassword) {
         throw new Error("Passwords do not match")
       }
 
-      // In a real app, you would make an API call to reset the password
+      // Call reset password API
+      await axiosInstance.patch('/api/user/reset-password', {
+        token: token,
+        password: password
+      })
 
       // Redirect to login page with success message
       router.push("/login?reset=success")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+    } catch (err: any) {
+      if (err.response) {
+        setError(err.response.data.error_message || err.response.data.error || "Failed to reset password")
+      } else {
+        setError(err.message || "An error occurred")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -81,7 +87,6 @@ export default function ResetPassword({ params }: { params: Promise<{ token: str
               </CardHeader>
               <CardContent>
                 <Alert variant="destructive" className="mb-4">
-                  <AlertCircle className="h-4 w-4" />
                   <AlertDescription>Please request a new password reset link.</AlertDescription>
                 </Alert>
               </CardContent>
@@ -104,7 +109,7 @@ export default function ResetPassword({ params }: { params: Promise<{ token: str
       <Navbar />
       <div className="flex flex-col min-h-screen items-center">
 
-        <main className="flex-1 container flex items-center justify-center py-12">
+        <main className="flex-1 container flex items-center justify-center py-12 mt-16">
           <Card className="w-full max-w-md">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold">Reset your password</CardTitle>
@@ -112,8 +117,7 @@ export default function ResetPassword({ params }: { params: Promise<{ token: str
             </CardHeader>
             <CardContent>
               {error && (
-                <Alert variant="destructive" className="mb-4">
-                  <AlertCircle className="h-4 w-4" />
+                <Alert variant="destructive" className="mb-4 flex items-center gap-4">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
