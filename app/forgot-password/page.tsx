@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import axiosInstance from "@/lib/axios"
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState("")
@@ -25,25 +26,30 @@ export default function ForgotPassword() {
         setError(null)
 
         try {
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1500))
-
             // Simple validation
-            if (!email) {
-                throw new Error("Please enter your email address")
-            }
+            if (!email) throw new Error("Please enter your email address")
 
             // Email format validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-            if (!emailRegex.test(email)) {
-                throw new Error("Please enter a valid email address")
-            }
+            if (!emailRegex.test(email)) throw new Error("Please enter a valid email address")
 
-            // In a real app, you would make an API call to send a password reset email
-            // For demo purposes, we'll just show a success message
+            // Call forgot password API
+            await axiosInstance.post('/api/user/forgot-password', {
+                email: email
+            })
+
+            // Show success message
             setIsSuccess(true)
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred")
+        } catch (err: any) {
+            if (err.response) {
+                if (err.response.status === 500) {
+                    setError("No account found with this email. Please check and try again.")
+                } else {
+                    setError(err.response.data.error_message || err.response.data.error || "Failed to send reset link")
+                }
+            } else {
+                setError(err.message || "An error occurred")
+            }
         } finally {
             setIsLoading(false)
         }
@@ -69,7 +75,6 @@ export default function ForgotPassword() {
 
                             {isSuccess ? (
                                 <Alert className="mb-4 border-green-500 text-green-500">
-                                    <CheckCircle2 className="h-4 w-4" />
                                     <AlertDescription>
                                         Password reset link sent! Check your email for instructions to reset your password.
                                     </AlertDescription>
