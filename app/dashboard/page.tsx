@@ -133,8 +133,8 @@ export default function Dashboard() {
                     />
                     <StatsCard
                         title="Private Classes"
-                        value="2"
-                        description="8 active members"
+                        value="N/A"
+                        description="N/A active members"
                         icon={<Users className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
