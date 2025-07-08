@@ -8,7 +8,6 @@ interface RetryableAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
 });
 
 let refreshPromise: Promise<string> | null = null;
