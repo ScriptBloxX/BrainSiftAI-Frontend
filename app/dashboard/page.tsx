@@ -706,16 +706,7 @@ function ExamAttemptCard({
             minute: "2-digit",
         })
     }
-
-    const formatDuration = (minutes: number) => {
-        if (minutes < 60) {
-            return `${minutes}m`
-        }
-        const hours = Math.floor(minutes / 60)
-        const remainingMinutes = minutes % 60
-        return `${hours}h ${remainingMinutes}m`
-    }
-
+    
     const getScoreBackground = (percentage: number) => {
         if (percentage >= 80) return "bg-green-500"
         if (percentage >= 60) return "bg-yellow-500"
