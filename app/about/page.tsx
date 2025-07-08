@@ -143,20 +143,14 @@ export default function AboutUs() {
                 image="https://media.tenor.com/BLOZw5VmYA8AAAAM/brain.gif"
               />
               <Testimonial
-                quote="As a high school teacher with multiple classes, BrainSiftAI has been a game-changer. I can quickly create customized exams for different learning levels, and my students love the instant feedback."
+                quote="The AI-generated questions are remarkably good at testing conceptual understanding, not just memorization. It's helped me create more effective assessments that truly measure learning."
                 author="Bot 2"
                 role="1st year SIT student"
                 image="https://media.tenor.com/BLOZw5VmYA8AAAAM/brain.gif"
               />
               <Testimonial
-                quote="The AI-generated questions are remarkably good at testing conceptual understanding, not just memorization. It's helped me create more effective assessments that truly measure learning."
-                author="Bot 3"
-                role="1st year SIT student"
-                image="https://media.tenor.com/BLOZw5VmYA8AAAAM/brain.gif"
-              />
-              <Testimonial
                 quote="I use BrainSiftAI to study for my medical exams. Being able to generate practice questions from my notes and textbooks has significantly improved my retention and test performance."
-                author="Bot 4"
+                author="Bot 3"
                 role="1st year SIT student"
                 image="https://media.tenor.com/BLOZw5VmYA8AAAAM/brain.gif"
               />

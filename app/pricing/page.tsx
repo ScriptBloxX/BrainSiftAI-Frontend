@@ -47,8 +47,6 @@ export default function Pricing() {
                     <PricingFeature>Up to 20 questions per exam</PricingFeature>
                     <PricingFeature>Basic content summaries</PricingFeature>
                     <PricingFeature>Community support</PricingFeature>
-                    {/* <PricingFeatureDemotion>Private exams</PricingFeatureDemotion>
-                    <PricingFeatureDemotion>Create classes</PricingFeatureDemotion> */}
                   </ul>
                 </CardContent>
                 <CardFooter>
@@ -79,9 +77,8 @@ export default function Pricing() {
                   <ul className="space-y-3">
                     <PricingFeature>Unlimited exams</PricingFeature>
                     <PricingFeature>Up to 50 questions per exam</PricingFeature>
-                    <PricingFeature>Up to 5 classes</PricingFeature>
                     <PricingFeature>Advanced content summaries</PricingFeature>
-                    <PricingFeature>Private exams and classes</PricingFeature>
+                    <PricingFeature>Private exams</PricingFeature>
                     <PricingFeature>PDF upload and processing</PricingFeature>
                     <PricingFeature>Priority support</PricingFeature>
                   </ul>
@@ -108,7 +105,6 @@ export default function Pricing() {
                 <CardContent className="flex-grow">
                   <ul className="space-y-3">
                     <PricingFeature>Everything in Pro</PricingFeature>
-                    <PricingFeature>Unlimited classes</PricingFeature>
                     <PricingFeature>Maximum 150 questions per exam</PricingFeature>
                     <PricingFeature>Advanced analytics</PricingFeature>
                     <PricingFeature>API access</PricingFeature>

@@ -159,12 +159,6 @@ export default function Dashboard() {
         return null
     }
 
-    // Mock data for classes
-    const myClasses = [
-        { id: 1, name: "[Mock] Biology 101", members: 12, exams: 3 },
-        { id: 2, name: "[Mock] Advanced Math Group", members: 8, exams: 5 },
-    ]
-
     const refreshExams = async () => {
         if (!isAuthenticated || !user) return
 
@@ -184,46 +178,33 @@ export default function Dashboard() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                        <p className="text-muted-foreground mt-1">Manage your exams and classes</p>
-                    </div>
-                    <div className="flex gap-4">
-                        <Button asChild>
-                            <Link href="/create-exam">
-                                <Plus className="mr-2 h-4 w-4" /> Create Exam
-                            </Link>
-                        </Button>
-                        <Button variant="outline" asChild>
-                            <Link href="/create-class">
-                                <Users className="mr-2 h-4 w-4" /> Create Class
-                            </Link>
-                        </Button>
+                        <p className="text-muted-foreground mt-1">Manage your exams</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <StatsCard
-                        title="Total Exams"
+                        title="Exams Created"
                         value={myExams.length.toString()}
                         description={`${myExams.filter((exam) => new Date(exam.createdAt).getMonth() === new Date().getMonth()).length} created this month`}
                         icon={<BookOpen className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
-                        title="Private Classes"
-                        value="N/A"
-                        description="N/A active members"
-                        icon={<Users className="h-5 w-5 text-muted-foreground" />}
+                        title="Total Completions"
+                        value={myExams.reduce((sum, exam) => sum + exam.completions, 0).toString()}
+                        description="Completions across all your exams"
+                        icon={<FileUp className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
-                        title="Exam Completions"
-                        value={myExams.reduce((sum, exam) => sum + exam.completions, 0).toString()}
-                        description="from all your exams"
-                        icon={<FileUp className="h-5 w-5 text-muted-foreground" />}
+                        title="Exam Attempts"
+                        value={examHistory.reduce((sum, group) => sum + group.totalAttempts, 0).toString()}
+                        description="All exams you have attempted"
+                        icon={<Users className="h-5 w-5 text-muted-foreground" />}
                     />
                 </div>
 
                 <Tabs defaultValue="exams" className="w-full">                    <TabsList className="mb-6">
                         <TabsTrigger value="exams">My Exams</TabsTrigger>
-                        <TabsTrigger value="classes">My Classes</TabsTrigger>
                         <TabsTrigger value="history">Exam History</TabsTrigger>
                     </TabsList>
 
@@ -275,27 +256,6 @@ export default function Dashboard() {
                                 )}
                             </div>
                         )}
-                    </TabsContent>
-
-                    <TabsContent value="classes">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <Link href="/create-class">
-                                <Card className="bg-primary/5 border-dashed border-primary/20 hover:border-primary/50 transition-colors cursor-pointer">
-                                    <CardHeader className="flex flex-col items-center justify-center pt-8">
-                                        <div className="p-3 rounded-full bg-primary/10 mb-4">
-                                            <Users className="h-8 w-8 text-primary" />
-                                        </div>
-                                        <CardTitle className="text-center">Create New Class</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-center pb-8">
-                                        <p className="text-sm text-muted-foreground">Create a private class and invite members</p>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                            {myClasses.map((cls) => (
-                                <ClassCard key={cls.id} name={cls.name} members={cls.members} exams={cls.exams} id={cls.id} />
-                            ))}
-                        </div>
                     </TabsContent>
 
                     <TabsContent value="history">
