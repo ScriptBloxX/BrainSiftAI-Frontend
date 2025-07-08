@@ -609,6 +609,8 @@ function ExamHistoryCard({
     examGroup: ExamHistoryGroup
     onClick: () => void
 }) {
+    const router = useRouter()
+    
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString("en-US", {
             year: "numeric",
@@ -617,10 +619,16 @@ function ExamHistoryCard({
         })
     }
 
+    const handleRetake = (e: React.MouseEvent) => {
+        e.stopPropagation() // Prevent card click event
+        router.push(`/exam/${examGroup.examId}`)
+    }
+
     return (
         <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={onClick}>
             <CardHeader>
                 <CardTitle className="line-clamp-2 text-lg">{examGroup.examTitle}</CardTitle>
+
                 <CardDescription>
                     Last attempt: {formatDate(examGroup.attempts[0]?.completedAt)}
                 </CardDescription>
@@ -657,6 +665,15 @@ function ExamHistoryCard({
                     </div>
                 </div>
             </CardContent>
+            <CardFooter className="pt-3">
+                <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={handleRetake}
+                >
+                    Retake
+                </Button>
+            </CardFooter>
         </Card>
     )
 }
