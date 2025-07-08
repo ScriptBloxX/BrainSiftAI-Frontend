@@ -156,7 +156,7 @@ export default function Settings() {
             setSuccessMessage("Profile updated successfully")
         } catch (error: any) {
             console.error("Failed to update profile:", error)
-            setErrorMessage(error.response?.data?.message || "Failed to update profile. Please try again.")
+            setErrorMessage(error.response?.data?.error_message?.[0] || "Failed to change password. Please try again.")
         } finally {
             setIsSaving(false)
         }
@@ -221,7 +221,7 @@ export default function Settings() {
 
         try {
             // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await new Promise((resolve) => setTimeout(resolve, 500))
 
             // setSuccessMessage("Notification preferences updated successfully")
             setErrorMessage("This feature is under development and will be available in a future update.")
@@ -243,14 +243,18 @@ export default function Settings() {
         setErrorMessage(null)
 
         try {
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await axiosInstance.delete('/api/user', {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
 
-            // In a real app, you would make an API call to delete the account
+            // Logout and redirect after successful deletion
             logout()
             router.push("/")
-        } catch (error) {
-            setErrorMessage("Failed to delete account. Please try again.")
+        } catch (error: any) {
+            console.error("Failed to delete account:", error)
+            setErrorMessage(error.response?.data?.error_message?.[0] || "Failed to change password. Please try again.")
             setIsSaving(false)
         }
     }
@@ -320,63 +324,6 @@ export default function Settings() {
                                                 <AlertDescription>{errorMessage}</AlertDescription>
                                             </Alert>
                                         )}
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="avatar">Profile Picture</Label>
-                                            <div className="flex items-center gap-4">
-                                                <Avatar className="h-16 w-16">
-                                                    {avatarPreview ? (
-                                                        <AvatarImage src={avatarPreview} alt={user?.name} />
-                                                    ) : (
-                                                        <AvatarImage
-                                                            src={user?.profile.avatar || "/placeholder.svg?height=64&width=64"}
-                                                            alt={user?.name}
-                                                        />
-                                                    )}
-                                                    <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
-                                                </Avatar>
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="flex gap-2 flex-wrap">
-                                                        <Button
-                                                            className="w-full sm:w-max"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={triggerFileInput}
-                                                            disabled={isUploadingAvatar}
-                                                        >
-                                                            <Upload className="mr-2 h-4 w-4" />
-                                                            Select Image
-                                                        </Button>
-                                                        {avatarFile && (
-                                                            <Button
-                                                                className="w-full sm:w-max"
-                                                                size="sm"
-                                                                onClick={handleAvatarUpload}
-                                                                disabled={isUploadingAvatar}
-                                                            >
-                                                                {isUploadingAvatar ? (
-                                                                    <>
-                                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                        Uploading...
-                                                                    </>
-                                                                ) : (
-                                                                    "Upload"
-                                                                )}
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                    <input
-                                                        ref={fileInputRef}
-                                                        type="file"
-                                                        id="avatar"
-                                                        accept="image/*"
-                                                        className="hidden"
-                                                        onChange={handleAvatarChange}
-                                                    />
-                                                    <p className="text-xs text-muted-foreground">Recommended: Square image, at least 200x200px</p>
-                                                </div>
-                                            </div>
-                                        </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="name">Full Name</Label>
