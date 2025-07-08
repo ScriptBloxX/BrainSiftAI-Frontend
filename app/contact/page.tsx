@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Mail, Phone, MapPin, MessageSquare } from "lucide-react"
+import { Mail, Phone, MapPin, MessageSquare, GithubIcon } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 
@@ -122,17 +122,11 @@ export default function Contact() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex gap-4">
-                      <SocialButton href="https://twitter.com/brainsiftai" label="Twitter">
-                        <TwitterIcon className="h-5 w-5" />
-                      </SocialButton>
-                      <SocialButton href="https://facebook.com/brainsiftai" label="Facebook">
-                        <FacebookIcon className="h-5 w-5" />
-                      </SocialButton>
-                      <SocialButton href="https://linkedin.com/company/brainsiftai" label="LinkedIn">
-                        <LinkedInIcon className="h-5 w-5" />
-                      </SocialButton>
-                      <SocialButton href="https://instagram.com/brainsiftai" label="Instagram">
+                      <SocialButton href="https://www.instagram.com/9hodev/" label="Instagram">
                         <InstagramIcon className="h-5 w-5" />
+                      </SocialButton>
+                      <SocialButton href="https://github.com/ScriptBloxX" label="Instagram">
+                        <GithubIcon className="h-5 w-5" />
                       </SocialButton>
                     </div>
                   </CardContent>
