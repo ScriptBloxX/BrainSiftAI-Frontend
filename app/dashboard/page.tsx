@@ -146,56 +146,6 @@ export default function Dashboard() {
                 console.error("Failed to fetch exam history:", error)
             } finally {
                 setLoadingHistory(false)
-                                   setExamHistory([
-                        {
-                            examId: "mock-exam-1",
-                            examTitle: "[Mock] Sample Exam 1",
-                            attempts: [
-                                {
-                                    id: "mock-attempt-1",
-                                    examId: "mock-exam-1",
-                                    examTitle: "[Mock] Sample Exam 1",
-                                    score: 8,
-                                    totalQuestions: 10,
-                                    percentage: 80,
-                                    completedAt: new Date().toISOString(),
-                                    timeTaken: 15,
-                                },
-                                {
-                                    id: "mock-attempt-2",
-                                    examId: "mock-exam-1",
-                                    examTitle: "[Mock] Sample Exam 1",
-                                    score: 7,
-                                    totalQuestions: 10,
-                                    percentage: 70,
-                                    completedAt: new Date(Date.now() - 86400000).toISOString(),
-                                    timeTaken: 20,
-                                },
-                            ],
-                            totalAttempts: 2,
-                            bestScore: 80,
-                            averageScore: 75,
-                        },
-                        {
-                            examId: "mock-exam-2",
-                            examTitle: "[Mock] Sample Exam 2",
-                            attempts: [
-                                {
-                                    id: "mock-attempt-3",
-                                    examId: "mock-exam-2",
-                                    examTitle: "[Mock] Sample Exam 2",
-                                    score: 9,
-                                    totalQuestions: 10,
-                                    percentage: 90,
-                                    completedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-                                    timeTaken: 10,
-                                },
-                            ],
-                            totalAttempts: 1,
-                            bestScore: 90,
-                            averageScore: 90,
-                        },
-                    ])
             }
         }
 
@@ -392,11 +342,6 @@ export default function Dashboard() {
                                 <ExamAttemptCard key={attempt.id} attempt={attempt} attemptNumber={index + 1} />
                             ))}
                         </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowHistoryDialog(false)}>
-                                Close
-                            </Button>
-                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </main>
@@ -758,31 +703,29 @@ function ExamHistoryCard({
                     <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Best Score</span>
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                <span className="text-xs font-medium text-primary">
-                                    {examGroup.bestScore}%
-                                </span>
-                            </div>
+                            <span
+                                className={`text-xs font-medium ${
+                                    examGroup.bestScore >= 80
+                                        ? "text-green-500"
+                                        : examGroup.bestScore >= 60
+                                        ? "text-yellow-500"
+                                        : "text-red-500"
+                                }`}
+                            >
+                                {examGroup.bestScore}%
+                            </span>
                         </div>
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Average Score</span>
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                                <span className="text-xs font-medium">
-                                    {examGroup.averageScore}%
-                                </span>
-                            </div>
+                            <span className="text-xs font-medium">
+                                {examGroup.averageScore}%
+                            </span>
                         </div>
                     </div>
                 </div>
             </CardContent>
-            <CardFooter>
-                <Button variant="outline" size="sm" className="w-full">
-                    <Clock className="mr-2 h-4 w-4" />
-                    View Attempts
-                </Button>
-            </CardFooter>
         </Card>
     )
 }
@@ -813,21 +756,15 @@ function ExamAttemptCard({
         return `${hours}h ${remainingMinutes}m`
     }
 
-    const getScoreColor = (percentage: number) => {
-        if (percentage >= 80) return "text-green-600"
-        if (percentage >= 60) return "text-yellow-600"
-        return "text-red-600"
-    }
-
     const getScoreBackground = (percentage: number) => {
-        if (percentage >= 80) return "bg-green-100"
-        if (percentage >= 60) return "bg-yellow-100"
-        return "bg-red-100"
+        if (percentage >= 80) return "bg-green-500"
+        if (percentage >= 60) return "bg-yellow-500"
+        return "bg-red-500"
     }
 
     return (
         <Card>
-            <CardContent className="pt-6">
+            <CardContent>
                 <div className="flex items-center justify-between">
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
@@ -848,11 +785,11 @@ function ExamAttemptCard({
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className={`w-16 h-16 rounded-full flex items-center justify-center ${getScoreBackground(attempt.percentage)}`}>
-                            <span className={`text-lg font-bold ${getScoreColor(attempt.percentage)}`}>
+                        <Badge className={`${getScoreBackground(attempt.percentage)}`}>
+                            <span className={`text-lg font-bold`}>
                                 {attempt.percentage}%
                             </span>
-                        </div>
+                        </Badge>
                     </div>
                 </div>
             </CardContent>
