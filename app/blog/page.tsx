@@ -162,14 +162,7 @@ export default function Blog() {
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold text-center mb-12">Browse by Category</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              <CategoryCard
-                title="Education"
-                description="Teaching strategies, learning theories, and classroom innovations"
-                count={24}
-                icon={<BookIcon className="h-8 w-8 text-primary" />}
-                href="/blog/category/education"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               <CategoryCard
                 title="AI Technology"
                 description="Advances in AI and their applications in educational settings"

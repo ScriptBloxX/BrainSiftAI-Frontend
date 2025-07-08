@@ -58,7 +58,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FeatureCard
                 icon={<FileText className="h-10 w-10 text-primary" />}
                 title="AI-Generated Exams"
@@ -68,11 +68,6 @@ export default function Home() {
                 icon={<BookOpen className="h-10 w-10 text-primary" />}
                 title="Content Summaries"
                 description="Get concise summaries of your content to review before taking the exam."
-              />
-              <FeatureCard
-                icon={<Users className="h-10 w-10 text-primary" />}
-                title="Private Classes"
-                description="Create private classes and invite specific users to take your exams."
               />
             </div>
           </div>

@@ -47,12 +47,6 @@ export default function HelpCenter() {
                 href="/help/content-management"
               />
               <TopicCard
-                icon={<Users className="h-8 w-8 text-primary" />}
-                title="Private Classes"
-                description="How to create and manage private classes for your students"
-                href="/help/private-classes"
-              />
-              <TopicCard
                 icon={<Settings className="h-8 w-8 text-primary" />}
                 title="Account Settings"
                 description="Manage your account, billing, and notification preferences"
@@ -125,11 +119,6 @@ export default function HelpCenter() {
                   title="Content summaries"
                   description="Understanding and customizing content summaries"
                   href="/help/content-summaries"
-                />
-                <HelpArticle
-                  title="Private classes"
-                  description="Creating and managing private classes"
-                  href="/help/private-classes-guide"
                 />
                 <HelpArticle
                   title="Exam settings"

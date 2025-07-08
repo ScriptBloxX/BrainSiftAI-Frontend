@@ -43,8 +43,6 @@ export default function Explore() {
     const [loadingScreen, setLoadingScreen] = useState(true);
     const [popularTags, setPopularTags] = useState<string[]>([]);
 
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
-
     useEffect(() => {
         const fetchExams = async () => {
             try {

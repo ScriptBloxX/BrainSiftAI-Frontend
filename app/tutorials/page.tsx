@@ -104,13 +104,6 @@ export default function Tutorials() {
                     href="/tutorials/advanced-content-processing"
                   />
                   <TutorialCard
-                    icon={<Users className="h-8 w-8 text-primary" />}
-                    title="Managing Private Classes"
-                    description="Advanced techniques for managing private classes and student access"
-                    duration="9 min"
-                    href="/tutorials/managing-private-classes"
-                  />
-                  <TutorialCard
                     icon={<FileText className="h-8 w-8 text-primary" />}
                     title="Exam Analytics"
                     description="Deep dive into exam analytics and performance metrics"
@@ -138,13 +131,6 @@ export default function Tutorials() {
                 <h2 className="text-2xl font-bold mb-6">Tutorials for Educators</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <TutorialCard
-                    icon={<FileText className="h-8 w-8 text-primary" />}
-                    title="Classroom Integration"
-                    description="How to integrate BrainSiftAI into your classroom teaching"
-                    duration="8 min"
-                    href="/tutorials/classroom-integration"
-                  />
                   <TutorialCard
                     icon={<BookOpen className="h-8 w-8 text-primary" />}
                     title="Creating Effective Assessments"
@@ -247,12 +233,6 @@ export default function Tutorials() {
                 duration="8:47"
                 thumbnail="/placeholder.svg?height=200&width=350"
                 href="/tutorials/videos/advanced-questions"
-              />
-              <VideoTutorial
-                title="Managing Private Classes"
-                duration="5:23"
-                thumbnail="/placeholder.svg?height=200&width=350"
-                href="/tutorials/videos/private-classes"
               />
               <VideoTutorial
                 title="Analyzing Exam Results"

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileUp, Plus, BookOpen, Users, Loader2 } from "lucide-react"
+import { FileUp, Plus, BookOpen, Users, Loader2, Clock, Trophy, Calendar } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
@@ -45,12 +45,34 @@ type ExamType = {
     }
 }
 
+type ExamHistoryType = {
+    id: string
+    examId: string
+    examTitle: string
+    score: number
+    totalQuestions: number
+    percentage: number
+    completedAt: string
+}
+
+type ExamHistoryGroup = {
+    examId: string
+    examTitle: string
+    attempts: ExamHistoryType[]
+    totalAttempts: number
+    bestScore: number
+    averageScore: number
+}
+
 export default function Dashboard() {
     const { isAuthenticated, isLoading, user, getToken } = useAuth()
     const router = useRouter()
     const [myExams, setMyExams] = useState<ExamType[]>([])
+    const [examHistory, setExamHistory] = useState<ExamHistoryGroup[]>([])
     const [loadingExams, setLoadingExams] = useState(true)
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
+    const [loadingHistory, setLoadingHistory] = useState(true)
+    const [selectedExamHistory, setSelectedExamHistory] = useState<ExamHistoryGroup | null>(null)
+    const [showHistoryDialog, setShowHistoryDialog] = useState(false)
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -78,16 +100,35 @@ export default function Dashboard() {
         }
     }, [isAuthenticated, user, getToken])
 
+    useEffect(() => {
+        const fetchExamHistory = async () => {
+            if (!isAuthenticated || !user) return
+
+            try {
+                setLoadingHistory(true)
+                const response = await axiosInstance.get(`/api/exam/total_attempts`)
+                         const groupedHistory: ExamHistoryGroup[] = response.data.map((group: ExamHistoryGroup) => ({
+                    ...group,
+                    attempts: group.attempts.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+                }))
+                
+                setExamHistory(groupedHistory)
+            } catch (error) {
+                console.error("Failed to fetch exam history:", error)
+            } finally {
+                setLoadingHistory(false)
+            }
+        }
+
+        if (isAuthenticated && user) {
+            fetchExamHistory()
+        }
+    }, [isAuthenticated, user])
+
     // If still loading or not authenticated, don't render the dashboard
     if (isLoading || !isAuthenticated) {
         return null
     }
-
-    // Mock data for classes
-    const myClasses = [
-        { id: 1, name: "[Mock] Biology 101", members: 12, exams: 3 },
-        { id: 2, name: "[Mock] Advanced Math Group", members: 8, exams: 5 },
-    ]
 
     const refreshExams = async () => {
         if (!isAuthenticated || !user) return
@@ -108,47 +149,34 @@ export default function Dashboard() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                        <p className="text-muted-foreground mt-1">Manage your exams and classes</p>
-                    </div>
-                    <div className="flex gap-4">
-                        <Button asChild>
-                            <Link href="/create-exam">
-                                <Plus className="mr-2 h-4 w-4" /> Create Exam
-                            </Link>
-                        </Button>
-                        <Button variant="outline" asChild>
-                            <Link href="/create-class">
-                                <Users className="mr-2 h-4 w-4" /> Create Class
-                            </Link>
-                        </Button>
+                        <p className="text-muted-foreground mt-1">Manage your exams</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <StatsCard
-                        title="Total Exams"
+                        title="Exams Created"
                         value={myExams.length.toString()}
                         description={`${myExams.filter((exam) => new Date(exam.createdAt).getMonth() === new Date().getMonth()).length} created this month`}
                         icon={<BookOpen className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
-                        title="Private Classes"
-                        value="N/A"
-                        description="N/A active members"
-                        icon={<Users className="h-5 w-5 text-muted-foreground" />}
+                        title="Total Completions"
+                        value={myExams.reduce((sum, exam) => sum + exam.completions, 0).toString()}
+                        description="Completions across all your exams"
+                        icon={<FileUp className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
-                        title="Exam Completions"
-                        value={myExams.reduce((sum, exam) => sum + exam.completions, 0).toString()}
-                        description="from all your exams"
-                        icon={<FileUp className="h-5 w-5 text-muted-foreground" />}
+                        title="Total Attempts"
+                        value={examHistory.reduce((sum, group) => sum + group.totalAttempts, 0).toString()}
+                        description="All exams you have attempted"
+                        icon={<Users className="h-5 w-5 text-muted-foreground" />}
                     />
                 </div>
 
-                <Tabs defaultValue="exams" className="w-full">
-                    <TabsList className="mb-6">
+                <Tabs defaultValue="exams" className="w-full">                    <TabsList className="mb-6">
                         <TabsTrigger value="exams">My Exams</TabsTrigger>
-                        <TabsTrigger value="classes">My Classes</TabsTrigger>
+                        <TabsTrigger value="history">My Attempts</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="exams">
@@ -201,27 +229,52 @@ export default function Dashboard() {
                         )}
                     </TabsContent>
 
-                    <TabsContent value="classes">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <Link href="/create-class">
-                                <Card className="bg-primary/5 border-dashed border-primary/20 hover:border-primary/50 transition-colors cursor-pointer">
-                                    <CardHeader className="flex flex-col items-center justify-center pt-8">
-                                        <div className="p-3 rounded-full bg-primary/10 mb-4">
-                                            <Users className="h-8 w-8 text-primary" />
-                                        </div>
-                                        <CardTitle className="text-center">Create New Class</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-center pb-8">
-                                        <p className="text-sm text-muted-foreground">Create a private class and invite members</p>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                            {myClasses.map((cls) => (
-                                <ClassCard key={cls.id} name={cls.name} members={cls.members} exams={cls.exams} id={cls.id} />
-                            ))}
-                        </div>
+                    <TabsContent value="history">
+                        {loadingHistory ? (
+                            <div className="flex justify-center items-center py-12">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        ) : examHistory.length === 0 ? (
+                            <Card>
+                                <CardContent className="flex flex-col items-center justify-center py-12">
+                                    <Trophy className="h-12 w-12 text-muted-foreground mb-4" />
+                                    <p className="text-muted-foreground mb-4">No exam history found</p>
+                                    <p className="text-sm text-muted-foreground">Take some exams to see your history here</p>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {examHistory.map((examGroup) => (
+                                    <ExamHistoryCard
+                                        key={examGroup.examId}
+                                        examGroup={examGroup}
+                                        onClick={() => {
+                                            setSelectedExamHistory(examGroup)
+                                            setShowHistoryDialog(true)
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </TabsContent>
                 </Tabs>
+
+                {/* Exam History Details Dialog */}
+                <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+                    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle>{selectedExamHistory?.examTitle}</DialogTitle>
+                            <DialogDescription>
+                                Exam attempt history ({selectedExamHistory?.totalAttempts} attempts)
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            {selectedExamHistory?.attempts.map((attempt, index) => (
+                                <ExamAttemptCard key={attempt.id} attempt={attempt} attemptNumber={index + 1} />
+                            ))}
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </main>
 
             <Footer />
@@ -273,13 +326,11 @@ function ExamCard({
     onUpdate?: () => void
 }) {
     const router = useRouter()
-    const { getToken } = useAuth()
     const [showEditDialog, setShowEditDialog] = useState(false)
     const [examTitle, setExamTitle] = useState(title)
     const [examVisibility, setExamVisibility] = useState(visibility)
     const [isSaving, setIsSaving] = useState(false)
     const [currentVisibility, setCurrentVisibility] = useState(visibility)
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
     const handleView = () => {
         router.push(`/exam/${id}`)
@@ -419,134 +470,139 @@ function ExamCard({
     )
 }
 
-function ClassCard({
-    name,
-    members,
-    exams,
-    id = Math.floor(Math.random() * 1000),
+function ExamHistoryCard({
+    examGroup,
+    onClick,
 }: {
-    name: string
-    members: number
-    exams: number
-    id?: number
+    examGroup: ExamHistoryGroup
+    onClick: () => void
 }) {
     const router = useRouter()
-    const [showEditDialog, setShowEditDialog] = useState(false)
-    const [className, setClassName] = useState(name)
-
-    const handleView = () => {
-        router.push(`/private-class/${id}`)
+    
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        })
     }
 
-    const handleManage = () => {
-        setShowEditDialog(true)
+    const handleRetake = (e: React.MouseEvent) => {
+        e.stopPropagation() // Prevent card click event
+        router.push(`/exam/${examGroup.examId}`)
     }
 
-    const handleSaveChanges = () => {
-        // In a real app, you would make an API call to update the class
-        setShowEditDialog(false)
-        // Show a success message
-        alert("Class updated successfully")
+    return (
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={onClick}>
+            <CardHeader>
+                <CardTitle className="line-clamp-2 text-lg">{examGroup.examTitle}</CardTitle>
+
+                <CardDescription>
+                    Last attempt: {formatDate(examGroup.attempts[0]?.completedAt)}
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Total Attempts</span>
+                        <Badge variant="secondary">{examGroup.totalAttempts}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Best Score</span>
+                        <div className="flex items-center gap-2">
+                            <span
+                                className={`text-xs font-medium ${
+                                    examGroup.bestScore >= 80
+                                        ? "text-green-500"
+                                        : examGroup.bestScore >= 60
+                                        ? "text-yellow-500"
+                                        : "text-red-500"
+                                }`}
+                            >
+                                {examGroup.bestScore}%
+                            </span>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Average Score</span>
+                        <div className="flex items-center gap-2">
+                            <span   className={`text-xs font-medium ${
+                                    examGroup.averageScore >= 80
+                                        ? "text-green-500"
+                                        : examGroup.averageScore >= 60
+                                        ? "text-yellow-500"
+                                        : "text-red-500"
+                                }`}
+                                >
+                                {examGroup.averageScore}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter className="pt-3">
+                <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={handleRetake}
+                >
+                    Retake
+                </Button>
+            </CardFooter>
+        </Card>
+    )
+}
+
+function ExamAttemptCard({
+    attempt,
+    attemptNumber,
+}: {
+    attempt: ExamHistoryType
+    attemptNumber: number
+}) {
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        })
+    }
+
+    const getScoreBackground = (percentage: number) => {
+        if (percentage >= 80) return "bg-green-500"
+        if (percentage >= 60) return "bg-yellow-500"
+        return "bg-red-500"
+    }
+
+    const getAttemptId = (id: string) => {
+        return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`
     }
 
     return (
         <Card>
-            <CardHeader>
-                <CardTitle className="line-clamp-1">{name}</CardTitle>
-                <CardDescription>{members} members</CardDescription>
-            </CardHeader>
             <CardContent>
-                <div className="text-sm">
-                    <span>{exams} exams in this class</span>
+                <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <Badge variant="outline">#{getAttemptId(attempt.id)}</Badge>
+                            <span className="text-sm text-muted-foreground">
+                                {formatDate(attempt.completedAt)}
+                            </span>
+                                <Trophy className="h-4 w-4 text-muted-foreground" />
+                            <span>{attempt.score}/{attempt.totalQuestions}</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Badge className={`${getScoreBackground(attempt.percentage)}`}>
+                            <span className={`text-lg font-bold`}>
+                                {attempt.percentage}%
+                            </span>
+                        </Badge>
+                    </div>
                 </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm" onClick={handleManage}>
-                    Manage
-                </Button>
-                <Button size="sm" onClick={handleView}>
-                    View
-                </Button>
-            </CardFooter>
-
-            {/* Edit Class Dialog */}
-            <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Manage Class</DialogTitle>
-                        <DialogDescription>Update class settings or invite members</DialogDescription>
-                    </DialogHeader>
-                    <Tabs defaultValue="settings">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="settings">Settings</TabsTrigger>
-                            <TabsTrigger value="members">Members</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="settings" className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="edit-class-name">Class Name</Label>
-                                <Input id="edit-class-name" value={className} onChange={(e) => setClassName(e.target.value)} />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                    <Label htmlFor="private-class">Private Class</Label>
-                                    <p className="text-sm text-muted-foreground">Only invited users can access this class</p>
-                                </div>
-                                <Switch id="private-class" defaultChecked />
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="members" className="py-4">
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="invite-email">Invite Member</Label>
-                                    <div className="flex gap-2">
-                                        <Input id="invite-email" placeholder="Enter email address" type="email" />
-                                        <Button>
-                                            <UserPlus className="mr-2 h-4 w-4" /> Invite
-                                        </Button>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Current Members</Label>
-                                    <div className="rounded-md border">
-                                        <div className="flex items-center justify-between p-3 border-b">
-                                            <div className="flex items-center gap-2">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarFallback>JS</AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="text-sm font-medium">John Smith</p>
-                                                    <p className="text-xs text-muted-foreground">john@example.com</p>
-                                                </div>
-                                            </div>
-                                            <Badge>Owner</Badge>
-                                        </div>
-                                        <div className="flex items-center justify-between p-3">
-                                            <div className="flex items-center gap-2">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarFallback>SJ</AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="text-sm font-medium">Sarah Johnson</p>
-                                                    <p className="text-xs text-muted-foreground">sarah@example.com</p>
-                                                </div>
-                                            </div>
-                                            <Button variant="ghost" size="sm">
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </TabsContent>
-                    </Tabs>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowEditDialog(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleSaveChanges}>Save Changes</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </Card>
     )
 }

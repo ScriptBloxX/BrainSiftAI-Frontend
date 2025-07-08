@@ -43,11 +43,6 @@ export default function Features() {
                 description="Get concise, AI-generated summaries of your content to help students review before taking the exam."
               />
               <FeatureCard
-                icon={<Users className="h-10 w-10 text-primary" />}
-                title="Private Classes"
-                description="Create private classes and invite specific users to take your exams with controlled access."
-              />
-              <FeatureCard
                 icon={<Zap className="h-10 w-10 text-primary" />}
                 title="Instant Feedback"
                 description="Students receive immediate results and feedback after completing exams to enhance learning."

@@ -35,8 +35,6 @@ export default function CreateExam() {
     const { isAuthenticated, isLoading, getToken, user } = useAuth()
     const router = useRouter()
 
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
-
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
             router.push("/login")
