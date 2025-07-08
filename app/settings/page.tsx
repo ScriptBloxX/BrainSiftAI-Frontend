@@ -19,32 +19,17 @@ import {
     Mail,
     Lock,
     Bell,
-    Palette,
-    Moon,
-    Sun,
-    Monitor,
     LogOut,
     Trash2,
-    Save,
-    AlertCircle,
-    CheckCircle2,
     Upload,
     Loader2,
-    Check,
 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
-import { useTheme } from "next-themes"
-
-// Theme types
-type PremiumTheme = "ocean" | "lavender" | "sunset" | "forest"
-type ColorScheme = "default" | "blue" | "purple" | "green" | "red" | "amber" | "pink"
-type FontStyle = "sans" | "serif"
 
 export default function Settings() {
     const { user, isAuthenticated, isLoading, logout, updateUser, updateProfile } = useAuth()
-    const { theme, setTheme } = useTheme()
     const router = useRouter()
 
     const [name, setName] = useState("")
@@ -64,21 +49,10 @@ export default function Settings() {
     const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    // Appearance settings
-    const [selectedPremiumTheme, setSelectedPremiumTheme] = useState<PremiumTheme | null>(null)
-    const [selectedColorScheme, setSelectedColorScheme] = useState<ColorScheme>("default")
-    const [selectedFontStyle, setSelectedFontStyle] = useState<FontStyle>("sans")
-
     // Notification preferences
     const [emailNotifications, setEmailNotifications] = useState(true)
-    const [examCompletions, setExamCompletions] = useState(true)
     const [classInvitations, setClassInvitations] = useState(true)
     const [marketingEmails, setMarketingEmails] = useState(false)
-
-    // Privacy settings
-    const [publicProfile, setPublicProfile] = useState(false)
-    const [showCompletions, setShowCompletions] = useState(false)
-    const [shareActivity, setShareActivity] = useState(false)
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -259,46 +233,6 @@ export default function Settings() {
         router.push("/")
     }
 
-    const handleSaveAppearance = async () => {
-        setIsSaving(true)
-        setSuccessMessage(null)
-        setErrorMessage(null)
-
-        try {
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-
-            // In a real app, you would save these preferences to the user's profile
-            // For now, we'll just show a success message
-            setSuccessMessage("Appearance settings saved successfully")
-        } catch (error) {
-            setErrorMessage("Failed to save appearance settings. Please try again.")
-        } finally {
-            setIsSaving(false)
-        }
-    }
-
-    const handleSelectPremiumTheme = (theme: PremiumTheme) => {
-        if (user?.plan === "free") return
-        setSelectedPremiumTheme(theme)
-        // In a real app, this would apply the theme to the application
-        setTheme(theme)
-    }
-
-    const handleSelectColorScheme = (scheme: ColorScheme) => {
-        if (user?.plan == "free") return
-        setSelectedColorScheme(scheme)
-        // In a real app, this would apply the color scheme to the application
-        // For now, we'll just update the state
-    }
-
-    const handleSelectFontStyle = (style: FontStyle) => {
-        if (user?.plan == "free") return
-        setSelectedFontStyle(style)
-        // In a real app, this would apply the font style to the application
-        // For now, we'll just update the state
-    }
-
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
@@ -338,7 +272,6 @@ export default function Settings() {
                                 <TabsTrigger value="account">Account</TabsTrigger>
                                 <TabsTrigger value="security">Security</TabsTrigger>
                                 <TabsTrigger value="notifications">Notifications</TabsTrigger>
-                                <TabsTrigger value="appearance">Appearance</TabsTrigger>
                             </TabsList>
 
                             {/* Account Settings */}
@@ -351,14 +284,12 @@ export default function Settings() {
                                     <CardContent className="space-y-6">
                                         {successMessage && (
                                             <Alert className="border-green-500 text-green-500">
-                                                <CheckCircle2 className="h-4 w-4" />
                                                 <AlertDescription>{successMessage}</AlertDescription>
                                             </Alert>
                                         )}
 
                                         {errorMessage && (
                                             <Alert variant="destructive">
-                                                <AlertCircle className="h-4 w-4" />
                                                 <AlertDescription>{errorMessage}</AlertDescription>
                                             </Alert>
                                         )}
@@ -473,14 +404,12 @@ export default function Settings() {
                                     <CardContent className="space-y-6">
                                         {successMessage && (
                                             <Alert className="border-green-500 text-green-500">
-                                                <CheckCircle2 className="h-4 w-4" />
                                                 <AlertDescription>{successMessage}</AlertDescription>
                                             </Alert>
                                         )}
 
                                         {errorMessage && (
                                             <Alert variant="destructive">
-                                                <AlertCircle className="h-4 w-4" />
                                                 <AlertDescription>{errorMessage}</AlertDescription>
                                             </Alert>
                                         )}
@@ -542,7 +471,6 @@ export default function Settings() {
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <Alert variant="destructive">
-                                            <AlertCircle className="h-4 w-4" />
                                             <AlertDescription>
                                                 This action cannot be undone. This will permanently delete your account and remove all of your
                                                 data from our servers.
@@ -584,14 +512,12 @@ export default function Settings() {
                                     <CardContent className="space-y-6">
                                         {successMessage && (
                                             <Alert className="border-green-500 text-green-500">
-                                                <CheckCircle2 className="h-4 w-4" />
                                                 <AlertDescription>{successMessage}</AlertDescription>
                                             </Alert>
                                         )}
 
                                         {errorMessage && (
                                             <Alert variant="destructive">
-                                                <AlertCircle className="h-4 w-4" />
                                                 <AlertDescription>{errorMessage}</AlertDescription>
                                             </Alert>
                                         )}
@@ -608,17 +534,6 @@ export default function Settings() {
                                         </div>
 
                                         <Separator />
-
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <Bell className="h-4 w-4 text-muted-foreground" />
-                                                <div>
-                                                    <p className="font-medium">Exam Completions</p>
-                                                    <p className="text-sm text-muted-foreground">Get notified when someone completes your exam</p>
-                                                </div>
-                                            </div>
-                                            <Switch checked={examCompletions} onCheckedChange={setExamCompletions} />
-                                        </div>
 
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
@@ -647,423 +562,6 @@ export default function Settings() {
                                     <CardFooter>
                                         <Button onClick={handleSaveNotifications} disabled={isSaving}>
                                             {isSaving ? "Saving..." : "Save Preferences"}
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            </TabsContent>
-
-                            {/* Appearance Settings */}
-                            <TabsContent value="appearance">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Appearance</CardTitle>
-                                        <CardDescription>Customize how BrainSiftAI looks for you</CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-6">
-                                        {successMessage && (
-                                            <Alert className="border-green-500 text-green-500">
-                                                <CheckCircle2 className="h-4 w-4" />
-                                                <AlertDescription>{successMessage}</AlertDescription>
-                                            </Alert>
-                                        )}
-
-                                        {errorMessage && (
-                                            <Alert variant="destructive">
-                                                <AlertCircle className="h-4 w-4" />
-                                                <AlertDescription>{errorMessage}</AlertDescription>
-                                            </Alert>
-                                        )}
-
-                                        <div className="space-y-2">
-                                            <Label>Theme Mode</Label>
-                                            <div className="grid grid-cols-3 gap-4">
-                                                <Button
-                                                    variant={theme === "light" ? "default" : "outline"}
-                                                    className="flex flex-col items-center justify-center gap-2 h-24"
-                                                    onClick={() => setTheme("light")}
-                                                >
-                                                    <Sun className="h-6 w-6" />
-                                                    <span>Light</span>
-                                                </Button>
-                                                <Button
-                                                    variant={theme === "dark" ? "default" : "outline"}
-                                                    className="flex flex-col items-center justify-center gap-2 h-24"
-                                                    onClick={() => setTheme("dark")}
-                                                >
-                                                    <Moon className="h-6 w-6" />
-                                                    <span>Dark</span>
-                                                </Button>
-                                                <Button
-                                                    variant={theme === "system" ? "default" : "outline"}
-                                                    className="flex flex-col items-center justify-center gap-2 h-24"
-                                                    onClick={() => setTheme("system")}
-                                                >
-                                                    <Monitor className="h-6 w-6" />
-                                                    <span>System</span>
-                                                </Button>
-                                            </div>
-                                        </div>
-
-                                        <Separator />
-
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <Label>Premium Themes</Label>
-                                                {user?.plan === "free" && <div className="text-xs text-muted-foreground">Pro Only</div>}
-                                            </div>
-
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                {/* Ocean Theme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant={selectedPremiumTheme === "ocean" ? "default" : "outline"}
-                                                        className={`w-full h-24 flex flex-col items-center justify-center gap-2 overflow-hidden ${user?.plan === "free" ? "opacity-70" : ""
-                                                            }`}
-                                                        disabled={user?.plan === "free"}
-                                                        onClick={() => handleSelectPremiumTheme("ocean")}
-                                                    >
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-600 opacity-20 dark:opacity-30"></div>
-                                                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-blue-200 to-transparent opacity-30 dark:from-blue-400 dark:opacity-20"></div>
-                                                        <div className="z-10 flex flex-col items-center">
-                                                            <div className="h-6 w-6 rounded-full bg-blue-500 shadow-lg mb-1"></div>
-                                                            <span className="font-medium">Ocean</span>
-                                                        </div>
-                                                        {selectedPremiumTheme === "ocean" && (
-                                                            <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5">
-                                                                <Check className="h-3 w-3" />
-                                                            </div>
-                                                        )}
-                                                    </Button>
-                                                    {user?.plan === "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-muted-foreground" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Lavender Theme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant={selectedPremiumTheme === "lavender" ? "default" : "outline"}
-                                                        className={`w-full h-24 flex flex-col items-center justify-center gap-2 overflow-hidden ${user?.plan === "free" ? "opacity-70" : ""
-                                                            }`}
-                                                        disabled={user?.plan === "free"}
-                                                        onClick={() => handleSelectPremiumTheme("lavender")}
-                                                    >
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-indigo-600 opacity-20 dark:opacity-30"></div>
-                                                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-purple-200 to-transparent opacity-30 dark:from-purple-400 dark:opacity-20"></div>
-                                                        <div className="z-10 flex flex-col items-center">
-                                                            <div className="h-6 w-6 rounded-full bg-purple-500 shadow-lg mb-1"></div>
-                                                            <span className="font-medium">Lavender</span>
-                                                        </div>
-                                                        {selectedPremiumTheme === "lavender" && (
-                                                            <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5">
-                                                                <Check className="h-3 w-3" />
-                                                            </div>
-                                                        )}
-                                                    </Button>
-                                                    {user?.plan === "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-muted-foreground" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Sunset Theme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant={selectedPremiumTheme === "sunset" ? "default" : "outline"}
-                                                        className={`w-full h-24 flex flex-col items-center justify-center gap-2 overflow-hidden ${user?.plan === "free" ? "opacity-70" : ""
-                                                            }`}
-                                                        disabled={user?.plan === "free"}
-                                                        onClick={() => handleSelectPremiumTheme("sunset")}
-                                                    >
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-600 opacity-20 dark:opacity-30"></div>
-                                                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-amber-200 to-transparent opacity-30 dark:from-amber-400 dark:opacity-20"></div>
-                                                        <div className="z-10 flex flex-col items-center">
-                                                            <div className="h-6 w-6 rounded-full bg-amber-500 shadow-lg mb-1"></div>
-                                                            <span className="font-medium">Sunset</span>
-                                                        </div>
-                                                        {selectedPremiumTheme === "sunset" && (
-                                                            <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5">
-                                                                <Check className="h-3 w-3" />
-                                                            </div>
-                                                        )}
-                                                    </Button>
-                                                    {user?.plan === "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-muted-foreground" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Forest Theme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant={selectedPremiumTheme === "forest" ? "default" : "outline"}
-                                                        className={`w-full h-24 flex flex-col items-center justify-center gap-2 overflow-hidden ${user?.plan === "free" ? "opacity-70" : ""
-                                                            }`}
-                                                        disabled={user?.plan === "free"}
-                                                        onClick={() => handleSelectPremiumTheme("forest")}
-                                                    >
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-600 opacity-20 dark:opacity-30"></div>
-                                                        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-green-200 to-transparent opacity-30 dark:from-green-400 dark:opacity-20"></div>
-                                                        <div className="z-10 flex flex-col items-center">
-                                                            <div className="h-6 w-6 rounded-full bg-emerald-500 shadow-lg mb-1"></div>
-                                                            <span className="font-medium">Forest</span>
-                                                        </div>
-                                                        {selectedPremiumTheme === "forest" && (
-                                                            <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-0.5">
-                                                                <Check className="h-3 w-3" />
-                                                            </div>
-                                                        )}
-                                                    </Button>
-                                                    {user?.plan === "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-muted-foreground" />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <p className="text-xs text-muted-foreground">
-                                                {user?.plan === "free"
-                                                    ? "Premium themes are available on Pro and Enterprise plans."
-                                                    : "Select a theme to customize the appearance of your dashboard."}
-                                            </p>
-                                        </div>
-
-                                        <Separator />
-
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <Label>Color Scheme</Label>
-                                                {user?.plan == "free" && (
-                                                    <div className="text-xs text-muted-foreground">Pro Only</div>
-                                                )}
-                                            </div>
-
-                                            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                                                {/* Default (White) Scheme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant="outline"
-                                                        className={`w-full aspect-square mb-2 bg-white dark:bg-gray-900 border-2 ${selectedColorScheme === "default" && (user?.plan === "pro" || user?.plan === "enterprise")
-                                                                ? "border-primary"
-                                                                : "border-gray-200 dark:border-gray-700"
-                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
-                                                        disabled={user?.plan == "free"}
-                                                        onClick={() => handleSelectColorScheme("default")}
-                                                    >
-                                                        {selectedColorScheme === "default" &&
-                                                            (user?.plan === "pro" || user?.plan === "enterprise") && (
-                                                                <Check className="h-5 w-5 text-primary" />
-                                                            )}
-                                                    </Button>
-                                                    <span className="text-sm block text-center">Default</span>
-                                                    {user?.plan == "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-muted-foreground" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Blue Scheme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant="outline"
-                                                        className={`w-full aspect-square mb-2 bg-blue-500 hover:bg-blue-600 text-white border-0 dark:bg-blue-500 dark:hover:bg-blue-600 ${selectedColorScheme === "blue" && (user?.plan === "pro" || user?.plan === "enterprise")
-                                                                ? "ring-2 ring-offset-2 ring-blue-500"
-                                                                : ""
-                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
-                                                        disabled={user?.plan == "free"}
-                                                        onClick={() => handleSelectColorScheme("blue")}
-                                                    >
-                                                        {selectedColorScheme === "blue" &&
-                                                            (user?.plan === "pro" || user?.plan === "enterprise") && <Check className="h-5 w-5" />}
-                                                    </Button>
-                                                    <span className="text-sm block text-center">Blue</span>
-                                                    {user?.plan == "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-white" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Purple Scheme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant="outline"
-                                                        className={`w-full aspect-square mb-2 bg-purple-500 hover:bg-purple-600 text-white border-0 dark:bg-purple-500 dark:hover:bg-purple-600 ${selectedColorScheme === "purple" && (user?.plan === "pro" || user?.plan === "enterprise")
-                                                                ? "ring-2 ring-offset-2 ring-purple-500"
-                                                                : ""
-                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
-                                                        disabled={user?.plan == "free"}
-                                                        onClick={() => handleSelectColorScheme("purple")}
-                                                    >
-                                                        {selectedColorScheme === "purple" &&
-                                                            (user?.plan === "pro" || user?.plan === "enterprise") && <Check className="h-5 w-5" />}
-                                                    </Button>
-                                                    <span className="text-sm block text-center">Purple</span>
-                                                    {user?.plan == "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-white" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Green Scheme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant="outline"
-                                                        className={`w-full aspect-square mb-2 bg-green-500 hover:bg-green-600 text-white border-0 dark:bg-green-500 dark:hover:bg-green-600 ${selectedColorScheme === "green" && (user?.plan === "pro" || user?.plan === "enterprise")
-                                                                ? "ring-2 ring-offset-2 ring-green-500"
-                                                                : ""
-                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
-                                                        disabled={user?.plan == "free"}
-                                                        onClick={() => handleSelectColorScheme("green")}
-                                                    >
-                                                        {selectedColorScheme === "green" &&
-                                                            (user?.plan === "pro" || user?.plan === "enterprise") && <Check className="h-5 w-5" />}
-                                                    </Button>
-                                                    <span className="text-sm block text-center">Green</span>
-                                                    {user?.plan == "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-white" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Red Scheme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant="outline"
-                                                        className={`w-full aspect-square mb-2 bg-red-500 hover:bg-red-600 text-white border-0 dark:bg-red-500 dark:hover:bg-red-600 ${selectedColorScheme === "red" && (user?.plan === "pro" || user?.plan === "enterprise")
-                                                                ? "ring-2 ring-offset-2 ring-red-500"
-                                                                : ""
-                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
-                                                        disabled={user?.plan == "free"}
-                                                        onClick={() => handleSelectColorScheme("red")}
-                                                    >
-                                                        {selectedColorScheme === "red" && (user?.plan === "pro" || user?.plan === "enterprise") && (
-                                                            <Check className="h-5 w-5" />
-                                                        )}
-                                                    </Button>
-                                                    <span className="text-sm block text-center">Red</span>
-                                                    {user?.plan == "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-white" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Amber Scheme */}
-                                                <div className="relative">
-                                                    <Button
-                                                        variant="outline"
-                                                        className={`w-full aspect-square mb-2 bg-amber-500 hover:bg-amber-600 text-white border-0 dark:bg-amber-500 dark:hover:bg-amber-600 ${selectedColorScheme === "amber" && (user?.plan === "pro" || user?.plan === "enterprise")
-                                                                ? "ring-2 ring-offset-2 ring-amber-500"
-                                                                : ""
-                                                            } ${user?.plan == "free" ? "opacity-70" : ""}`}
-                                                        disabled={user?.plan == "free"}
-                                                        onClick={() => handleSelectColorScheme("amber")}
-                                                    >
-                                                        {selectedColorScheme === "amber" &&
-                                                            (user?.plan === "pro" || user?.plan === "enterprise") && <Check className="h-5 w-5" />}
-                                                    </Button>
-                                                    <span className="text-sm block text-center">Amber</span>
-                                                    {user?.plan == "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-white" />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <p className="text-xs text-muted-foreground">
-                                                {user?.plan == "free"
-                                                    ? "Custom color schemes are available on Pro plans only."
-                                                    : "Select a primary color to customize your experience."}
-                                            </p>
-                                        </div>
-
-                                        <Separator />
-
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <Label>Font Style</Label>
-                                                {user?.plan == "free" && (
-                                                    <div className="text-xs text-muted-foreground">Pro Only</div>
-                                                )}
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="relative">
-                                                    <Button
-                                                        variant={
-                                                            selectedFontStyle === "sans" && (user?.plan === "pro" || user?.plan === "enterprise")
-                                                                ? "default"
-                                                                : "outline"
-                                                        }
-                                                        className={`w-full h-16 font-sans ${user?.plan == "free" ? "opacity-70" : ""}`}
-                                                        disabled={user?.plan == "free"}
-                                                        onClick={() => handleSelectFontStyle("sans")}
-                                                    >
-                                                        Sans Serif
-                                                    </Button>
-                                                    {user?.plan == "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-muted-foreground" />
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="relative">
-                                                    <Button
-                                                        variant={
-                                                            selectedFontStyle === "serif" && (user?.plan === "pro" || user?.plan === "enterprise")
-                                                                ? "default"
-                                                                : "outline"
-                                                        }
-                                                        className={`w-full h-16 font-serif ${user?.plan == "free" ? "opacity-70" : ""}`}
-                                                        disabled={user?.plan == "free"}
-                                                        onClick={() => handleSelectFontStyle("serif")}
-                                                    >
-                                                        Serif
-                                                    </Button>
-                                                    {user?.plan == "free" && (
-                                                        <div className="absolute top-2 right-2">
-                                                            <Lock className="h-4 w-4 text-muted-foreground" />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {user?.plan === "free" && (
-                                            <div className="mt-6 p-4 bg-muted rounded-lg">
-                                                <div className="flex items-start gap-4">
-                                                    <div className="p-2 rounded-full bg-primary/10">
-                                                        <Palette className="h-5 w-5 text-primary" />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-sm font-medium">Unlock all appearance options</h4>
-                                                        <p className="text-sm text-muted-foreground mt-1">
-                                                            Upgrade to Pro or Enterprise to access premium themes, custom color schemes, and font
-                                                            options.
-                                                        </p>
-                                                        <Button className="mt-3" size="sm" onClick={() => (window.location.href = "/pricing")}>
-                                                            View Plans
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                    <CardFooter>
-                                        <Button onClick={handleSaveAppearance} disabled={isSaving}>
-                                            <Save className="mr-2 h-4 w-4" />
-                                            {isSaving ? "Saving..." : "Save Appearance"}
                                         </Button>
                                     </CardFooter>
                                 </Card>
