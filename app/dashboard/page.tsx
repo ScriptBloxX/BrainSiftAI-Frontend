@@ -53,7 +53,6 @@ type ExamHistoryType = {
     totalQuestions: number
     percentage: number
     completedAt: string
-    timeTaken: number // in minutes
 }
 
 type ExamHistoryGroup = {
@@ -108,40 +107,12 @@ export default function Dashboard() {
             try {
                 setLoadingHistory(true)
                 const response = await axiosInstance.get(`/api/exam/total_attempts`)
+                         const groupedHistory: ExamHistoryGroup[] = response.data.map((group: ExamHistoryGroup) => ({
+                    ...group,
+                    attempts: group.attempts.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+                }))
                 
-                // Group exam history by exam
-                const groupedHistory: { [key: string]: ExamHistoryGroup } = {}
-                
-                response.data.forEach((attempt: ExamHistoryType) => {
-                    if (!groupedHistory[attempt.examId]) {
-                        groupedHistory[attempt.examId] = {
-                            examId: attempt.examId,
-                            examTitle: attempt.examTitle,
-                            attempts: [],
-                            totalAttempts: 0,
-                            bestScore: 0,
-                            averageScore: 0
-                        }
-                    }
-                    
-                    groupedHistory[attempt.examId].attempts.push(attempt)
-                    groupedHistory[attempt.examId].totalAttempts++
-                    
-                    if (attempt.percentage > groupedHistory[attempt.examId].bestScore) {
-                        groupedHistory[attempt.examId].bestScore = attempt.percentage
-                    }
-                })
-                
-                // Calculate average scores
-                Object.values(groupedHistory).forEach(group => {
-                    const totalPercentage = group.attempts.reduce((sum, attempt) => sum + attempt.percentage, 0)
-                    group.averageScore = Math.round(totalPercentage / group.attempts.length)
-                    
-                    // Sort attempts by date (newest first)
-                    group.attempts.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
-                })
-                
-                setExamHistory(Object.values(groupedHistory))
+                setExamHistory(groupedHistory)
             } catch (error) {
                 console.error("Failed to fetch exam history:", error)
             } finally {
