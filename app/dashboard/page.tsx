@@ -176,7 +176,7 @@ export default function Dashboard() {
 
                 <Tabs defaultValue="exams" className="w-full">                    <TabsList className="mb-6">
                         <TabsTrigger value="exams">My Exams</TabsTrigger>
-                        <TabsTrigger value="history">Exam History</TabsTrigger>
+                        <TabsTrigger value="history">My Attempts</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="exams">
@@ -470,138 +470,6 @@ function ExamCard({
     )
 }
 
-function ClassCard({
-    name,
-    members,
-    exams,
-    id = Math.floor(Math.random() * 1000),
-}: {
-    name: string
-    members: number
-    exams: number
-    id?: number
-}) {
-    const router = useRouter()
-    const [showEditDialog, setShowEditDialog] = useState(false)
-    const [className, setClassName] = useState(name)
-
-    const handleView = () => {
-        router.push(`/private-class/${id}`)
-    }
-
-    const handleManage = () => {
-        setShowEditDialog(true)
-    }
-
-    const handleSaveChanges = () => {
-        // In a real app, you would make an API call to update the class
-        setShowEditDialog(false)
-        // Show a success message
-        alert("Class updated successfully")
-    }
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="line-clamp-1">{name}</CardTitle>
-                <CardDescription>{members} members</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="text-sm">
-                    <span>{exams} exams in this class</span>
-                </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm" onClick={handleManage}>
-                    Manage
-                </Button>
-                <Button size="sm" onClick={handleView}>
-                    View
-                </Button>
-            </CardFooter>
-
-            {/* Edit Class Dialog */}
-            <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Manage Class</DialogTitle>
-                        <DialogDescription>Update class settings or invite members</DialogDescription>
-                    </DialogHeader>
-                    <Tabs defaultValue="settings">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="settings">Settings</TabsTrigger>
-                            <TabsTrigger value="members">Members</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="settings" className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="edit-class-name">Class Name</Label>
-                                <Input id="edit-class-name" value={className} onChange={(e) => setClassName(e.target.value)} />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                    <Label htmlFor="private-class">Private Class</Label>
-                                    <p className="text-sm text-muted-foreground">Only invited users can access this class</p>
-                                </div>
-                                <Switch id="private-class" defaultChecked />
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="members" className="py-4">
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="invite-email">Invite Member</Label>
-                                    <div className="flex gap-2">
-                                        <Input id="invite-email" placeholder="Enter email address" type="email" />
-                                        <Button>
-                                            <UserPlus className="mr-2 h-4 w-4" /> Invite
-                                        </Button>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Current Members</Label>
-                                    <div className="rounded-md border">
-                                        <div className="flex items-center justify-between p-3 border-b">
-                                            <div className="flex items-center gap-2">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarFallback>JS</AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="text-sm font-medium">John Smith</p>
-                                                    <p className="text-xs text-muted-foreground">john@example.com</p>
-                                                </div>
-                                            </div>
-                                            <Badge>Owner</Badge>
-                                        </div>
-                                        <div className="flex items-center justify-between p-3">
-                                            <div className="flex items-center gap-2">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarFallback>SJ</AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="text-sm font-medium">Sarah Johnson</p>
-                                                    <p className="text-xs text-muted-foreground">sarah@example.com</p>
-                                                </div>
-                                            </div>
-                                            <Button variant="ghost" size="sm">
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </TabsContent>
-                    </Tabs>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowEditDialog(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleSaveChanges}>Save Changes</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </Card>
-    )
-}
-
 function ExamHistoryCard({
     examGroup,
     onClick,
@@ -658,7 +526,14 @@ function ExamHistoryCard({
                     <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Average Score</span>
                         <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium">
+                            <span   className={`text-xs font-medium ${
+                                    examGroup.averageScore >= 80
+                                        ? "text-green-500"
+                                        : examGroup.averageScore >= 60
+                                        ? "text-yellow-500"
+                                        : "text-red-500"
+                                }`}
+                                >
                                 {examGroup.averageScore}%
                             </span>
                         </div>
