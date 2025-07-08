@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -27,6 +26,7 @@ import {
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
+import axiosInstance from "@/lib/axios"
 
 export default function Settings() {
     const { user, isAuthenticated, isLoading, logout, updateUser, updateProfile } = useAuth()
@@ -34,9 +34,6 @@ export default function Settings() {
 
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
-    const [bio, setBio] = useState("")
-    const [language, setLanguage] = useState("english")
-    const [timezone, setTimezone] = useState("utc")
     const [currentPassword, setCurrentPassword] = useState("")
     const [newPassword, setNewPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
@@ -63,9 +60,6 @@ export default function Settings() {
         if (user) {
             setName(user.name || "")
             setEmail(user.email || "")
-            setBio(user.profile.bio || "")
-            setLanguage(user.profile.language || "english")
-            setTimezone(user.profile.timezone || "utc")
         }
     }, [isAuthenticated, isLoading, router, user])
 
@@ -96,13 +90,19 @@ export default function Settings() {
         setErrorMessage(null)
 
         try {
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1500))
+            // Update profile picture via API with all fields
+            const payload = {
+                username: "",
+                password: "",
+                email: "",
+                profileUrl: avatarPreview || ""
+            }
 
-            // In a real app, you would upload the file to your server or a storage service
-            // const formData = new FormData()
-            // formData.append('avatar', avatarFile)
-            // const response = await fetch('/api/upload-avatar', { method: 'POST', body: formData })
+            await axiosInstance.patch('/api/user', payload, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
 
             // Update the avatar in the user profile
             updateProfile({
@@ -111,12 +111,15 @@ export default function Settings() {
 
             setSuccessMessage("Profile picture updated successfully")
 
-            // Reset the file input
+            // Reset the file input and preview
             if (fileInputRef.current) {
                 fileInputRef.current.value = ""
             }
-        } catch (error) {
-            setErrorMessage("Failed to upload profile picture. Please try again.")
+            setAvatarFile(null)
+            setAvatarPreview(null)
+        } catch (error: any) {
+            console.error("Failed to upload profile picture:", error)
+            setErrorMessage(error.response?.data?.error_message[0] || "Failed to upload profile picture. Please try again.")
         } finally {
             setIsUploadingAvatar(false)
         }
@@ -132,18 +135,28 @@ export default function Settings() {
         setErrorMessage(null)
 
         try {
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            // Prepare payload with all fields (can be empty strings)
+            const payload = {
+                username: name || "",
+                currentPassword: "",
+                password: "",
+                email: email || "",
+                profileUrl: ""
+            }
+
+            await axiosInstance.patch('/api/user', payload, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
 
             // Update user profile in context
             updateUser({ name, email })
-            updateProfile({
-                bio,
-            })
 
             setSuccessMessage("Profile updated successfully")
-        } catch (error) {
-            setErrorMessage("Failed to update profile. Please try again.")
+        } catch (error: any) {
+            console.error("Failed to update profile:", error)
+            setErrorMessage(error.response?.data?.message || "Failed to update profile. Please try again.")
         } finally {
             setIsSaving(false)
         }
@@ -160,24 +173,38 @@ export default function Settings() {
                 throw new Error("Current password is required")
             }
 
-            if (newPassword.length < 8) {
-                throw new Error("New password must be at least 8 characters")
+            const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+            if (!passwordRequirements.test(newPassword)) {
+                throw new Error("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
             }
 
             if (newPassword !== confirmPassword) {
                 throw new Error("New passwords do not match")
             }
 
-            // Simulate API call delay
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            const payload = {
+                username: "",
+                password: newPassword,
+                email: "",
+                profileUrl: "",
+                currentPassword: currentPassword
+            }
 
-            // In a real app, you would make an API call to change the password
+            await axiosInstance.patch('/api/user', payload, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
             setSuccessMessage("Password changed successfully")
             setCurrentPassword("")
             setNewPassword("")
             setConfirmPassword("")
-        } catch (error) {
-            if (error instanceof Error) {
+        } catch (error: any) {
+            console.error("Failed to change password:", error)
+            if (typeof error === "object" && error !== null && "response" in error) {
+                setErrorMessage(error.response?.data?.error_message?.[0] || "Failed to change password. Please try again.")
+            } else if (error instanceof Error) {
                 setErrorMessage(error.message)
             } else {
                 setErrorMessage("Failed to change password. Please try again.")
@@ -196,8 +223,8 @@ export default function Settings() {
             // Simulate API call delay
             await new Promise((resolve) => setTimeout(resolve, 1000))
 
-            // In a real app, you would make an API call to update notification preferences
-            setSuccessMessage("Notification preferences updated successfully")
+            // setSuccessMessage("Notification preferences updated successfully")
+            setErrorMessage("This feature is under development and will be available in a future update.")
         } catch (error) {
             setErrorMessage("Failed to update notification preferences. Please try again.")
         } finally {
@@ -373,17 +400,6 @@ export default function Settings() {
                                             </div>
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <Label htmlFor="bio">Bio</Label>
-                                            <Textarea
-                                                id="bio"
-                                                placeholder="Tell us about yourself"
-                                                value={bio}
-                                                onChange={(e) => setBio(e.target.value)}
-                                                rows={4}
-                                            />
-                                        </div>
-
                                         <Separator />
                                     </CardContent>
                                     <CardFooter>
@@ -440,7 +456,6 @@ export default function Settings() {
                                                     className="flex-1"
                                                 />
                                             </div>
-                                            <p className="text-xs text-muted-foreground">Password must be at least 8 characters long</p>
                                         </div>
 
                                         <div className="space-y-2">
