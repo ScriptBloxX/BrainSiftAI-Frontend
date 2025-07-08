@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileUp, Plus, BookOpen, Users, Loader2 } from "lucide-react"
+import { FileUp, Plus, BookOpen, Users, Loader2, Clock, Trophy, Calendar } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
@@ -45,12 +45,35 @@ type ExamType = {
     }
 }
 
+type ExamHistoryType = {
+    id: string
+    examId: string
+    examTitle: string
+    score: number
+    totalQuestions: number
+    percentage: number
+    completedAt: string
+    timeTaken: number // in minutes
+}
+
+type ExamHistoryGroup = {
+    examId: string
+    examTitle: string
+    attempts: ExamHistoryType[]
+    totalAttempts: number
+    bestScore: number
+    averageScore: number
+}
+
 export default function Dashboard() {
     const { isAuthenticated, isLoading, user, getToken } = useAuth()
     const router = useRouter()
     const [myExams, setMyExams] = useState<ExamType[]>([])
+    const [examHistory, setExamHistory] = useState<ExamHistoryGroup[]>([])
     const [loadingExams, setLoadingExams] = useState(true)
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
+    const [loadingHistory, setLoadingHistory] = useState(true)
+    const [selectedExamHistory, setSelectedExamHistory] = useState<ExamHistoryGroup | null>(null)
+    const [showHistoryDialog, setShowHistoryDialog] = useState(false)
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -77,6 +100,109 @@ export default function Dashboard() {
             fetchExams()
         }
     }, [isAuthenticated, user, getToken])
+
+    useEffect(() => {
+        const fetchExamHistory = async () => {
+            if (!isAuthenticated || !user) return
+
+            try {
+                setLoadingHistory(true)
+                const response = await axiosInstance.get(`/api/exam/history`)
+                
+                // Group exam history by exam
+                const groupedHistory: { [key: string]: ExamHistoryGroup } = {}
+                
+                response.data.forEach((attempt: ExamHistoryType) => {
+                    if (!groupedHistory[attempt.examId]) {
+                        groupedHistory[attempt.examId] = {
+                            examId: attempt.examId,
+                            examTitle: attempt.examTitle,
+                            attempts: [],
+                            totalAttempts: 0,
+                            bestScore: 0,
+                            averageScore: 0
+                        }
+                    }
+                    
+                    groupedHistory[attempt.examId].attempts.push(attempt)
+                    groupedHistory[attempt.examId].totalAttempts++
+                    
+                    if (attempt.percentage > groupedHistory[attempt.examId].bestScore) {
+                        groupedHistory[attempt.examId].bestScore = attempt.percentage
+                    }
+                })
+                
+                // Calculate average scores
+                Object.values(groupedHistory).forEach(group => {
+                    const totalPercentage = group.attempts.reduce((sum, attempt) => sum + attempt.percentage, 0)
+                    group.averageScore = Math.round(totalPercentage / group.attempts.length)
+                    
+                    // Sort attempts by date (newest first)
+                    group.attempts.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+                })
+                
+                setExamHistory(Object.values(groupedHistory))
+            } catch (error) {
+                console.error("Failed to fetch exam history:", error)
+            } finally {
+                setLoadingHistory(false)
+                                   setExamHistory([
+                        {
+                            examId: "mock-exam-1",
+                            examTitle: "[Mock] Sample Exam 1",
+                            attempts: [
+                                {
+                                    id: "mock-attempt-1",
+                                    examId: "mock-exam-1",
+                                    examTitle: "[Mock] Sample Exam 1",
+                                    score: 8,
+                                    totalQuestions: 10,
+                                    percentage: 80,
+                                    completedAt: new Date().toISOString(),
+                                    timeTaken: 15,
+                                },
+                                {
+                                    id: "mock-attempt-2",
+                                    examId: "mock-exam-1",
+                                    examTitle: "[Mock] Sample Exam 1",
+                                    score: 7,
+                                    totalQuestions: 10,
+                                    percentage: 70,
+                                    completedAt: new Date(Date.now() - 86400000).toISOString(),
+                                    timeTaken: 20,
+                                },
+                            ],
+                            totalAttempts: 2,
+                            bestScore: 80,
+                            averageScore: 75,
+                        },
+                        {
+                            examId: "mock-exam-2",
+                            examTitle: "[Mock] Sample Exam 2",
+                            attempts: [
+                                {
+                                    id: "mock-attempt-3",
+                                    examId: "mock-exam-2",
+                                    examTitle: "[Mock] Sample Exam 2",
+                                    score: 9,
+                                    totalQuestions: 10,
+                                    percentage: 90,
+                                    completedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+                                    timeTaken: 10,
+                                },
+                            ],
+                            totalAttempts: 1,
+                            bestScore: 90,
+                            averageScore: 90,
+                        },
+                    ])
+            }
+        }
+
+        if (isAuthenticated && user) {
+            fetchExamHistory()
+        }
+    }, [isAuthenticated, user])
 
     // If still loading or not authenticated, don't render the dashboard
     if (isLoading || !isAuthenticated) {
@@ -145,10 +271,10 @@ export default function Dashboard() {
                     />
                 </div>
 
-                <Tabs defaultValue="exams" className="w-full">
-                    <TabsList className="mb-6">
+                <Tabs defaultValue="exams" className="w-full">                    <TabsList className="mb-6">
                         <TabsTrigger value="exams">My Exams</TabsTrigger>
                         <TabsTrigger value="classes">My Classes</TabsTrigger>
+                        <TabsTrigger value="history">Exam History</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="exams">
@@ -221,7 +347,58 @@ export default function Dashboard() {
                             ))}
                         </div>
                     </TabsContent>
+
+                    <TabsContent value="history">
+                        {loadingHistory ? (
+                            <div className="flex justify-center items-center py-12">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        ) : examHistory.length === 0 ? (
+                            <Card>
+                                <CardContent className="flex flex-col items-center justify-center py-12">
+                                    <Trophy className="h-12 w-12 text-muted-foreground mb-4" />
+                                    <p className="text-muted-foreground mb-4">No exam history found</p>
+                                    <p className="text-sm text-muted-foreground">Take some exams to see your history here</p>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {examHistory.map((examGroup) => (
+                                    <ExamHistoryCard
+                                        key={examGroup.examId}
+                                        examGroup={examGroup}
+                                        onClick={() => {
+                                            setSelectedExamHistory(examGroup)
+                                            setShowHistoryDialog(true)
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </TabsContent>
                 </Tabs>
+
+                {/* Exam History Details Dialog */}
+                <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+                    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle>{selectedExamHistory?.examTitle}</DialogTitle>
+                            <DialogDescription>
+                                Exam attempt history ({selectedExamHistory?.totalAttempts} attempts)
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            {selectedExamHistory?.attempts.map((attempt, index) => (
+                                <ExamAttemptCard key={attempt.id} attempt={attempt} attemptNumber={index + 1} />
+                            ))}
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowHistoryDialog(false)}>
+                                Close
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </main>
 
             <Footer />
@@ -273,13 +450,11 @@ function ExamCard({
     onUpdate?: () => void
 }) {
     const router = useRouter()
-    const { getToken } = useAuth()
     const [showEditDialog, setShowEditDialog] = useState(false)
     const [examTitle, setExamTitle] = useState(title)
     const [examVisibility, setExamVisibility] = useState(visibility)
     const [isSaving, setIsSaving] = useState(false)
     const [currentVisibility, setCurrentVisibility] = useState(visibility)
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
 
     const handleView = () => {
         router.push(`/exam/${id}`)
@@ -547,6 +722,140 @@ function ClassCard({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+        </Card>
+    )
+}
+
+function ExamHistoryCard({
+    examGroup,
+    onClick,
+}: {
+    examGroup: ExamHistoryGroup
+    onClick: () => void
+}) {
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        })
+    }
+
+    return (
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={onClick}>
+            <CardHeader>
+                <CardTitle className="line-clamp-2 text-lg">{examGroup.examTitle}</CardTitle>
+                <CardDescription>
+                    Last attempt: {formatDate(examGroup.attempts[0]?.completedAt)}
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Total Attempts</span>
+                        <Badge variant="secondary">{examGroup.totalAttempts}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Best Score</span>
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                                <span className="text-xs font-medium text-primary">
+                                    {examGroup.bestScore}%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Average Score</span>
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                <span className="text-xs font-medium">
+                                    {examGroup.averageScore}%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button variant="outline" size="sm" className="w-full">
+                    <Clock className="mr-2 h-4 w-4" />
+                    View Attempts
+                </Button>
+            </CardFooter>
+        </Card>
+    )
+}
+
+function ExamAttemptCard({
+    attempt,
+    attemptNumber,
+}: {
+    attempt: ExamHistoryType
+    attemptNumber: number
+}) {
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        })
+    }
+
+    const formatDuration = (minutes: number) => {
+        if (minutes < 60) {
+            return `${minutes}m`
+        }
+        const hours = Math.floor(minutes / 60)
+        const remainingMinutes = minutes % 60
+        return `${hours}h ${remainingMinutes}m`
+    }
+
+    const getScoreColor = (percentage: number) => {
+        if (percentage >= 80) return "text-green-600"
+        if (percentage >= 60) return "text-yellow-600"
+        return "text-red-600"
+    }
+
+    const getScoreBackground = (percentage: number) => {
+        if (percentage >= 80) return "bg-green-100"
+        if (percentage >= 60) return "bg-yellow-100"
+        return "bg-red-100"
+    }
+
+    return (
+        <Card>
+            <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <Badge variant="outline">Attempt #{attemptNumber}</Badge>
+                            <span className="text-sm text-muted-foreground">
+                                {formatDate(attempt.completedAt)}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm">
+                            <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span>{formatDuration(attempt.timeTaken)}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <Trophy className="h-4 w-4 text-muted-foreground" />
+                                <span>{attempt.score}/{attempt.totalQuestions}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className={`w-16 h-16 rounded-full flex items-center justify-center ${getScoreBackground(attempt.percentage)}`}>
+                            <span className={`text-lg font-bold ${getScoreColor(attempt.percentage)}`}>
+                                {attempt.percentage}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
         </Card>
     )
 }

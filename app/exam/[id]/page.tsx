@@ -54,7 +54,6 @@ export default function TakeExam({ params }: Props) {
     const { isAuthenticated, isLoading, getToken } = useAuth()
     const router = useRouter()
 
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
     useEffect(() => {
         params.then(({ id }) => {
             const examIdFromUrl = window.location.pathname.split("/exam/")[1];

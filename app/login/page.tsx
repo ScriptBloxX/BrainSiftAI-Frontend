@@ -27,8 +27,6 @@ export default function Login() {
   const searchParams = useSearchParams()
   const { login } = useAuth()
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://brain-sift-ai-backend.onrender.com";
-
   useEffect(() => {
     // Check for password reset success message
     const resetSuccess = searchParams.get("reset")
