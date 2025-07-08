@@ -196,7 +196,7 @@ export default function Dashboard() {
                         icon={<FileUp className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
-                        title="Exam Attempts"
+                        title="Total Attempts"
                         value={examHistory.reduce((sum, group) => sum + group.totalAttempts, 0).toString()}
                         description="All exams you have attempted"
                         icon={<Users className="h-5 w-5 text-muted-foreground" />}
@@ -706,7 +706,7 @@ function ExamAttemptCard({
             minute: "2-digit",
         })
     }
-    
+
     const getScoreBackground = (percentage: number) => {
         if (percentage >= 80) return "bg-green-500"
         if (percentage >= 60) return "bg-yellow-500"
