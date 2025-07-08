@@ -576,13 +576,17 @@ function ExamAttemptCard({
         return "bg-red-500"
     }
 
+    const getAttemptId = (id: string) => {
+        return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`
+    }
+
     return (
         <Card>
             <CardContent>
                 <div className="flex items-center justify-between">
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                            <Badge variant="outline">Attempt #{attemptNumber}</Badge>
+                            <Badge variant="outline">#{getAttemptId(attempt.id)}</Badge>
                             <span className="text-sm text-muted-foreground">
                                 {formatDate(attempt.completedAt)}
                             </span>
