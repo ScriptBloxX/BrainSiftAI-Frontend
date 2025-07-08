@@ -107,7 +107,7 @@ export default function Dashboard() {
 
             try {
                 setLoadingHistory(true)
-                const response = await axiosInstance.get(`/api/exam/history`)
+                const response = await axiosInstance.get(`/api/exam/total_attempts`)
                 
                 // Group exam history by exam
                 const groupedHistory: { [key: string]: ExamHistoryGroup } = {}
