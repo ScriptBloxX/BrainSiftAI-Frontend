@@ -107,11 +107,11 @@ export default function Dashboard() {
             try {
                 setLoadingHistory(true)
                 const response = await axiosInstance.get(`/api/exam/total_attempts`)
-                         const groupedHistory: ExamHistoryGroup[] = response.data.map((group: ExamHistoryGroup) => ({
+                const groupedHistory: ExamHistoryGroup[] = response.data.map((group: ExamHistoryGroup) => ({
                     ...group,
                     attempts: group.attempts.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
                 }))
-                
+
                 setExamHistory(groupedHistory)
             } catch (error) {
                 console.error("Failed to fetch exam history:", error)
@@ -175,9 +175,9 @@ export default function Dashboard() {
                 </div>
 
                 <Tabs defaultValue="exams" className="w-full">                    <TabsList className="mb-6">
-                        <TabsTrigger value="exams">My Exams</TabsTrigger>
-                        <TabsTrigger value="history">My Attempts</TabsTrigger>
-                    </TabsList>
+                    <TabsTrigger value="exams">My Exams</TabsTrigger>
+                    <TabsTrigger value="history">My Attempts</TabsTrigger>
+                </TabsList>
 
                     <TabsContent value="exams">
                         {loadingExams ? (
@@ -329,8 +329,12 @@ function ExamCard({
     const [showEditDialog, setShowEditDialog] = useState(false)
     const [examTitle, setExamTitle] = useState(title)
     const [examVisibility, setExamVisibility] = useState(visibility)
+    const [examTags, setExamTags] = useState<string[]>(tags)
+    const [newTag, setNewTag] = useState("")
     const [isSaving, setIsSaving] = useState(false)
     const [currentVisibility, setCurrentVisibility] = useState(visibility)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
     const handleView = () => {
         router.push(`/exam/${id}`)
@@ -351,10 +355,12 @@ function ExamCard({
     const handleSaveChanges = async () => {
         try {
             setIsSaving(true)
-            
+
             const payload = {
                 id: id,
-                visibility: examVisibility === "public"
+                title: examTitle,
+                visibility: examVisibility === "public",
+                tags: examTags
             }
 
             await axiosInstance.patch(`/api/exam`, payload, {
@@ -365,12 +371,12 @@ function ExamCard({
 
             setCurrentVisibility(examVisibility)
             setShowEditDialog(false)
-            
+
             // Update parent component's state
             if (onUpdate) {
                 onUpdate()
             }
-            
+
             toast.success("Exam updated successfully!", {
                 position: 'bottom-right',
                 style: {
@@ -389,6 +395,58 @@ function ExamCard({
             })
         } finally {
             setIsSaving(false)
+        }
+    }
+
+    const handleAddTag = () => {
+        if (newTag.trim() === "") return
+        if (!examTags.includes(newTag.trim())) {
+            setExamTags([...examTags, newTag.trim()])
+            setNewTag("")
+        }
+    }
+
+    const handleDeleteTag = (tagToDelete: string) => {
+        setExamTags(examTags.filter(tag => tag !== tagToDelete))
+    }
+
+    const handleDeleteExam = async () => {
+        try {
+            setIsDeleting(true)
+            
+            await axiosInstance.delete(`/api/exam`, {
+                data: { id },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            
+            setShowEditDialog(false)
+            
+            // Update parent component's state
+            if (onUpdate) {
+                onUpdate()
+            }
+            
+            toast.success("Exam deleted successfully!", {
+                position: 'bottom-right',
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+            })
+        } catch (error) {
+            console.error("Failed to delete exam:", error)
+            toast.error("Failed to delete exam. Please try again.", {
+                position: 'bottom-right',
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+            })
+        } finally {
+            setIsDeleting(false)
+            setShowDeleteConfirm(false)
         }
     }
 
@@ -448,22 +506,106 @@ function ExamCard({
                                 </SelectContent>
                             </Select>
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="edit-tags">Tags</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {examTags.map((tag) => (
+                                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                                        {tag}
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleDeleteTag(tag)}
+                                            className="h-4 w-4 p-0"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </Badge>
+                                ))}
+                                <Input
+                                    id="edit-tags"
+                                    value={newTag}
+                                    onChange={(e) => setNewTag(e.target.value)}
+                                    placeholder="Add a tag and press Enter"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            handleAddTag();
+                                        }
+                                    }}
+                                    disabled={isSaving}
+                                />
+                            </div>
+                        </div>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowEditDialog(false)} disabled={isSaving}>
+                    <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
+                        <div className="order-2 sm:order-1">
+                            <Button 
+                                variant="destructive" 
+                                onClick={() => setShowDeleteConfirm(true)} 
+                                disabled={isSaving || isDeleting}
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    "Delete Exam"
+                                )}
+                            </Button>
+                        </div>
+                        <div className="flex justify-end gap-2 order-1 sm:order-2">
+                            <Button variant="outline" onClick={() => setShowEditDialog(false)} disabled={isSaving || isDeleting}>
+                                Cancel
+                            </Button>
+                            <Button onClick={handleSaveChanges} disabled={isSaving || isDeleting}>
+                                {isSaving ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    "Save Changes"
+                                )}
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Delete Exam</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this exam? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-2 mt-4">
+                        <Button 
+                            variant="outline" 
+                            onClick={() => setShowDeleteConfirm(false)} 
+                            disabled={isDeleting}
+                        >
                             Cancel
                         </Button>
-                        <Button onClick={handleSaveChanges} disabled={isSaving}>
-                            {isSaving ? (
+                        <Button 
+                            variant="destructive" 
+                            onClick={handleDeleteExam} 
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Saving...
+                                    Deleting...
                                 </>
                             ) : (
-                                "Save Changes"
+                                "Delete"
                             )}
                         </Button>
-                    </DialogFooter>
+                    </div>
                 </DialogContent>
             </Dialog>
         </Card>
@@ -478,7 +620,7 @@ function ExamHistoryCard({
     onClick: () => void
 }) {
     const router = useRouter()
-    
+
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString("en-US", {
             year: "numeric",
@@ -511,13 +653,12 @@ function ExamHistoryCard({
                         <span className="text-sm text-muted-foreground">Best Score</span>
                         <div className="flex items-center gap-2">
                             <span
-                                className={`text-xs font-medium ${
-                                    examGroup.bestScore >= 80
+                                className={`text-xs font-medium ${examGroup.bestScore >= 80
                                         ? "text-green-500"
                                         : examGroup.bestScore >= 60
-                                        ? "text-yellow-500"
-                                        : "text-red-500"
-                                }`}
+                                            ? "text-yellow-500"
+                                            : "text-red-500"
+                                    }`}
                             >
                                 {examGroup.bestScore}%
                             </span>
@@ -526,14 +667,13 @@ function ExamHistoryCard({
                     <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Average Score</span>
                         <div className="flex items-center gap-2">
-                            <span   className={`text-xs font-medium ${
-                                    examGroup.averageScore >= 80
-                                        ? "text-green-500"
-                                        : examGroup.averageScore >= 60
+                            <span className={`text-xs font-medium ${examGroup.averageScore >= 80
+                                    ? "text-green-500"
+                                    : examGroup.averageScore >= 60
                                         ? "text-yellow-500"
                                         : "text-red-500"
                                 }`}
-                                >
+                            >
                                 {examGroup.averageScore}%
                             </span>
                         </div>
@@ -541,8 +681,8 @@ function ExamHistoryCard({
                 </div>
             </CardContent>
             <CardFooter className="pt-3">
-                <Button 
-                    className="w-full" 
+                <Button
+                    className="w-full"
                     variant="outline"
                     onClick={handleRetake}
                 >
@@ -590,7 +730,7 @@ function ExamAttemptCard({
                             <span className="text-sm text-muted-foreground">
                                 {formatDate(attempt.completedAt)}
                             </span>
-                                <Trophy className="h-4 w-4 text-muted-foreground" />
+                            <Trophy className="h-4 w-4 text-muted-foreground" />
                             <span>{attempt.score}/{attempt.totalQuestions}</span>
                         </div>
                     </div>
