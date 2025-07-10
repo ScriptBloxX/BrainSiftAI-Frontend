@@ -333,6 +333,8 @@ function ExamCard({
     const [newTag, setNewTag] = useState("")
     const [isSaving, setIsSaving] = useState(false)
     const [currentVisibility, setCurrentVisibility] = useState(visibility)
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
     const handleView = () => {
         router.push(`/exam/${id}`)
@@ -406,6 +408,46 @@ function ExamCard({
 
     const handleDeleteTag = (tagToDelete: string) => {
         setExamTags(examTags.filter(tag => tag !== tagToDelete))
+    }
+
+    const handleDeleteExam = async () => {
+        try {
+            setIsDeleting(true)
+            
+            await axiosInstance.delete(`/api/exam`, {
+                data: { id },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            
+            setShowEditDialog(false)
+            
+            // Update parent component's state
+            if (onUpdate) {
+                onUpdate()
+            }
+            
+            toast.success("Exam deleted successfully!", {
+                position: 'bottom-right',
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+            })
+        } catch (error) {
+            console.error("Failed to delete exam:", error)
+            toast.error("Failed to delete exam. Please try again.", {
+                position: 'bottom-right',
+                style: {
+                    background: '#020817',
+                    color: '#fff',
+                },
+            })
+        } finally {
+            setIsDeleting(false)
+            setShowDeleteConfirm(false)
+        }
     }
 
     return (
@@ -496,21 +538,74 @@ function ExamCard({
                             </div>
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowEditDialog(false)} disabled={isSaving}>
+                    <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
+                        <div className="order-2 sm:order-1">
+                            <Button 
+                                variant="destructive" 
+                                onClick={() => setShowDeleteConfirm(true)} 
+                                disabled={isSaving || isDeleting}
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    "Delete Exam"
+                                )}
+                            </Button>
+                        </div>
+                        <div className="flex justify-end gap-2 order-1 sm:order-2">
+                            <Button variant="outline" onClick={() => setShowEditDialog(false)} disabled={isSaving || isDeleting}>
+                                Cancel
+                            </Button>
+                            <Button onClick={handleSaveChanges} disabled={isSaving || isDeleting}>
+                                {isSaving ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    "Save Changes"
+                                )}
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Delete Exam</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this exam? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-2 mt-4">
+                        <Button 
+                            variant="outline" 
+                            onClick={() => setShowDeleteConfirm(false)} 
+                            disabled={isDeleting}
+                        >
                             Cancel
                         </Button>
-                        <Button onClick={handleSaveChanges} disabled={isSaving}>
-                            {isSaving ? (
+                        <Button 
+                            variant="destructive" 
+                            onClick={handleDeleteExam} 
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Saving...
+                                    Deleting...
                                 </>
                             ) : (
-                                "Save Changes"
+                                "Delete"
                             )}
                         </Button>
-                    </DialogFooter>
+                    </div>
                 </DialogContent>
             </Dialog>
         </Card>
