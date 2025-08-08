@@ -146,7 +146,7 @@ export default function TakeExam({ params }: Props) {
     }
 
     const calculateScore = () => {
-        // If we have API result, use it
+        // If API result, use it
         if (examResult) {
             return {
                 correct: examResult.correctAnswers,

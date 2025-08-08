@@ -1,7 +1,7 @@
 import type React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, BookOpen, FileText, Users } from "lucide-react"
+import { ArrowRight, BookOpen, FileText } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision"

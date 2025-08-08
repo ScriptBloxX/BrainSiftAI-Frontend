@@ -20,8 +20,6 @@ import {
     Bell,
     LogOut,
     Trash2,
-    Upload,
-    Loader2,
 } from "lucide-react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"

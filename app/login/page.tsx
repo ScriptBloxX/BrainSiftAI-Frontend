@@ -42,8 +42,6 @@ export default function Login() {
     setSuccessMessage(null)
 
     try {
-      // Simulate API call delay
-
       if (!email || !password) {
         throw new Error("Please fill in all fields")
       }
