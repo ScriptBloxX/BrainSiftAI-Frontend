@@ -77,7 +77,9 @@ export default function TakeExam({ params }: Props) {
     }, [examId]);
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
-            router.push("/login")
+            // Store current URL for redirect after login
+            const currentPath = window.location.pathname
+            router.push(`/login?redirect=${encodeURIComponent(currentPath)}`)
         }
     }, [isAuthenticated, isLoading, router])
     useEffect(() => {

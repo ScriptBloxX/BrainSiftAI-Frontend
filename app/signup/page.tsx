@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -27,6 +27,7 @@ export default function Signup() {
     const [error, setError] = useState<string | null>(null)
 
     const router = useRouter()
+    const searchParams = useSearchParams()
     const { login } = useAuth()
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -73,8 +74,13 @@ export default function Signup() {
                 creditsRemaining: response.data.creditsRemaining
             })
 
-            // Redirect to dashboard
-            router.push("/dashboard")
+            // Check for redirect URL and redirect back, otherwise go to dashboard
+            const redirectUrl = searchParams.get("redirect")
+            if (redirectUrl) {
+                router.push(redirectUrl)
+            } else {
+                router.push("/dashboard")
+            }
         } catch (err: any) {
             console.log(err)
             if (err.response) {
@@ -185,7 +191,10 @@ export default function Signup() {
                         <CardFooter className="flex flex-col space-y-4">
                             <div className="text-sm text-center text-muted-foreground">
                                 Already have an account?{" "}
-                                <Link href="/login" className="text-primary font-medium hover:underline">
+                                <Link 
+                                    href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`} 
+                                    className="text-primary font-medium hover:underline"
+                                >
                                     Log in
                                 </Link>
                             </div>

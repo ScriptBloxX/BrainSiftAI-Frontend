@@ -5,7 +5,8 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 import { Menu, X, User, LogOut } from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+
 import { useAuth } from "@/components/auth-context"
 import {
   DropdownMenu,
@@ -35,6 +36,8 @@ export default function Navbar() {
     logout()
     router.push("/")
   }
+
+  const searchParams = useSearchParams()
 
   return (
     <header className="border-b border-border fixed w-full z-50 bg-background/95 backdrop-blur">
@@ -101,10 +104,18 @@ export default function Navbar() {
             ) : (
               <>
                 <Button variant="outline" asChild>
-                  <Link href="/login">Log In</Link>
+                  <Link
+                    href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
+                  >
+                    Log In
+                  </Link>
                 </Button>
                 <Button asChild>
-                  <Link href="/signup">Sign Up</Link>
+                  <Link
+                    href={`/signup${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
+                  >
+                    Sign Up
+                  </Link>
                 </Button>
               </>
             )}
@@ -182,12 +193,12 @@ export default function Navbar() {
             ) : (
               <div className="flex flex-col gap-2 pt-2">
                 <Button variant="outline" asChild className="w-full">
-                  <Link href="/login" onClick={toggleMenu}>
+                  <Link href={`/login?redirect=${encodeURIComponent(pathname)}`} onClick={toggleMenu}>
                     Log In
                   </Link>
                 </Button>
                 <Button asChild className="w-full">
-                  <Link href="/signup" onClick={toggleMenu}>
+                  <Link href={`/signup?redirect=${encodeURIComponent(pathname)}`} onClick={toggleMenu}>
                     Sign Up
                   </Link>
                 </Button>

@@ -69,8 +69,13 @@ export default function Login() {
         creditsRemaining: response.data.creditsRemaining
       })
 
-      // Redirect to dashboard
-      router.push("/dashboard")
+      // Check for redirect URL and redirect back, otherwise go to dashboard
+      const redirectUrl = searchParams.get("redirect")
+      if (redirectUrl) {
+        router.push(redirectUrl)
+      } else {
+        router.push("/dashboard")
+      }
     } catch (err: any) {
       if (err.response) {
         setError(err.response.data.error_message || err.response.data.error);
@@ -151,7 +156,10 @@ export default function Login() {
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-sm text-center text-muted-foreground">
                 Don&apos;t have an account?{" "}
-                <Link href="/signup" className="text-primary font-medium hover:underline">
+                <Link 
+                  href={`/signup${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`} 
+                  className="text-primary font-medium hover:underline"
+                >
                   Sign up
                 </Link>
               </div>

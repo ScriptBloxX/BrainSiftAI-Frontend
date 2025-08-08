@@ -51,7 +51,9 @@ export default function Settings() {
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
-            router.push("/login")
+            // Store current URL for redirect after login
+            const currentPath = window.location.pathname
+            router.push(`/login?redirect=${encodeURIComponent(currentPath)}`)
         }
 
         // Populate form with user data if available
