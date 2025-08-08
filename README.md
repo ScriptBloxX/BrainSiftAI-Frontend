@@ -43,11 +43,6 @@
 - **Axios** - HTTP client for API communications
 - **React Hot Toast** - Elegant toast notifications
 
-### Development Tools
-- **ESLint** - Code linting and formatting
-- **PostCSS** - CSS processing
-- **Turbopack** - Fast bundler for development
-
 ## 📁 Project Structure
 
 ```
@@ -195,26 +190,6 @@ The frontend integrates with a backend API for:
 - AI-powered question generation
 - Performance analytics
 - Content processing
-
-## 🎓 User Types & Permissions (Not for sale)
-
-### Free Users
-- 3 exams per week
-- Up to 20 questions per exam
-- Basic content summaries
-- Community support
-
-### Pro Users
-- 50 exams per month
-- Up to 50 questions per exam
-- Advanced summaries
-- Priority support
-
-### Enterprise Users
-- Unlimited exams
-- Unlimited questions
-- Custom integrations
-- Dedicated support
 
 ## 🌍 Community Features
 
