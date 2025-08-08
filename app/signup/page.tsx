@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -12,12 +12,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2, AlertCircle } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 import axiosInstance from "@/lib/axios"
 
-export default function Signup() {
+function SignupForm() {
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -95,7 +95,7 @@ export default function Signup() {
 
     return (
         <>
-            <Navbar />
+            <NavbarWrapper />
             <div className="flex flex-col min-h-screen items-center">
                 <main className="flex-1 container flex items-center justify-center py-12 px-4 mt-16">
                     <Card className="w-full max-w-md">
@@ -191,12 +191,14 @@ export default function Signup() {
                         <CardFooter className="flex flex-col space-y-4">
                             <div className="text-sm text-center text-muted-foreground">
                                 Already have an account?{" "}
-                                <Link 
-                                    href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`} 
-                                    className="text-primary font-medium hover:underline"
-                                >
-                                    Log in
-                                </Link>
+                                <Suspense>
+                                    <Link 
+                                        href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`} 
+                                        className="text-primary font-medium hover:underline"
+                                    >
+                                        Log in
+                                    </Link>
+                                </Suspense>
                             </div>
                         </CardFooter>
                     </Card>
@@ -205,6 +207,22 @@ export default function Signup() {
                 <Footer />
             </div>
         </>
+    )
+}
+
+export default function Signup() {
+    return (
+        <Suspense fallback={
+            <div className="flex flex-col min-h-screen">
+                <NavbarWrapper />
+                <div className="flex-1 flex items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+                <Footer />
+            </div>
+        }>
+            <SignupForm />
+        </Suspense>
     )
 }
 

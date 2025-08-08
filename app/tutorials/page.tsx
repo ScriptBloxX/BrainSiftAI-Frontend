@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BookOpen, FileText, Users, Play, Clock } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 
 export default function Tutorials() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <NavbarWrapper />
 
       <main className="flex-1">
         {/* Hero Section */}

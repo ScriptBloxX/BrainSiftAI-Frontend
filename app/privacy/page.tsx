@@ -2,13 +2,13 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Shield, FileText } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 
 export default function PrivacyPolicy() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <NavbarWrapper />
 
       <main className="flex-1">
         {/* Hero Section */}

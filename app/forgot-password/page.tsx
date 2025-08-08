@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import axiosInstance from "@/lib/axios"
 
@@ -57,7 +57,7 @@ export default function ForgotPassword() {
 
     return (
         <>
-            <Navbar />
+            <NavbarWrapper />
             <div className="flex flex-col min-h-screen items-center">
                 <main className="flex-1 container flex items-center justify-center py-12 px-4 mt-16">
                     <Card className="w-full max-w-md">

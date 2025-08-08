@@ -10,7 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Search, BookOpen, Clock, User } from "lucide-react"
 import Link from "next/link"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import axiosInstance from "@/lib/axios"
 import LoadingScreen from "@/components/loading-screen"
@@ -204,7 +204,7 @@ export default function Explore() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Navbar />
+            <NavbarWrapper />
 
             <main className="flex-1 container mx-auto max-w-6xl px-4 md:px-6 py-8 mt-16">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">

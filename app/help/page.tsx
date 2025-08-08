@@ -5,13 +5,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, FileQuestion, BookOpen, Users, Settings, MessageSquare } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 
 export default function HelpCenter() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <NavbarWrapper />
 
       <main className="flex-1">
         {/* Hero Section */}

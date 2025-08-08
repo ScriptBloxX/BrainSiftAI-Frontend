@@ -21,7 +21,7 @@ import {
     LogOut,
     Trash2,
 } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 import axiosInstance from "@/lib/axios"
@@ -266,7 +266,7 @@ export default function Settings() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Navbar />
+            <NavbarWrapper />
 
             <main className="flex-1 container mx-auto max-w-6xl px-4 md:px-6 py-8 mt-16">
                 <div className="mb-8">

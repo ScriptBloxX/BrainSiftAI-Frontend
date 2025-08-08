@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Check, X } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 
@@ -14,7 +14,7 @@ export default function Pricing() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <NavbarWrapper />
 
       <main className="flex-1">
         {/* Hero Section */}

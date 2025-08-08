@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { FileUp, Upload, Loader2, X, Tag as TagIcon } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 import axiosInstance from "@/lib/axios"
@@ -183,7 +183,7 @@ export default function CreateExam() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Navbar />
+            <NavbarWrapper />
             <Toaster
                 position="bottom-right"
             />

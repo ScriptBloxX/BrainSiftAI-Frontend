@@ -2,14 +2,14 @@ import type React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, BookOpen, FileText } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision"
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <NavbarWrapper />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="py-20 px-4 md:px-6 bg-gradient-to-b from-background to-secondary/20 min-h-screen flex items-center">

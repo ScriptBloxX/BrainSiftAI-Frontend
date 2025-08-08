@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Copy, Share2, Edit, Check, Clock } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import toast, { Toaster } from "react-hot-toast"
 import LoadingScreen from "@/components/loading-screen"
@@ -119,7 +119,7 @@ export default function ExamPreview({ params }: Props) {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Navbar />
+            <NavbarWrapper />
             <Toaster
                 position="bottom-right"
                 toastOptions={{

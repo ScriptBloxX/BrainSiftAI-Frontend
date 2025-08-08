@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertCircle } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import axiosInstance from "@/lib/axios"
 
@@ -76,7 +76,7 @@ export default function ResetPassword({ params }: { params: Promise<{ token: str
   if (!isValidToken) {
     return (
       <>
-        <Navbar />
+        <NavbarWrapper />
         <div className="flex flex-col min-h-screen items-center">
 
           <main className="flex-1 container flex items-center justify-center py-12 mt-16">
@@ -106,7 +106,7 @@ export default function ResetPassword({ params }: { params: Promise<{ token: str
 
   return (
     <>
-      <Navbar />
+      <NavbarWrapper />
       <div className="flex flex-col min-h-screen items-center">
 
         <main className="flex-1 container flex items-center justify-center py-12 mt-16">

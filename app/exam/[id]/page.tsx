@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, ArrowRight, CheckCircle, Timer } from "lucide-react"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 import { useRouter } from "next/navigation"
@@ -184,7 +184,7 @@ export default function TakeExam({ params }: Props) {
     if (isSubmitted) {
         return (            
             <div className="flex flex-col min-h-screen">
-                <Navbar />
+                <NavbarWrapper />
 
                 <main className="flex-1 container mx-auto max-w-4xl px-4 md:px-6 py-8 mt-16">
                     <Card className="max-w-2xl mx-auto">
@@ -330,7 +330,7 @@ export default function TakeExam({ params }: Props) {
     
     return (
         <div className="flex flex-col min-h-screen">
-            <Navbar />
+            <NavbarWrapper />
 
             <main className="flex-1 container mx-auto max-w-4xl px-4 md:px-6 py-8 mt-16">
                 <div className="mb-8">

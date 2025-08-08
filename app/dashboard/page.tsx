@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileUp, Plus, BookOpen, Users, Loader2, Clock, Trophy, Calendar } from "lucide-react"
 import Link from "next/link"
-import Navbar from "@/components/navbar"
+import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import { useAuth } from "@/components/auth-context"
 import axiosInstance from "@/lib/axios"
@@ -145,7 +145,7 @@ export default function Dashboard() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Navbar />
+            <NavbarWrapper />
 
             <main className="flex-1 container mx-auto max-w-6xl px-4 md:px-6 py-8 mt-16">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
