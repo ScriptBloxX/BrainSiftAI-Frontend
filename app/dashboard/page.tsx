@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileUp, Plus, BookOpen, Users, Loader2, Clock, Trophy, Calendar } from "lucide-react"
+import { FileUp, Plus, BookOpen, Users, Loader2, Clock, Trophy, Calendar, Search, Filter } from "lucide-react"
 import Link from "next/link"
 import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
@@ -73,6 +73,11 @@ export default function Dashboard() {
     const [loadingHistory, setLoadingHistory] = useState(true)
     const [selectedExamHistory, setSelectedExamHistory] = useState<ExamHistoryGroup | null>(null)
     const [showHistoryDialog, setShowHistoryDialog] = useState(false)
+    
+    // Filter and search states
+    const [searchTerm, setSearchTerm] = useState("")
+    const [visibilityFilter, setVisibilityFilter] = useState<"all" | "public" | "private">("all")
+    const [sortBy, setSortBy] = useState<"newest" | "oldest" | "completions">("newest")
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -143,6 +148,33 @@ export default function Dashboard() {
         }
     }
 
+    // Filter and sort exams
+    const filteredAndSortedExams = myExams
+        .filter((exam) => {
+            // Search filter
+            const matchesSearch = exam.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                exam.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+            
+            // Visibility filter
+            const matchesVisibility = visibilityFilter === "all" || 
+                (visibilityFilter === "public" && exam.visibility) ||
+                (visibilityFilter === "private" && !exam.visibility)
+            
+            return matchesSearch && matchesVisibility
+        })
+        .sort((a, b) => {
+            switch (sortBy) {
+                case "newest":
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                case "oldest":
+                    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                case "completions":
+                    return b.completions - a.completions
+                default:
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            }
+        })
+
     return (
         <div className="flex flex-col min-h-screen">
             <NavbarWrapper />
@@ -182,6 +214,56 @@ export default function Dashboard() {
                 </TabsList>
 
                     <TabsContent value="exams">
+                        {/* Search and Filter Controls */}
+                        <div className="mb-6 space-y-4">
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                {/* Search */}
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        placeholder="Search exams by title or tags..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="pl-10"
+                                    />
+                                </div>
+                                
+                                {/* Visibility Filter */}
+                                <div className="min-w-[140px]">
+                                    <Select value={visibilityFilter} onValueChange={(value: "all" | "public" | "private") => setVisibilityFilter(value)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Filter by visibility" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Exams</SelectItem>
+                                            <SelectItem value="public">Public Only</SelectItem>
+                                            <SelectItem value="private">Private Only</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                
+                                {/* Sort Options */}
+                                <div className="min-w-[160px]">
+                                    <Select value={sortBy} onValueChange={(value: "newest" | "oldest" | "completions") => setSortBy(value)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Sort by" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="newest">Newest</SelectItem>
+                                            <SelectItem value="oldest">Oldest</SelectItem>
+                                            <SelectItem value="completions">Most Completed</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            
+                            {/* Results count */}
+                            <div className="text-sm text-muted-foreground">
+                                Showing {filteredAndSortedExams.length} of {myExams.length} exams
+                                {searchTerm && ` for "${searchTerm}"`}
+                            </div>
+                        </div>
+
                         {loadingExams ? (
                             <div className="flex justify-center items-center py-12">
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -202,19 +284,37 @@ export default function Dashboard() {
                                     </Card>
                                 </Link>
 
-                                {myExams.length === 0 ? (
+                                {filteredAndSortedExams.length === 0 ? (
                                     <Card className="col-span-1 md:col-span-2 lg:col-span-2">
                                         <CardContent className="flex flex-col items-center justify-center py-12">
-                                            <p className="text-muted-foreground mb-4">You haven't created any exams yet</p>
-                                            <Button asChild>
-                                                <Link href="/create-exam">
-                                                    <Plus className="mr-2 h-4 w-4" /> Create Your First Exam
-                                                </Link>
-                                            </Button>
+                                            {myExams.length === 0 ? (
+                                                <>
+                                                    <p className="text-muted-foreground mb-4">You haven't created any exams yet</p>
+                                                    <Button asChild>
+                                                        <Link href="/create-exam">
+                                                            <Plus className="mr-2 h-4 w-4" /> Create Your First Exam
+                                                        </Link>
+                                                    </Button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p className="text-muted-foreground mb-4">No exams match your search criteria</p>
+                                                    <Button 
+                                                        variant="outline" 
+                                                        onClick={() => {
+                                                            setSearchTerm("")
+                                                            setVisibilityFilter("all")
+                                                            setSortBy("newest")
+                                                        }}
+                                                    >
+                                                        Clear Filters
+                                                    </Button>
+                                                </>
+                                            )}
                                         </CardContent>
                                     </Card>
                                 ) : (
-                                    myExams.map((exam) => (
+                                    filteredAndSortedExams.map((exam) => (
                                         <ExamCard
                                             key={exam.id}
                                             title={exam.title}
