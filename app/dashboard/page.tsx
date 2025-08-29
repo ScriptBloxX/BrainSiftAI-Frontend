@@ -93,6 +93,15 @@ export default function Dashboard() {
     const [allLoadedExams, setAllLoadedExams] = useState<ExamType[]>([])
     const observerRef = useRef<IntersectionObserver | null>(null)
     const loadMoreRef = useRef<HTMLDivElement | null>(null)
+    
+    // Stats data
+    const [stats, setStats] = useState({
+        examsCreated: 0,
+        examsCreatedThisMonth: 0,
+        totalCompletions: 0,
+        totalAttempts: 0
+    })
+    const [loadingStats, setLoadingStats] = useState(true)
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -155,6 +164,26 @@ export default function Dashboard() {
 
         if (isAuthenticated && user) {
             fetchExamHistory()
+        }
+    }, [isAuthenticated, user])
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            if (!isAuthenticated || !user) return
+
+            try {
+                setLoadingStats(true)
+                const response = await axiosInstance.get(`/api/exam/stats`)
+                setStats(response.data)
+            } catch (error) {
+                console.error("Failed to fetch stats:", error)
+            } finally {
+                setLoadingStats(false)
+            }
+        }
+
+        if (isAuthenticated && user) {
+            fetchStats()
         }
     }, [isAuthenticated, user])
 
@@ -275,19 +304,19 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <StatsCard
                         title="Exams Created"
-                        value={(allLoadedExams || []).length.toString()}
-                        description={`${(allLoadedExams || []).filter((exam) => new Date(exam.createdAt).getMonth() === new Date().getMonth()).length} created this month`}
+                        value={loadingStats ? "..." : stats.examsCreated.toString()}
+                        description={loadingStats ? "Loading..." : `${stats.examsCreatedThisMonth} created this month`}
                         icon={<BookOpen className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
                         title="Total Completions"
-                        value={(allLoadedExams || []).reduce((sum, exam) => sum + exam.completions, 0).toString()}
+                        value={loadingStats ? "..." : stats.totalCompletions.toString()}
                         description="Completions across all your exams"
                         icon={<FileUp className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
                         title="Total Attempts"
-                        value={examHistory.reduce((sum, group) => sum + group.totalAttempts, 0).toString()}
+                        value={loadingStats ? "..." : stats.totalAttempts.toString()}
                         description="All exams you have attempted"
                         icon={<Users className="h-5 w-5 text-muted-foreground" />}
                     />
