@@ -1,12 +1,42 @@
+"use client"
+
 import type React from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, BookOpen, FileText } from "lucide-react"
+import { ArrowRight, BookOpen, FileText, Users, Target, Clock, TrendingUp } from "lucide-react"
 import NavbarWrapper from "@/components/navbar-wrapper"
 import Footer from "@/components/footer"
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision"
+import axiosInstance from "@/lib/axios"
+
+interface ServerStats {
+  examsCount: number
+  completionsCount: number
+  usersCount: number
+  uptime: number
+  timestamp: string
+}
 
 export default function Home() {
+  const [stats, setStats] = useState<ServerStats | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axiosInstance.get('/api/server/info')
+        setStats(response.data)
+      } catch (error) {
+        console.error('Failed to fetch server stats:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchStats()
+  }, [])
+
   return (
     <div className="flex flex-col min-h-screen">
       <NavbarWrapper />
@@ -48,6 +78,53 @@ export default function Home() {
             </div>
           </BackgroundBeamsWithCollision>
         </section>
+
+        {/* Stats Section */}
+        <section className="py-16 px-4 md:px-6 bg-secondary/10">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">Join Our Growing Community</h2>
+              <p className="text-muted-foreground">
+                Thousands of users trust BrainSiftAI for their exam creation needs
+              </p>
+            </div>
+            
+            {isLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full animate-pulse"></div>
+                    <div className="h-8 bg-muted rounded mb-2 animate-pulse"></div>
+                    <div className="h-4 bg-muted rounded animate-pulse"></div>
+                  </div>
+                ))}
+              </div>
+            ) : stats ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <StatCard
+                  icon={<Target className="h-8 w-8 text-primary" />}
+                  value={`${stats.examsCount}+`}
+                  label="Exams Created"
+                />
+                <StatCard
+                  icon={<TrendingUp className="h-8 w-8 text-primary" />}
+                  value={`${stats.completionsCount}+`}
+                  label="Exams Completed"
+                />
+                <StatCard
+                  icon={<Users className="h-8 w-8 text-primary" />}
+                  value={`${stats.usersCount}+`}
+                  label="Active Users"
+                />
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground">
+                Unable to load statistics
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="py-20 px-4 md:px-6">
           <div className="container mx-auto max-w-6xl">
@@ -123,6 +200,24 @@ export default function Home() {
       </main>
 
       <Footer />
+    </div>
+  )
+}
+
+function StatCard({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode
+  value: number | string
+  label: string
+}) {
+  return (
+    <div className="text-center">
+      <div className="flex justify-center mb-4">{icon}</div>
+      <div className="text-3xl font-bold text-foreground mb-2">{value}</div>
+      <div className="text-sm text-muted-foreground">{label}</div>
     </div>
   )
 }
