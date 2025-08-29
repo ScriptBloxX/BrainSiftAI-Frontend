@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -78,6 +78,21 @@ export default function Dashboard() {
     const [searchTerm, setSearchTerm] = useState("")
     const [visibilityFilter, setVisibilityFilter] = useState<"all" | "public" | "private">("all")
     const [sortBy, setSortBy] = useState<"newest" | "oldest" | "completions">("newest")
+    
+    // Infinite scroll states
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 10,
+        hasNextPage: false,
+        hasPreviousPage: false
+    })
+    const [isLoadingMore, setIsLoadingMore] = useState(false)
+    const [hasMoreExams, setHasMoreExams] = useState(true)
+    const [allLoadedExams, setAllLoadedExams] = useState<ExamType[]>([])
+    const observerRef = useRef<IntersectionObserver | null>(null)
+    const loadMoreRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -93,8 +108,19 @@ export default function Dashboard() {
 
             try {
                 setLoadingExams(true)
-                const response = await axiosInstance.get(`/api/exam/dashboard`)
-                setMyExams(response.data)
+                const response = await axiosInstance.get(`/api/exam/dashboard?page=1&limit=30`)
+                // Handle the new response format with data array and pagination
+                const examData = response.data.data || response.data
+                setMyExams(examData)
+                setAllLoadedExams(examData)
+                
+                // Handle pagination data
+                if (response.data.pagination) {
+                    setPagination(response.data.pagination)
+                    setHasMoreExams(response.data.pagination.hasNextPage)
+                } else {
+                    setHasMoreExams(false)
+                }
             } catch (error) {
                 console.error("Failed to fetch exams:", error)
             } finally {
@@ -132,6 +158,56 @@ export default function Dashboard() {
         }
     }, [isAuthenticated, user])
 
+    // Load more exams for infinite scroll
+    const loadMoreExams = useCallback(async () => {
+        if (isLoadingMore || !hasMoreExams || !isAuthenticated || !user) return
+        
+        try {
+            setIsLoadingMore(true)
+            const nextPage = pagination.currentPage + 1
+            const response = await axiosInstance.get(`/api/exam/dashboard?page=${nextPage}&limit=30`)
+            const examData = response.data.data || response.data
+            
+            // Append new exams to existing ones
+            setAllLoadedExams(prev => [...prev, ...examData])
+            setMyExams(prev => [...prev, ...examData])
+            
+            if (response.data.pagination) {
+                setPagination(response.data.pagination)
+                setHasMoreExams(response.data.pagination.hasNextPage)
+            } else {
+                setHasMoreExams(false)
+            }
+            
+        } catch (error) {
+            console.error("Error loading more exams:", error)
+        } finally {
+            setIsLoadingMore(false)
+        }
+    }, [isLoadingMore, hasMoreExams, pagination.currentPage, isAuthenticated, user])
+
+    // Setup Intersection Observer for infinite scroll
+    useEffect(() => {
+        if (loadMoreRef.current) {
+            observerRef.current = new IntersectionObserver(
+                (entries) => {
+                    if (entries[0].isIntersecting && hasMoreExams && !isLoadingMore && !loadingExams) {
+                        loadMoreExams()
+                    }
+                },
+                { threshold: 0.1 }
+            )
+            
+            observerRef.current.observe(loadMoreRef.current)
+        }
+        
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect()
+            }
+        }
+    }, [loadMoreExams, hasMoreExams, isLoadingMore, loadingExams])
+
     // If still loading or not authenticated, don't render the dashboard
     if (isLoading || !isAuthenticated) {
         return null
@@ -141,15 +217,24 @@ export default function Dashboard() {
         if (!isAuthenticated || !user) return
 
         try {
-            const response = await axiosInstance.get(`/api/exam/dashboard`)
-            setMyExams(response.data)
+            const response = await axiosInstance.get(`/api/exam/dashboard?page=1&limit=30`)
+            const examData = response.data.data || response.data
+            setMyExams(examData)
+            setAllLoadedExams(examData)
+            
+            if (response.data.pagination) {
+                setPagination(response.data.pagination)
+                setHasMoreExams(response.data.pagination.hasNextPage)
+            } else {
+                setHasMoreExams(false)
+            }
         } catch (error) {
             console.error("Failed to fetch exams:", error)
         }
     }
 
-    // Filter and sort exams
-    const filteredAndSortedExams = myExams
+    // Filter and sort exams (use allLoadedExams instead of myExams for filtering)
+    const filteredAndSortedExams = (allLoadedExams || [])
         .filter((exam) => {
             // Search filter
             const matchesSearch = exam.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -190,13 +275,13 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <StatsCard
                         title="Exams Created"
-                        value={myExams.length.toString()}
-                        description={`${myExams.filter((exam) => new Date(exam.createdAt).getMonth() === new Date().getMonth()).length} created this month`}
+                        value={(allLoadedExams || []).length.toString()}
+                        description={`${(allLoadedExams || []).filter((exam) => new Date(exam.createdAt).getMonth() === new Date().getMonth()).length} created this month`}
                         icon={<BookOpen className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
                         title="Total Completions"
-                        value={myExams.reduce((sum, exam) => sum + exam.completions, 0).toString()}
+                        value={(allLoadedExams || []).reduce((sum, exam) => sum + exam.completions, 0).toString()}
                         description="Completions across all your exams"
                         icon={<FileUp className="h-5 w-5 text-muted-foreground" />}
                     />
@@ -259,8 +344,13 @@ export default function Dashboard() {
                             
                             {/* Results count */}
                             <div className="text-sm text-muted-foreground">
-                                Showing {filteredAndSortedExams.length} of {myExams.length} exams
+                                Showing {filteredAndSortedExams.length} of {(allLoadedExams || []).length} exams
                                 {searchTerm && ` for "${searchTerm}"`}
+                                {pagination.totalItems > (allLoadedExams || []).length && (
+                                    <span className="ml-1 text-xs">
+                                        ({pagination.totalItems} total available)
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -287,7 +377,7 @@ export default function Dashboard() {
                                 {filteredAndSortedExams.length === 0 ? (
                                     <Card className="col-span-1 md:col-span-2 lg:col-span-2">
                                         <CardContent className="flex flex-col items-center justify-center py-12">
-                                            {myExams.length === 0 ? (
+                                            {(allLoadedExams || []).length === 0 ? (
                                                 <>
                                                     <p className="text-muted-foreground mb-4">You haven't created any exams yet</p>
                                                     <Button asChild>
@@ -326,6 +416,18 @@ export default function Dashboard() {
                                             onUpdate={refreshExams}
                                         />
                                     ))
+                                )}
+                                
+                                {/* Infinite Scroll Loading Indicator for My Exams */}
+                                {hasMoreExams && (
+                                    <div ref={loadMoreRef} className="flex justify-center py-8">
+                                        {isLoadingMore && (
+                                            <div className="flex items-center space-x-2">
+                                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                                                <span className="text-muted-foreground">Loading more exams...</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         )}

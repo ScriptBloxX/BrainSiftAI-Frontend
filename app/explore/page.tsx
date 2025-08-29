@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -42,12 +42,26 @@ export default function Explore() {
     }[]>([]);
     const [loadingScreen, setLoadingScreen] = useState(true);
     const [popularTags, setPopularTags] = useState<string[]>([]);
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 10,
+        hasNextPage: false,
+        hasPreviousPage: false
+    });
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         const fetchExams = async () => {
             try {
-                const response = await axiosInstance.get(`/api/exam/explore`);
-                const formattedExams = response.data.map((exam: any) => ({
+                const response = await axiosInstance.get(`/api/exam/explore?page=1&limit=30`);
+                // Handle the new response format with data array and pagination
+                const examData = response.data.data || response.data; // Support both old and new format
+                const formattedExams = examData.map((exam: any) => ({
                     id: exam.id,
                     title: exam.title,
                     creator: exam.creator.username || "Unknown",
@@ -74,6 +88,15 @@ export default function Explore() {
                 setPopularTags(sortedTags);
                 setFilteredExams(formattedExams);
                 setPublicExams(formattedExams);
+                
+                // Handle pagination data
+                if (response.data.pagination) {
+                    setPagination(response.data.pagination);
+                    setHasMore(response.data.pagination.hasNextPage);
+                } else {
+                    setHasMore(false);
+                }
+                
                 setLoadingScreen(false);
             } catch (error) {
                 console.error("Error fetching exams:", error);
@@ -84,7 +107,7 @@ export default function Explore() {
         fetchExams();
     }, []);
 
-    // Filter exams based on selected filters
+    // Filter exams based on selected filters (works on currently loaded data)
     useEffect(() => {
         let filtered = [...publicExams]
 
@@ -186,6 +209,83 @@ export default function Explore() {
             setSelectedDateFilter(filter)
         }
     }
+
+    // Load more exams for infinite scroll
+    const loadMoreExams = useCallback(async () => {
+        if (isLoadingMore || !hasMore) return;
+        
+        try {
+            setIsLoadingMore(true);
+            const nextPage = pagination.currentPage + 1;
+            const response = await axiosInstance.get(`/api/exam/explore?page=${nextPage}&limit=30`);
+            const examData = response.data.data || response.data;
+            const newExams = examData.map((exam: any) => ({
+                id: exam.id,
+                title: exam.title,
+                creator: exam.creator.username || "Unknown",
+                questions: exam.questionsCount || 0,
+                completions: exam.completions || 0,
+                createdAt: exam.createdAt || new Date().toISOString(),
+                tags: exam.tags || [],
+            }));
+            
+            // Append new exams to existing ones
+            setPublicExams(prev => {
+                const updated = [...prev, ...newExams];
+                
+                // Update popular tags with all loaded exams
+                const tagCounts: { [key: string]: number } = {};
+                updated.forEach((exam: any) => {
+                    exam.tags.forEach((tag: string) => {
+                        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                    });
+                });
+                
+                const sortedTags = Object.entries(tagCounts)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10)
+                    .map(([tag]) => tag);
+                
+                setPopularTags(sortedTags);
+                return updated;
+            });
+            setFilteredExams(prev => [...prev, ...newExams]);
+            
+            if (response.data.pagination) {
+                setPagination(response.data.pagination);
+                setHasMore(response.data.pagination.hasNextPage);
+            } else {
+                setHasMore(false);
+            }
+            
+        } catch (error) {
+            console.error("Error loading more exams:", error);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    }, [isLoadingMore, hasMore, pagination.currentPage]);
+
+    // Setup Intersection Observer for infinite scroll
+    useEffect(() => {
+        if (loadMoreRef.current) {
+            observerRef.current = new IntersectionObserver(
+                (entries) => {
+                    if (entries[0].isIntersecting && hasMore && !isLoadingMore && !loadingScreen) {
+                        loadMoreExams();
+                    }
+                },
+                { threshold: 0.1 }
+            );
+            
+            observerRef.current.observe(loadMoreRef.current);
+        }
+        
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+        };
+    }, [loadMoreExams, hasMore, isLoadingMore, loadingScreen]);
 
     // Handle search input
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -354,6 +454,18 @@ export default function Explore() {
                         )}
                     </div>
                 </div>
+                
+                {/* Infinite Scroll Loading Indicator */}
+                {hasMore && (
+                    <div ref={loadMoreRef} className="flex justify-center py-8">
+                        {isLoadingMore && (
+                            <div className="flex items-center space-x-2">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                                <span className="text-muted-foreground">Loading more exams...</span>
+                            </div>
+                        )}
+                    </div>
+                )}
             </main>
 
             <Footer />
