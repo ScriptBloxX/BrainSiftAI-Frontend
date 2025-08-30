@@ -145,7 +145,7 @@ export default function Home() {
             <motion.div className="text-center mb-12" variants={fadeInUp}>
               <h2 className="text-2xl md:text-3xl font-bold mb-4">Join Our Growing Community</h2>
               <p className="text-muted-foreground">
-                Thousands of users trust BrainSiftAI for their exam creation needs
+                Trusted by countless learners and educators, BrainSiftAI crafts meticulously tailored exams from your content.
               </p>
             </motion.div>
             
