@@ -57,16 +57,6 @@ export default function Footer() {
                   Tutorials
                 </Link>
               </li>
-              <li className="mt-4">
-                <Link
-                  href="https://stats.uptimerobot.com/Ekv3b8E0x5"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  System Status
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -101,12 +91,25 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-
         <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} BrainSiftAI. All rights reserved.
           </p>
-          <div className="flex gap-4 mt-4 md:mt-0">
+          <div className="flex items-center gap-4 mt-4 md:mt-0">
+            <div className="flex items-center">
+              <span
+                className="inline-block mr-2 h-3 w-3 bg-green-500 rounded-full animate-pulse ring-2 ring-background"
+                aria-hidden="true"
+              />
+              <Link
+                href="https://stats.uptimerobot.com/Ekv3b8E0x5"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center"
+              >
+                System Status
+              </Link>
+            </div>
             <Link href="https://www.instagram.com/9hodev/" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors">
               Instagram
             </Link>
