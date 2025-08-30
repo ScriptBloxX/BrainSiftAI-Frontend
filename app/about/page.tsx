@@ -40,14 +40,14 @@ export default function AboutUs() {
           <div className="container mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-bold mb-6">Our Story</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              BrainSiftAI was founded in 2025 by a team of educators and AI specialists who recognized the challenges of
+              BrainSiftAI was founded in 2025 by a team of educators who recognized the challenges of
               creating effective assessments. We saw how much time teachers spent creating exams and how difficult it
               was to ensure they accurately measured student understanding.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
               Our solution combines cutting-edge AI technology with educational expertise to automatically generate
               relevant, high-quality exam questions from any content. What started as a simple tool has grown into a
-              comprehensive platform used by thousands of educators and students worldwide.
+              comprehensive platform used by many students worldwide.
             </p>
             <p className="text-lg text-muted-foreground">
               Today, we're proud to be at the forefront of educational technology, constantly innovating to make
@@ -164,7 +164,7 @@ export default function AboutUs() {
             <div className="bg-primary text-primary-foreground rounded-xl p-8 md:p-12 text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Join Us in Transforming Education</h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Experience the power of AI-assisted exam creation and join thousands of educators already using
+                Experience the power of AI-assisted exam creation and join many students already using
                 BrainSiftAI.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

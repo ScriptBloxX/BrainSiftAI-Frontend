@@ -136,7 +136,7 @@ export default function Features() {
             <div className="bg-primary text-primary-foreground rounded-xl p-8 md:p-12 text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Exams?</h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Join thousands of educators and students who are already using BrainSiftAI to create and take exams.
+                Join many students who are already using BrainSiftAI to create and take exams.
               </p>
               <Button asChild size="lg" variant="secondary">
                 <Link href="/signup">Get Started for Free</Link>
