@@ -29,7 +29,7 @@ export default function AboutUs() {
                 </Button>
               </div>
               <div className="rounded-lg overflow-hidden shadow-xl border border-border">
-                <img src="/placeholder.svg?height=500&width=600" alt="BrainSiftAI Team" className="w-full h-auto" />
+                <img src="/about/part1.gif" alt="BrainSiftAI Team" className="w-full h-auto" />
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@ export default function AboutUs() {
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold text-center mb-16">Meet Our Team</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 select-none">
               <TeamMember
                 name="Somchai Wantaeng"
                 role="CEO & Founder"
@@ -137,22 +137,16 @@ export default function AboutUs() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Testimonial
-                quote="BrainSiftAI has completely transformed how I create assessments. What used to take hours now takes minutes, and the quality of the questions is consistently excellent."
-                author="Bot 1"
-                role="1st year SIT student"
-                image="https://media.tenor.com/BLOZw5VmYA8AAAAM/brain.gif"
+                quote="ช่วยให้การทบทวนเนื้อหาการเรียนและเตรียมตัวสอบ เป็นไปได้อย่างมีประสิทธิภาพและย่นเวลาลงมากๆ"
+                author="Somchai W."
+                role="SIT student"
+                image="https://cdn-icons-png.flaticon.com/512/4123/4123757.png"
               />
               <Testimonial
-                quote="The AI-generated questions are remarkably good at testing conceptual understanding, not just memorization. It's helped me create more effective assessments that truly measure learning."
-                author="Bot 2"
-                role="1st year SIT student"
-                image="https://media.tenor.com/BLOZw5VmYA8AAAAM/brain.gif"
-              />
-              <Testimonial
-                quote="I use BrainSiftAI to study for my medical exams. Being able to generate practice questions from my notes and textbooks has significantly improved my retention and test performance."
-                author="Bot 3"
-                role="1st year SIT student"
-                image="https://media.tenor.com/BLOZw5VmYA8AAAAM/brain.gif"
+                quote="ใช้ทบทวนความรู้ก่อนสอบได้ดีมากๆ"
+                author="Satit A."
+                role="SIT student"
+                image="https://cdn-icons-png.flaticon.com/512/4123/4123757.png"
               />
             </div>
           </div>
@@ -217,7 +211,7 @@ function Testimonial({ quote, author, role, image }: { quote: string; author: st
     <Card>
       <CardContent className="pt-6">
         <div className="flex flex-col">
-          <p className="text-lg italic mb-6">"{quote}"</p>
+          <p className="text-lg mb-6">"{quote}"</p>
           <div className="flex items-center mt-auto">
             <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
               <img src={image || "/placeholder.svg"} alt={author} className="w-full h-full object-cover" />

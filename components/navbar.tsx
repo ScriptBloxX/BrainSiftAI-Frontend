@@ -64,6 +64,12 @@ export default function Navbar() {
               Explore
             </Link>
             <Link
+              href="/about"
+              className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/about") ? "text-primary" : "text-foreground/70"}`}
+            >
+              About
+            </Link>
+            <Link
               href="/pricing"
               className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/pricing") ? "text-primary" : "text-foreground/70"}`}
             >
@@ -148,6 +154,13 @@ export default function Navbar() {
               onClick={toggleMenu}
             >
               Explore
+            </Link>
+            <Link
+              href="/about"
+              className={`text-sm font-medium py-2 transition-colors hover:text-primary ${isActive("/about") ? "text-primary" : "text-foreground/70"}`}
+              onClick={toggleMenu}
+            >
+              About
             </Link>
             <Link
               href="/pricing"
